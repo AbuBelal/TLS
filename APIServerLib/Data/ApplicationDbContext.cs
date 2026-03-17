@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.Entities;
 using System;
@@ -75,6 +76,43 @@ namespace APIServerLib.Data
                 .HasOne(sc => sc.Student)
                 .WithMany(s => s.StdCenters)
                 .HasForeignKey(sc => sc.StudentId);
+
+
+            // بيانات ابتدائية للموظفين
+            modelBuilder.Entity<Employee>().HasData(
+                new Employee { Id = 1, Name = "أحمد", GenderId = 1, JobId = 1, OrgJobId = 1, SpecializationId = 1 },
+                new Employee { Id = 2, Name = "سارة", GenderId = 2, JobId = 2, OrgJobId = 2, SpecializationId = 2 }
+            );
+
+            // بيانات ابتدائية للطلاب
+            modelBuilder.Entity<Student>().HasData(
+                new Student { Id = 1, Name = "محمد", GenderId = 1, LevelId = 1 },
+                new Student { Id = 2, Name = "ليلى", GenderId = 2, LevelId = 2 }
+            );
+
+            // بيانات ابتدائية للمراكز
+            modelBuilder.Entity<Center>().HasData(
+                new Center { Id = 1, Name = "مركز الرياض" },
+                new Center { Id = 2, Name = "مركز جدة" }
+            );
+
+            // بيانات ابتدائية للربط بين الموظفين والمراكز
+            modelBuilder.Entity<EmpCenter>().HasData(
+                new EmpCenter { EmployeeId = 1, CenterId = 1 },
+                new EmpCenter { EmployeeId = 2, CenterId = 2 }
+            );
+
+            // بيانات ابتدائية للربط بين الطلاب والمراكز
+            modelBuilder.Entity<StdCenter>().HasData(
+                new StdCenter { StudentId = 1, CenterId = 1, FromDate =DateOnly.Parse("2024-01-01") },
+                new StdCenter { StudentId = 2, CenterId = 2, FromDate = DateOnly.Parse("2024-01-01") }
+            );
+
+            // بيانات ابتدائية للـ LookupValue
+            modelBuilder.Entity<LookupValue>().HasData(
+                new LookupValue { Id = 1, Name = "ذكر" },
+                new LookupValue { Id = 2, Name = "أنثى" }
+            );
         }
 
     }

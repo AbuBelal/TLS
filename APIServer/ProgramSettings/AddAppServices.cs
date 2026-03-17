@@ -1,7 +1,7 @@
 ﻿using APIServerLib.Repositories.Implemntations;
 using APIServerLib.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using SharedLib.Entities;
-using SharedLib.Repositories;
 
 
 namespace APIServerLib.ProgramSettings
@@ -17,6 +17,8 @@ namespace APIServerLib.ProgramSettings
             builder.Services.AddScoped<IEmpCenterRepository, EmpCenterRepository>();
             builder.Services.AddScoped<IStdCenterRepository, StdCenterRepository>();
             builder.Services.AddScoped<ILookupValueRepository, LookupValueRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            //builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 
             return builder;
         }

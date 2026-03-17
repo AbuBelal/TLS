@@ -1,0 +1,108 @@
+﻿@* @page "/admin/add-user" *@
+@attribute [Route(PagesUris.UsersPages.Add)]
+
+
+<div class="container mt-5" dir="rtl">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white p-3">
+            <h4 class="mb-0 text-center"><i class="bi bi-person-plus-fill"></i> إضافة مستخدم جديد للنظام</h4>
+        </div>
+        <div class="card-body p-4">
+            
+            @if (Errors.Any())
+            {
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach (var error in Errors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <EditForm Model="Input" OnValidSubmit="RegisterUserByAdmin" FormName="AdminAddUserForm">
+                <DataAnnotationsValidator />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <InputText @bind-Value="Input.Email" class="form-control" placeholder="example@domain.com" />
+                        <ValidationMessage For="() => Input.Email" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">اسم المستخدم</label>
+                        <InputText @bind-Value="Input.UserName" class="form-control" />
+                        <ValidationMessage For="() => Input.UserName" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">كلمة المرور المؤقتة</label>
+                        <InputText @bind-Value="Input.Password" type="password" class="form-control" />
+                        <ValidationMessage For="() => Input.Password" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">صلاحية المستخدم (Role)</label>
+                        <InputSelect @bind-Value="Input.Role" class="form-select">
+                            <option value="">-- اختر الصلاحية --</option>
+                            @foreach (var role in AvailableRoles)
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => Input.Role" class="text-danger" />
+                    </div>
+                </div>
+
+                <hr />
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary me-2" @onclick='() => NavManager.NavigateTo("/admin/users")'>إلغاء</button>
+                    <button type="submit" class="btn btn-success px-5" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-border spinner-border-sm"></span>
+                        }
+                        إضافة المستخدم
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isProcessing = false;
+    private List<string> Errors = new();
+    private List<string> AvailableRoles = new();
+
+    [SupplyParameterFromForm]
+    public AdminUserInputModel Input { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // جلب قائمة الأدوار (Roles) المتوفرة في النظام
+         AvailableRoles =await RolesApi.GetAll(); 
+    }
+
+    private async Task RegisterUserByAdmin()
+    {
+        isProcessing = true;
+        Errors.Clear();
+        var result = await UserApi.Insert(Input);
+        
+
+        if (result.Success)
+        {
+            NavManager.NavigateTo(PagesUris.UsersPages.Manage);
+        }
+        else
+        {
+            Errors.AddRange(result.Message);
+        }
+       isProcessing = false;
+    }
+
+   
+}

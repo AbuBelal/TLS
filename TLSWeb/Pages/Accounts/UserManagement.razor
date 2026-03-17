@@ -1,0 +1,97 @@
+﻿@* @page "/users" *@
+@attribute [Route(PagesUris.UsersPages.Manage)]
+
+<h3>إدارة المستخدمين</h3>
+
+@if (users == null)
+{
+    <p>جاري التحميل...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>اسم المستخدم</th>
+                <th>البريد الإلكتروني</th>
+                <th> اسم الموظف المرتبط</th>
+                <th>رقم الموظف المرتبط</th>
+                <th>الصلاحيات</th>
+                <th>خيارات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@user.Employee?.Name</td>
+                    <td>@user.Employee?.EmpId</td>
+                    <td>
+                        @if (user.Roles != null && user.Roles.Any())
+                        {
+                            @string.Join(", ", user.Roles)
+                        }
+                        else
+                        {
+                            <span>user</span>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @onclick="() => EditUser(user)">تعديل</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteUser(user.Id)">حذف</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<UserWithRoles?>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserApi.GetAllWithRoles();
+    }
+
+    private void EditUser(ApplicationUser user)
+    {
+        // افتح نافذة تعديل أو انتقل لصفحة التعديل
+        NavManager.NavigateTo($"{PagesUris.UsersPages.Edit}/{user.Id}");
+    }
+
+    private async Task DeleteUser(string userId)
+    {
+        // var parameters = new DialogParameters<MyMessageBox>
+        // {
+        //     { x => x.ContentText, "هل أنت متأكد من عملية الحذف ؟" },
+        //     { x => x.OKButtonText, "موافق" },
+        //     { x => x.CancelButtonText, "إلغاء" },
+        // };
+
+        // var options = new DialogOptions { CloseOnEscapeKey = true };
+        // var result = MudDialogService.ShowMessageBoxAsync();   //<MyMessageBox>("هل أنت متأكد ؟", parameters, options);
+
+        bool? result = await MudDialogService.ShowMessageBoxAsync(
+          "تحذير",
+          "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+          yesText: "حذف!",
+          cancelText: "إلغاء"
+           );
+        if (result==true)
+        {
+            var response = await UserApi.DeleteById(userId);
+            if (response.Success)
+            {
+                MudSnackbar.Add("تم حذف المستخدم بنجاح", Severity.Success);
+                users = await UserApi.GetAllWithRoles(); // تحديث القائمة بعد الحذف
+            }
+            else
+            {
+                MudSnackbar.Add("حدث خطأ أثناء حذف المستخدم", Severity.Error);
+            }
+        }
+    }
+}

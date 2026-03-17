@@ -1,0 +1,172 @@
+﻿@page "/login"
+
+@inject IAccountManagement AccountManagement
+@inject NavigationManager Navigation
+@* @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap'); *@
+<style>
+    /* استيراد خط عربي عصري من جوجل */
+
+    .arabic-login-container {
+        font-family: 'Cairo', sans-serif;
+        direction: rtl; /* ضبط الاتجاه من اليمين لليسار */
+        text-align: right;
+    }
+
+    .card-custom {
+        border-radius: 1.25rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border: none;
+    }
+
+    /* تحسين شكل الحقول */
+    .custom-input {
+        border-radius: 0.75rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding-right: 1.5rem; /* مسافة للنص العربي */
+    }
+    
+        .custom-input:focus {
+            background-color: #ffffff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+    /* ضبط الحقول العائمة (Floating Labels) لتناسب اللغة العربية */
+    .form-floating > label {
+        right: 0;
+        left: auto;
+        padding-right: 1.25rem;
+        transform-origin: top right;
+    }
+
+    /* تحسين شكل الزر */
+    .btn-custom {
+        border-radius: 0.75rem;
+        background: linear-gradient(45deg, #0d6efd, #0099ff);
+        border: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+        }
+    
+        .btn-custom:disabled {
+            background: #a5c8fd;
+            transform: none;
+            box-shadow: none;
+        }
+</style>
+
+<div class="col-12 col-md-6 col-lg-4 mx-auto arabic-login-container">
+    <div class="card card-custom mt-4">
+        <div class="card-body p-5">
+            <div class="text-center mb-5">
+                <h3 class="fw-bold fs-4 mb-2 text-primary">مرحباً بعودتك</h3>
+                <p class="text-muted">قم بتسجيل الدخول للوصول إلى حسابك</p>
+            </div>
+
+            <EditForm Model="Model" OnValidSubmit="Submit">
+                <DataAnnotationsValidator />
+
+                <div class="form-floating mb-4">
+                    <InputText @bind-Value="Model!.Email"
+                               type="email"
+                               class="form-control custom-input"
+                               id="email"
+                               placeholder="البريد الإلكتروني"
+                               dir="ltr" />
+                    <label for="email">البريد الإلكتروني</label>
+                    <ValidationMessage For="() => Model.Email" class="text-danger small mt-1" />
+                </div>
+
+                <div class="form-floating mb-4">
+                    <InputText @bind-Value="Model!.Password"
+                               type="password"
+                               class="form-control custom-input"
+                               id="password"
+                               placeholder="كلمة المرور"
+                               dir="ltr" />
+                    <label for="password">كلمة المرور</label>
+                    <ValidationMessage For="() => Model.Password" class="text-danger small mt-1" />
+                </div>
+
+                @if (IsNew)
+                {
+                    <div class="col-12 mb-4">
+                        <div class="alert alert-success rounded-3 d-flex align-items-center">
+                            <span>تم إنشاء الحساب بنجاح! يمكنك الدخول الآن.</span>
+                        </div>
+                    </div>
+                }
+
+                <div class="col-12 mb-4 @(errorList.Any() ? string.Empty : "d-none")">
+                    <div class="alert alert-danger rounded-3">
+                        <ul class="mb-0 pe-3">
+                            @foreach (var error in errorList)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-custom btn-lg w-100 fs-6 fw-bold py-3 mt-2" disabled="@loading">
+                    @if (loading)
+                    {
+                        <span>جاري تسجيل الدخول...</span>
+                    }
+                    else
+                    {
+                        <span>تسجيل الدخول</span>
+                    }
+                </button>
+            </EditForm>
+        </div>
+    </div>
+    
+   @*  <div class="text-center mt-4 mb-4">
+        <p class="text-muted">
+            ليس لديك حساب بعد؟
+            <NavLink href="/register" class="text-primary fw-bold text-decoration-none">سجل الآن</NavLink>
+        </p>
+    </div> *@
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private LoginModel? Model { get; set; }
+
+    [SupplyParameterFromQuery(Name = "IsNew")]
+    private bool IsNew { get; set; }
+
+    private string[] errorList = [];
+    private bool loading = false;
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private async Task Submit()
+    {
+        loading = true;
+        LoginModel loginModel = new()
+        {
+             Email= Model!.Email,
+            Password = Model.Password
+        };
+        var result = await AccountManagement.LoginAsync(Model!);
+        // var result = await UserApi.LogIn(loginModel);
+
+        if (result.Succeeded)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorList = result.ErrorList;
+        }
+
+        loading = false;
+    }
+}

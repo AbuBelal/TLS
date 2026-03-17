@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SharedLib.Entities
 {
@@ -38,6 +39,7 @@ namespace SharedLib.Entities
         public ICollection<EmpCenter> EmpCenters { get; set; } = new List<EmpCenter>();
         // سنفترض هنا أنك ستستخدم نفس الـ Id الخاص بالمستخدم
         // أو يمكنك إضافة حقل منفصل
+        //[JsonIgnore]
         public virtual ApplicationUser? User { get; set; }
 
     }

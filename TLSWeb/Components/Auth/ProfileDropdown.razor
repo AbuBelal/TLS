@@ -1,0 +1,58 @@
+﻿
+@* @inject IUserApi userApi *@
+
+<div class="dropdown">
+    @* الزر الذي يظهر في شريط التنقل *@
+    <div class="d-flex align-items-center" data-bs-toggle="dropdown" style="cursor:pointer;">
+        <div class="me-2 text-end d-none d-md-block">
+            <span class="d-block fw-bold" style="font-size: 0.9rem;">@UserName</span>
+            <small class="text-muted" style="font-size: 0.75rem;">@* @curUser.Roles *@</small>
+        </div>
+        @* صورة المستخدم أو أيقونة افتراضية *@
+        <img src="../images/profile/defaultprofileimg_sm.png" class="rounded-circle border" width="40" height="40" alt="Profile" />
+    </div>
+
+    @* قائمة الخيارات المنسدلة *@
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+        <li class="px-3 py-2 border-bottom">
+            <p class="mb-0 fw-bold">حسابي</p>
+            <small class="text-muted">@UserEmail</small>
+        </li>
+        <li><a class="dropdown-item mt-2" href="PagesUris.UserProfile"><i class="bi bi-person me-2"></i> Profile</a></li>
+        <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear me-2"></i> الإعدادت</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <button class="dropdown-item text-danger" @onclick="Logout">
+                <i class="bi bi-box-arrow-right me-2"></i> تسجيل الخروج
+            </button>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private string UserName { get; set; } = "Guest";
+    private string UserEmail { get; set; } = "guest@example.com";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // جلب بيانات المستخدم الحالية من نظام المصادقة
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+        {
+            UserName = user.Identity.Name!;
+            UserEmail = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
+        }
+    }
+
+    private async Task Logout()
+    {
+        var customAuthStateProvider = (CookieAuthenticationStateProvider)authenticationStateProvider;
+        // var logoutmodel = new UserSession();
+        // await customAuthStateProvider.UpdateAuthenticationState(logoutmodel);
+
+        await customAuthStateProvider.LogoutAsync();
+        NavManager.NavigateTo("/", forceLoad: true);
+    }
+}

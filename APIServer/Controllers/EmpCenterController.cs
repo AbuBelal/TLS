@@ -8,7 +8,7 @@ namespace APIServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class EmpCenterController : ControllerBase
     {
         private readonly IEmpCenterRepository _empCenterRepository;

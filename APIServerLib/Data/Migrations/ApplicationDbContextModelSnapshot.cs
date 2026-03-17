@@ -261,6 +261,28 @@ namespace APIServerLib.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Centers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Address = "",
+                            DaysOfWeek = "",
+                            Name = "مركز الرياض",
+                            OtherSpaces = 0,
+                            Rooms = 0,
+                            Tarpaulins = 0
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Address = "",
+                            DaysOfWeek = "",
+                            Name = "مركز جدة",
+                            OtherSpaces = 0,
+                            Rooms = 0,
+                            Tarpaulins = 0
+                        });
                 });
 
             modelBuilder.Entity("SharedLib.Entities.EmpCenter", b =>
@@ -285,6 +307,20 @@ namespace APIServerLib.Data.Migrations
                     b.HasIndex("CenterId");
 
                     b.ToTable("EmpCenters");
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeeId = 1L,
+                            CenterId = 1L,
+                            FromDate = new DateOnly(2026, 3, 2)
+                        },
+                        new
+                        {
+                            EmployeeId = 2L,
+                            CenterId = 2L,
+                            FromDate = new DateOnly(2026, 3, 2)
+                        });
                 });
 
             modelBuilder.Entity("SharedLib.Entities.Employee", b =>
@@ -348,6 +384,30 @@ namespace APIServerLib.Data.Migrations
                     b.HasIndex("SpecializationId");
 
                     b.ToTable("Employees");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CivilId = "",
+                            EmpId = "",
+                            GenderId = 1L,
+                            JobId = 1L,
+                            Name = "أحمد",
+                            OrgJobId = 1L,
+                            SpecializationId = 1L
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            CivilId = "",
+                            EmpId = "",
+                            GenderId = 2L,
+                            JobId = 2L,
+                            Name = "سارة",
+                            OrgJobId = 2L,
+                            SpecializationId = 2L
+                        });
                 });
 
             modelBuilder.Entity("SharedLib.Entities.LookupValue", b =>
@@ -378,6 +438,24 @@ namespace APIServerLib.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LookupValues");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            IsActive = true,
+                            Name = "ذكر",
+                            SortOrder = 0,
+                            ValueType = ""
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            IsActive = true,
+                            Name = "أنثى",
+                            SortOrder = 0,
+                            ValueType = ""
+                        });
                 });
 
             modelBuilder.Entity("SharedLib.Entities.StdCenter", b =>
@@ -402,6 +480,20 @@ namespace APIServerLib.Data.Migrations
                     b.HasIndex("CenterId");
 
                     b.ToTable("StdCenters");
+
+                    b.HasData(
+                        new
+                        {
+                            StudentId = 1L,
+                            CenterId = 1L,
+                            FromDate = new DateOnly(2024, 1, 1)
+                        },
+                        new
+                        {
+                            StudentId = 2L,
+                            CenterId = 2L,
+                            FromDate = new DateOnly(2024, 1, 1)
+                        });
                 });
 
             modelBuilder.Entity("SharedLib.Entities.Student", b =>
@@ -455,6 +547,26 @@ namespace APIServerLib.Data.Migrations
                     b.HasIndex("LevelId");
 
                     b.ToTable("Students");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CivilId = "",
+                            EnName = "",
+                            GenderId = 1L,
+                            LevelId = 1L,
+                            Name = "محمد"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            CivilId = "",
+                            EnName = "",
+                            GenderId = 2L,
+                            LevelId = 2L,
+                            Name = "ليلى"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

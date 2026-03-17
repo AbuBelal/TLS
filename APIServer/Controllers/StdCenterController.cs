@@ -8,7 +8,7 @@ namespace APIServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class StdCenterController : ControllerBase
     {
         private readonly IStdCenterRepository _stdCenterRepository;

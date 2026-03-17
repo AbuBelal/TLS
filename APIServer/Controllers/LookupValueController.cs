@@ -8,7 +8,7 @@ namespace APIServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class LookupValueController : ControllerBase
     {
         private readonly ILookupValueRepository _lookupValueRepository;
@@ -24,6 +24,11 @@ namespace APIServer.Controllers
         {
             var result = await _lookupValueRepository.GetAll();
             return Ok(result);
+        }
+        [HttpGet("type/{typeName}")]
+        public async Task<IActionResult> GetByType(string typeName)
+        {
+            return Ok(await _lookupValueRepository.GetByLookupType(typeName));
         }
 
         [HttpGet("{id}")]

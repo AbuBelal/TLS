@@ -1,0 +1,273 @@
+﻿
+@attribute [Route(PagesUris.UsersPages.Edit + "/{Id}")]
+
+@* @inject UserManager<IdentityUser> UserManager *@
+
+<PageTitle>إعدادات الحساب</PageTitle>
+
+<div class="container mt-4" dir="rtl">
+    <h2 class="mb-4">إعدادات الحساب</h2>
+
+    @if (!string.IsNullOrEmpty(StatusMessage))
+    {
+        <div class="alert alert-info">@StatusMessage</div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">تحديث البيانات الأساسية</div>
+                <div class="card-body">
+                    @if (InfoModel is not null)
+                    {
+                        <EditForm Model="InfoModel" OnValidSubmit="UpdateProfileAsync" FormName="UpdateProfileForm">
+                            <DataAnnotationsValidator />
+                            <div hidden>
+                                <InputText @bind-Value="InfoModel.Id" class="form-control" disbaled />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">الإيميل</label>
+                                <input class="form-control" value="@user?.Email" disbaled readonly />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">اسم المستخدم</label>
+                                <InputText @bind-Value="InfoModel.UserName" class="form-control"  />
+                                <ValidationMessage For="() => InfoModel.UserName" class="text-danger" />
+                            </div>
+
+                            
+
+                            <div class="mb-3">
+                                <label class="form-label">رقم الهاتف</label>
+                                <InputText @bind-Value="InfoModel.PhoneNumber" class="form-control"  />
+                                <ValidationMessage For="() => InfoModel.PhoneNumber" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">صلاحية المستخدم (Role)</label>
+                                <InputSelect @bind-Value="InfoModel.Role" class="form-select">
+                                    <option value="">-- اختر الصلاحية --</option>
+                                    @foreach (var role in AvailableRoles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => InfoModel.Role" class="text-danger" />
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-label">اسم الموظف</label>
+                                <InputText @bind-Value="InfoModel.EmpName" class="form-control" disabled />
+                                <ValidationMessage For="() => InfoModel.EmpName" class="text-danger" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">رقم الموظف</label>
+                                <InputText @bind-Value="InfoModel.EmpId" class="form-control" disabled />
+                                <ValidationMessage For="() => InfoModel.EmpId" class="text-danger" />
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100">حفظ التغييرات</button>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">تغيير كلمة المرور</div>
+                <div class="card-body">
+                    @if (PasswordModel is not null)
+                    {
+                        <EditForm Model="PasswordModel" OnValidSubmit="ChangePasswordAsync" FormName="ChangePasswordForm">
+                            <DataAnnotationsValidator />
+                            <p hidden>
+                                <InputText @bind-Value="ResetPasswordModel.UserId" class="form-control" />
+                            </p>
+                            <div class="mb-3">
+                                <label class="form-label">كلمة المرور الحالية</label>
+                                <InputText @bind-Value="PasswordModel.OldPassword" type="password" class="form-control" />
+                                <ValidationMessage For="() => PasswordModel.OldPassword" class="text-danger" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">كلمة المرور الجديدة</label>
+                                <InputText @bind-Value="PasswordModel.NewPassword" type="password" class="form-control" />
+                                <ValidationMessage For="() => PasswordModel.NewPassword" class="text-danger" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">تأكيد كلمة المرور الجديدة</label>
+                                <InputText @bind-Value="PasswordModel.ConfirmPassword" type="password" class="form-control" />
+                                <ValidationMessage For="() => PasswordModel.ConfirmPassword" class="text-danger" />
+                            </div>
+
+                            <button type="submit" class="btn btn-danger w-100">تحديث كلمة المرور</button>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+            <br />
+            <div class="card shadow-sm ">
+                <div class="card-header bg-warning text-dark">إعادة ضبط كلمة المرور</div>
+                <div class="card-body">
+                    @if (ResetPasswordModel is not null)
+                    {
+                        <EditForm Model="ResetPasswordModel" OnValidSubmit="ResetPasswordAsync" FormName="ResetPasswordForm">
+                            <DataAnnotationsValidator />
+                            <p hidden>
+                                <InputText @bind-Value="ResetPasswordModel.OldPassword" type="password" class="form-control" />
+                                <InputText @bind-Value="ResetPasswordModel.UserId"  class="form-control" />
+                            </p>
+                            <ValidationMessage For="() => ResetPasswordModel.OldPassword" class="text-danger" />
+                            <div class="mb-3">
+                                <label class="form-label">كلمة المرور الجديدة</label>
+                                <InputText @bind-Value="ResetPasswordModel.NewPassword" type="password" class="form-control" />
+                                <ValidationMessage For="() => ResetPasswordModel.NewPassword" class="text-danger" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">تأكيد كلمة المرور الجديدة</label>
+                                <InputText @bind-Value="ResetPasswordModel.ConfirmPassword" type="password" class="form-control" />
+                                <ValidationMessage For="() => ResetPasswordModel.ConfirmPassword" class="text-danger" />
+                            </div>
+
+                            <button type="submit" class="btn btn-danger w-100">إعادة ضبط كلمة المرور</button>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+
+            
+        <div class="col-md-6">
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private ApplicationUser? user;
+    private string? StatusMessage;
+    private List<string> AvailableRoles = new();
+
+    [SupplyParameterFromForm]
+    public ProfileInputModel InfoModel { get; set; }= new();
+
+    [SupplyParameterFromForm]
+    public PasswordInputModel PasswordModel { get; set; } = new();
+    public PasswordInputModel ResetPasswordModel { get; set; } = new() { OldPassword = "0000" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableRoles = await RolesApi.GetAll();
+
+        // var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        // var UserEmail = authState.User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
+        user = await UserApi.GetById(Id); //UserManager.GetUserAsync(authState.User);
+
+        if (user == null)
+        {
+            NavManager.NavigateTo(PagesUris.Auth.Login);
+            return;
+        }
+        PasswordModel.UserId = user.Id;
+        ResetPasswordModel.UserId = user.Id;
+        // تعبئة البيانات الحالية
+        InfoModel.PhoneNumber = user.PhoneNumber ??"";
+        InfoModel.Id = user.Id ??"";
+        InfoModel.Email = user.Email ??"";
+        InfoModel.UserName = user.UserName ??"";
+        // try
+        // {
+        //     InfoModel.Role = (await UserApi.GetUserRole(user.Id))?.FirstOrDefault() ?? "";
+        // }
+        // catch (ApiException ex)
+        // {
+        //     Console.WriteLine($"Error fetching user role: {ex.Message}");
+        //     InfoModel.Role = "";
+        // }
+        var userRoles = await UserApi.GetUserRole(user.Id);
+        InfoModel.Role = userRoles?.FirstOrDefault() ?? "";
+        InfoModel.EmpName = user.Employee?.Name??"";
+        InfoModel.EmpId = user.Employee?.EmpId??"";
+    }
+
+    private async Task UpdateProfileAsync()
+    {
+        if (InfoModel == null) return;
+
+        try 
+        {
+            var result = await UserApi.Update(InfoModel);
+            StatusMessage = result.Success ? "تم تحديث البيانات بنجاح ✅" : "حدث خطأ أثناء التحديث ❌";
+            MudSnackbar.Add(StatusMessage);
+            NavManager.NavigateTo(PagesUris.UsersPages.Manage);
+        }
+        catch (ApiException ex)
+        {
+            // هنا تجد تفاصيل الخطأ القادمة من السيرفر
+            var errorContent = await ex.GetContentAsAsync<Dictionary<string, string>>();
+            Console.WriteLine(ex.Content);
+        }
+
+    }
+
+    private async Task ChangePasswordAsync()
+    {
+        if (user == null) return;
+        PasswordModel.UserId = user.Id;
+        var result = await UserApi.ChangePassword(PasswordModel);
+
+        // var result = await UserManager.ChangePasswordAsync(user, PasswordModel.OldPassword, PasswordModel.NewPassword);
+
+        if (result.Success)
+        {
+            StatusMessage = "تم تغيير كلمة المرور بنجاح ✅";
+            PasswordModel = new(); // تصفير الحقول
+        }
+        else
+        {
+            StatusMessage = "خطأ: " + string.Join(", ", result.Message);
+        }
+
+        MudSnackbar.Add(StatusMessage);
+    }
+
+    private async Task ResetPasswordAsync()
+    {
+        if (user == null) return;
+        PasswordModel.UserId = user.Id;
+        try
+        {
+            var result = await UserApi.ResetPassword(ResetPasswordModel);
+
+            // var result = await UserManager.ChangePasswordAsync(user, PasswordModel.OldPassword, PasswordModel.NewPassword);
+
+            if (result.Success)
+            {
+                StatusMessage = "تم إعادة ضبط كلمة المرور بنجاح ✅";
+                ResetPasswordModel = new(); // تصفير الحقول
+            }
+            else
+            {
+                StatusMessage = "خطأ: " + string.Join(", ", result.Message);
+            }
+            MudSnackbar.Add(StatusMessage);
+        }
+        catch (ApiException ex)
+        {
+            // هنا تجد تفاصيل الخطأ القادمة من السيرفر
+            var errorContent = await ex.GetContentAsAsync<Dictionary<string, string>>();
+            Console.WriteLine(ex.Content);
+            StatusMessage = "خطأ: " + string.Join(", ", errorContent.Select(kv => $"{kv.Key}: {kv.Value}"));
+            MudSnackbar.Add(StatusMessage);
+        }
+    }
+}

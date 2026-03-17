@@ -1,0 +1,40 @@
+﻿@page "/"
+@using SharedLib.Entities
+
+
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+<button class="btn btn-primary" @onclick="LoadData">Load Data</button>
+@username
+
+
+
+Welcome to your new app.
+
+@code {
+
+    string username = "";
+    protected override async void OnInitialized()
+    {
+        // LoadData();
+    }
+
+    async void LoadData()
+    {
+        username = await UserService.GetCurrentUserProfileAsync().ContinueWith(t => t.Result.Email);
+    }
+
+    async void addRole()
+    {
+        // جلب بيانات المستخدم الحالية من نظام المصادقة
+        // var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+        // var UserEmail = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
+        // ApplicationUser u = new();
+        // u.Email = UserEmail;
+        // await UserApi.Update(u);
+    }
+}
+

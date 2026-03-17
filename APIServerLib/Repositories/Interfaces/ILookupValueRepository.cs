@@ -6,5 +6,6 @@ namespace APIServerLib.Repositories.Interfaces
     public interface ILookupValueRepository : IGenericInterface<LookupValue>
     {
         // أضف هنا أي دوال خاصة بـ LookupValue إذا لزم الأمر
+        Task<List<LookupValue>> GetByLookupType(string ValueType);
     }
 }

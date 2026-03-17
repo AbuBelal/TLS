@@ -2,4 +2,6 @@
   <Project Path="APIServer/APIServer.csproj" Id="30b956f3-c2d5-43f4-8a8c-f2af014d8ad9" />
   <Project Path="APIServerLib/APIServerLib.csproj" Id="912da53d-9ac2-4522-b390-8a98f2703cd0" />
   <Project Path="SharedLib/SharedLib.csproj" Id="c9f6b787-72ac-4af8-89a3-8f12eef4bab3" />
+  <Project Path="TLSClientSharedLib/TLSClientSharedLib.csproj" Id="58af4389-c3b5-497c-aa80-3974545b5b70" />
+  <Project Path="TLSWeb/TLSWeb.csproj" Id="937121b7-df52-499a-90f7-6c4810a17355" />
 </Solution>

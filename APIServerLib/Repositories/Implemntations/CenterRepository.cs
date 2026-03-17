@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SharedLib.Entities;
 using SharedLib.Responses;
 
-namespace SharedLib.Repositories
+namespace APIServerLib.Repositories.Implemntations
 {
     public class CenterRepository : ICenterRepository
     {

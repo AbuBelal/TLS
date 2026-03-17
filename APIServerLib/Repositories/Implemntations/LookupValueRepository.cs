@@ -49,5 +49,10 @@ namespace APIServerLib.Repositories.Implemntations
             await _context.SaveChangesAsync();
             return new GeneralResponse(true, "LookupValue deleted successfully.", id);
         }
+
+        public async Task<List<LookupValue>> GetByLookupType(string ValueType)
+        {
+            return await _context.LookupValues.Where(_=>_.ValueType == ValueType).ToListAsync();
+        }
     }
 }
