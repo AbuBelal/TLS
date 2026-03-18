@@ -69,7 +69,7 @@ namespace APIServerLib.Repositories.Implemntations
         {
            
             return string.IsNullOrEmpty(Email) ? null : await _context.Users
-                .Include(u => u.Employee)
+                .Include(u => u.Employee).ThenInclude(x => x.EmpCenters).ThenInclude(x => x.Center)
                 .Where(u => u.Email == Email)
                 .FirstOrDefaultAsync();
         }
@@ -77,7 +77,7 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<UserProfileDto?> GetUserProfileAsync(string userId)
         {
             return await _context.Users
-                .Include(u => u.Employee)
+                .Include(u => u.Employee).ThenInclude(x=>x.EmpCenters).ThenInclude(x=>x.Center)
                 .Where(u => u.Id == userId)
                 .Select(u => new UserProfileDto
                 {
@@ -85,6 +85,8 @@ namespace APIServerLib.Repositories.Implemntations
                     Email = u.Email!,
                     EmployeeId = u.EmployeeId,
                     EmployeeName = u.Employee != null ? u.Employee.Name : "N/A",
+                    CenterId = u.Employee.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().CenterId,
+                    CenterName = u.Employee.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name
                 })
                 .FirstOrDefaultAsync();
         }

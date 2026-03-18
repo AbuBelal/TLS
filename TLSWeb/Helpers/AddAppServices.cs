@@ -47,6 +47,12 @@ namespace TLSWeb.Helpers
                     c.BaseAddress = new Uri(ApiUrls.BaseUrl);
                 }).AddHttpMessageHandler<CookieHandler>();
 
+            builder.Services.AddRefitClient<IStudentApi>()
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+                }).AddHttpMessageHandler<CookieHandler>();
+
             builder.Services.AddRefitClient<IAccountApi>()
                .ConfigureHttpClient(c =>
                {

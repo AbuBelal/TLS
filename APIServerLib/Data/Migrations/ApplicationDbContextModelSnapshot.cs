@@ -238,6 +238,9 @@ namespace APIServerLib.Data.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CenterCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
 
@@ -313,13 +316,13 @@ namespace APIServerLib.Data.Migrations
                         {
                             EmployeeId = 1L,
                             CenterId = 1L,
-                            FromDate = new DateOnly(2026, 3, 2)
+                            FromDate = new DateOnly(2026, 3, 18)
                         },
                         new
                         {
                             EmployeeId = 2L,
                             CenterId = 2L,
-                            FromDate = new DateOnly(2026, 3, 2)
+                            FromDate = new DateOnly(2026, 3, 18)
                         });
                 });
 

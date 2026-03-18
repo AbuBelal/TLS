@@ -16,5 +16,6 @@ namespace SharedLib.DTOs
         public string? EmpId { get; set; }
        // public Employee? employee { get; set; }
         public string? Role { get; set; }
+
     }
 }

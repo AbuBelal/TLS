@@ -2,6 +2,64 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Quiet Green Theme */
+.top-row, .nav-scrollable {
+    background-color: #00af86;
+}
+
+.navbar-brand {
+    font-size: 1.1rem;
+    color: #ffffff;
+}
+
+/* ... (حافظ على تنسيقات .bi و .bi-xxxx الخاصة بالأيقونات كما هي) ... */
+
+.nav-item {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item ::deep a {
+        color: #ecf0f1;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+    }
+
+        .nav-item ::deep a.active {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .nav-item ::deep a:hover {
+            background-color: #219150;
+            color: white;
+        }
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        display: block;
+    }
+
+    .nav-scrollable {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+}
+
+
+
+
+/*.navbar-toggler {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 .top-row {
     min-height: 3.5rem;
     background-color: rgba(0,0,0,0.4);
@@ -70,14 +128,14 @@
         display: none;
     }
 
-    .collapse {
+    .collapse {*/
         /* Never collapse the sidebar for wide screens */
-        display: block;
+        /*display: block;
     }
 
-    .nav-scrollable {
+    .nav-scrollable {*/
         /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        /*height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
-}
+}*/

@@ -1,0 +1,69 @@
+﻿<div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+    <div class="card">
+        <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape @BKColor shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">@Icon</i>
+            </div>
+            <div class="text-start pt-1">
+                <p class="text-sm mb-0 text-capitalize">@Title</p>
+                <h4 class="mb-0">@Value</h4>
+            </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+            @* <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">+55% </span>من الأسبوع الماضي</p> *@
+        </div>
+    </div>
+</div>
+
+
+@* <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+        <div class="card-header p-3 pt-2">
+            <!-- الأيقونة: وضعت في جهة اليسار (end-0) مع هامش جهة اليمين (ms-3) -->
+            <div class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute end-0 ms-3">
+                <i class="material-icons opacity-10">@Icon</i>
+            </div>
+            <!-- النص: محاذاة لليمين (text-start) مع هامش جهة اليسار (me-5) لضمان عدم التداخل -->
+            <div class="text-start pt-1 me-5">
+                <p class="text-sm mb-0 text-capitalize">@Title</p>
+                <h4 class="mb-0">@Value</h4>
+            </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+            @* <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than lask week</p> 
+        </div>
+    </div>
+</div> *@
+
+
+
+@* //////////////////////////////////////// *@
+@* <div class="card text-white  mb-3 bg-gradient" style="background-color: @BKColor;">
+    <div class="card-header">@Title</div>
+    <div class="card-body">
+        <h5 class="card-title">@Value</h5>
+    </div>
+</div> *@
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public int Value { get; set; }
+    [Parameter] public string BKColor { get; set; } = "#3bbaa5";
+    [Parameter] public string Icon { get; set; } = "person";
+
+    override protected void OnParametersSet()
+    {
+        if (Value <= 0)
+        {
+            BKColor = "#ff0000";
+        }
+        else if (Value > 100)
+        {
+            BKColor = "#00ff00";
+        }
+
+        
+    }
+}

@@ -37,6 +37,9 @@ namespace TLSClientSharedLib.Helpers
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
+            //    /api/Employee/EmployeeCenterCount/{CenterId}
+            public const string EmployeesCenterCount = PriorUrl + "/EmployeeCenterCount/{id}";
+
         }
         public static class Student
         {
@@ -46,6 +49,8 @@ namespace TLSClientSharedLib.Helpers
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
+            //   /api/Student/StudentCenterCount/{CenterId})
+            public const string StudentsCenterCount = PriorUrl + "/StudentCenterCount/{id}";
         }
         public static class Center
         {

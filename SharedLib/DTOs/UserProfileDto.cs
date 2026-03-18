@@ -12,5 +12,7 @@ namespace SharedLib.DTOs
         public long? EmployeeId { get; set; }
         public string? EmployeeName { get; set; }
         public string? Role { get; set; }
+        public long? CenterId { get; set; }
+        public string? CenterName { get; set; }
     }
 }

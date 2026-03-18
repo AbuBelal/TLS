@@ -24,5 +24,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Delete(ApiUrls.Student.DeleteById)]
         Task<GeneralResponse> DeleteById(long id);
+
+        [Get(ApiUrls.Student.StudentsCenterCount)]
+        Task<int> GetStudentCountByCenterId(long id);
     }
 }

@@ -22,7 +22,9 @@ namespace APIServer.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public UserController(IUserRepository userRepository, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public UserController(IUserRepository userRepository, 
+            UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager)
         {
             _userRepository = userRepository;
             _userManager = userManager;
@@ -34,6 +36,7 @@ namespace APIServer.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var user = await _userManager.FindByIdAsync(userId);
+            var user1 =await _userRepository.GetUserByEmail(user.Email); //await _userManager.FindByIdAsync(userId);
             if(user == null) return NotFound("User not found");
 
             UserProfileDto profile = new UserProfileDto();
@@ -41,16 +44,15 @@ namespace APIServer.Controllers
             profile.Email = user.Email;
             profile.UserName = user.UserName;
             profile.UserId = user.Id;
-            profile.EmployeeId = user.EmployeeId;
-            profile.EmployeeName = user.Employee != null ? user.Employee.Name : null;
+            profile.EmployeeId = user1.EmployeeId;
+            profile.EmployeeName = user1.Employee.Name != null ? user.Employee.Name : null;
+            if (profile.EmployeeId is not null)
+            {
+                var Center =  user1.Employee?.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault();
+                profile.CenterId = Center?.CenterId;
+                profile.CenterName = Center?.Center.Name;
+            }
             return Ok(profile);
-
-            //if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
-            //var profile = await _userRepository.GetUserProfileAsync(userId);
-
-            //if (profile == null) return NotFound("User not found");
-
         }
 
         [HttpGet("logout")]

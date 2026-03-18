@@ -1,0 +1,41 @@
+﻿<div class="container mt-4">
+    <div class="row">
+        @if (!loading)
+        {
+            @* https://fonts.google.com/icons?selected=Material+Symbols+Outlined:group:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24&icon.color=%23e3e3e3&query=person *@
+            @* bg-gradient-dark
+            bg-gradient-primary
+            bg-gradient-success
+            bg-gradient-info *@
+
+            <DashboardCard Title="إجمالي الطلاب" Value="@studentCount" BKColor="bg-gradient-primary" Icon="group" />
+       
+            <DashboardCard Title="إجمالي الموظفين" Value="@employeeCount" BKColor="bg-gradient-info" Icon="person" />
+      
+            @* <div class="col-md-3">
+                <DashboardCard Title="إجمالي الموظفين" Value="@employeeCount" BKColor="#bfddf2" />
+            </div>
+            <div class="col-md-3">
+                <DashboardCard Title="إجمالي الموظفين" Value="@employeeCount" BKColor="#3bbaa5" />
+            </div> *@
+        }
+    </div>
+</div>
+
+@code {
+    private int studentCount = 0;
+    private int employeeCount = 0;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+
+        var profile = await UserApi.GetUserProfileAsync();
+        employeeCount = await EmployeeApi.GetEmployeesCountByCenterId(profile.CenterId ?? 0);
+        studentCount = await StudentApi.GetStudentCountByCenterId(profile.CenterId ?? 0);
+             
+        loading = false;
+
+    }
+}

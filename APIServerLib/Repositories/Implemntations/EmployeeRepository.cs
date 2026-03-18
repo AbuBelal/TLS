@@ -49,5 +49,11 @@ namespace APIServerLib.Repositories.Implemntations
             await _context.SaveChangesAsync();
             return new GeneralResponse  ( true, "Employee deleted successfully." );
         }
+
+        public async Task<int> GetCenterEmployeesCountAsync(long CenterId)
+        {
+           var count =await _context.Employees.Where(e => e.EmpCenters.OrderByDescending(x => x.FromDate).First().CenterId == CenterId).CountAsync();
+            return count;
+        }
     }
 }

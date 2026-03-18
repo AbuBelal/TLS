@@ -8,6 +8,7 @@ namespace SharedLib.Entities
 {
     public  class Center: BaseEntity
     {
+        public string? CenterCode { get; set; }
         public int? Rooms { get; set; } = 0;
         public int? Tarpaulins { get; set; } = 0;
         public int? OtherSpaces { get; set; } = 0;

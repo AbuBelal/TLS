@@ -49,5 +49,12 @@ namespace APIServerLib.Repositories.Implemntations
             await _context.SaveChangesAsync();
             return new GeneralResponse(true, "Student deleted successfully.", id);
         }
+
+        public async Task<int> GetCenterStudentsCountAsync(long CenterId)
+        {
+            //var count =await _context.Students.Where(s => s.StdCenters.Any(sc => sc.CenterId == CenteId && sc.ToDate == null)).CountAsync();
+            var count =await _context.Students.Where(s => s.StdCenters.OrderByDescending(x=>x.FromDate).First().CenterId== CenterId).CountAsync();
+            return count;
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace APIServerLib.Repositories.Interfaces
     public interface IEmployeeRepository : IGenericInterface<Employee>
     {
         // أضف هنا أي دوال خاصة بـ Employee إذا لزم الأمر
+        Task<int> GetCenterEmployeesCountAsync(long CenterId);
     }
 }

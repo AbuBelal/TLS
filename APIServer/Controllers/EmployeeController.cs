@@ -55,5 +55,12 @@ namespace APIServer.Controllers
             var response = await _employeeRepository.DeleteById(id);
             return Ok(response);
         }
+
+        [HttpGet("EmployeeCenterCount/{id}")]
+        public async Task<ActionResult<int>> GetEmployeeCountByCenterId(long id)
+        {
+            var result = await _employeeRepository.GetCenterEmployeesCountAsync(id);
+            return Ok(result);
+        }
     }
 }
