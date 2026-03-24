@@ -48,9 +48,22 @@
     }
 
     .nav-scrollable {
-        height: calc(100vh - 3.5rem);
+        /*height: calc(100vh - 3.5rem);
+        overflow-y: auto;*/
+        flex: 1; /* يأخذ باقي المساحة المتاحة */
         overflow-y: auto;
+        overflow-x: hidden;
     }
+}
+
+aside.sidenav {
+    /*height: 100vh;*/
+    position: fixed;
+    /*top: 0;*/
+    /*right: 0;*/ /* لأنك تستخدم RTL */
+    overflow: hidden;
+    /*display: flex;*/
+    flex-direction: column;
 }
 
 

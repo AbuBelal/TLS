@@ -17,7 +17,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<List<Employee>> GetAll()
         {
-            return await _context.Employees.ToListAsync();
+            return await _context.Employees.AsNoTracking().Include(x=>x.EmpCenters).ThenInclude(x=>x.Center).ToListAsync();
         }
 
         public async Task<Employee> GetById(long id)

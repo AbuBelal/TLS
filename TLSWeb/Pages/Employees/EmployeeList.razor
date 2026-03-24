@@ -1,0 +1,46 @@
+﻿@* @page "/employees" *@
+@attribute [Route(PagesUris.EmployeesPages.Manage)]
+
+<h3>إدارة الموظفين</h3>
+<a class="btn btn-primary" href="@PagesUris.EmployeesPages.Add">إضافة موظف جديد</a>
+
+@if (employees == null)
+{
+    <p>جاري التحميل...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>رقم الموظف</th>
+                <th>الاسم</th>
+                <th>رقم الموظف</th>
+                <th>رقم الجوال</th>
+                <th>المركز</th>
+                <th>العمليات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emp in employees)
+            {
+                <tr>
+                    <td>@emp.EmpId</td>
+                    <td>@emp.Name</td>
+                    <td>@emp.EmpId</td>
+                    <td>@emp.Mobile</td>
+                    <td>@emp.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault()?.Center.Name</td>
+                    <td>
+                        <a class="btn btn-sm btn-info" href="@PagesUris.EmployeesPages.Edit/@emp.Id">تعديل</a>
+                        <a class="btn btn-sm btn-warning" href="">حذف</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Employee>? employees;
+    protected override async Task OnInitializedAsync() => employees = await EmployeeApi.GetAll();
+}

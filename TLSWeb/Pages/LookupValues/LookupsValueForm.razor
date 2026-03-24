@@ -1,0 +1,103 @@
+﻿@* @page "/lookups/add"
+@page "/lookups/edit/{Id:long}" *@
+@attribute [Route(PagesUris.LookupsValuePages.Add)]
+@attribute [Route(PagesUris.LookupsValuePages.Edit + "/{Id:long}")]
+
+<h3>@(Id == 0 ? "إضافة قيمة مرجعية" : "تعديل قيمة مرجعية")</h3>
+
+<EditForm Model="@lookup" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <!-- الاسم (موروث من BaseEntity) -->
+        <div class="col-md-6 mb-3">
+            <label>الاسم (مطلوب)</label>
+            <InputText class="form-control" @bind-Value="lookup.Name" />
+            <ValidationMessage For="@(() => lookup.Name)" />
+        </div>
+
+        <!-- النوع (ValueType) -->
+        <div class="col-md-6 mb-3">
+            @* <label>النوع (مثال: Gender, Job)</label>
+            <InputText class="form-control" @bind-Value="lookup.ValueType" /> *@
+
+                <label>النوع (مثال: Gender, Job)</label>
+                <InputSelect class="form-control" @bind-Value="lookup.ValueType">
+                    <option value="">-- اختر النوع --</option>
+                    @foreach (var item in Types)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </InputSelect>
+        </div>
+
+        <!-- الترتيب -->
+        <div class="col-md-6 mb-3">
+            <label>الترتيب</label>
+            <InputNumber class="form-control" @bind-Value="lookup.SortOrder" />
+        </div>
+
+        <!-- الحالة -->
+        <div class="col-md-6 mb-3">
+            <label class="form-check-label">
+                <InputCheckbox class="form-check-input" @bind-Value="lookup.IsActive" />
+                نشط (Is Active)
+            </label>
+        </div>
+
+        <!-- الملاحظات -->
+        <div class="col-md-12 mb-3">
+            <label>ملاحظات</label>
+            <InputTextArea class="form-control" @bind-Value="lookup.Comments" />
+        </div>
+
+    </div>
+
+    <button type="submit" class="btn btn-success">حفظ البيانات</button>
+    <a class="btn btn-secondary" href="@PagesUris.LookupsValuePages.Manage">إلغاء</a>
+</EditForm>
+
+
+
+@code {
+        
+    [Parameter] 
+    public long Id { get; set; }
+    private LookupValue lookup = new() { IsActive = true }; // افتراضي: نشط
+    List<(string Id, string Name)> Types = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LookupValueApi.GetAll().ContinueWith(task =>
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                var allLookups = task.Result;
+                Types = allLookups
+                    .Select(l => l.ValueType)
+                    .Distinct()
+                    .Select(vt => (Id: vt, Name: vt)) // نستخدم نفس القيمة كـ Id و Name
+                    .ToList();
+            }
+        });
+
+        if (Id != 0)
+        {
+            lookup = await LookupValueApi.GetById(Id);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id == 0)
+        {
+            await LookupValueApi.Insert(lookup);
+        }
+        else
+        {
+            await LookupValueApi.Update(lookup);
+        }
+        NavManager.NavigateTo(PagesUris.LookupsValuePages.Manage);
+    }
+}

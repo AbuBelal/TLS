@@ -16,6 +16,10 @@ namespace TLSClientSharedLib.Services.Apis
         [Get(ApiUrls.LookupValue.GetById)]
         Task<LookupValue> GetById(long id);
 
+
+        [Get(ApiUrls.LookupValue.GetByValueType)]
+        Task<List<LookupValue>> GetByValueType(string typeName);
+
         [Post(ApiUrls.LookupValue.Insert)]
         Task<GeneralResponse> Insert([Body] LookupValue lookupValue);
 

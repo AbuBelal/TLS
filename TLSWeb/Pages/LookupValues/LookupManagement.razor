@@ -1,0 +1,72 @@
+﻿@* @page "/lookups" *@
+@attribute [Route(PagesUris.LookupsValuePages.Manage)]
+
+<h3>إدارة القيم المرجعية</h3>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label>الفلترة حسب النوع:</label>
+        <select class="form-control" @onchange="OnTypeFilterChanged">
+            <option value="">-- عرض الكل --</option>
+            @foreach (var type in distinctTypes)
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>الاسم</th>
+            <th>النوع (Type)</th>
+            <th>الترتيب</th>
+            <th>نشط</th>
+            <th>الإجراءات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in filteredLookups)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.ValueType</td>
+                <td>@item.SortOrder</td>
+                <td>@(item.IsActive == true ? "نعم" : "لا")</td>
+                <td>
+                    <a class="btn btn-sm btn-info" href="@PagesUris.LookupsValuePages.Edit/@item.Id">تعديل</a>
+                    <button class="btn btn-sm btn-danger">حذف</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<LookupValue> allLookups = new();
+    private List<LookupValue> filteredLookups = new();
+    private List<string> distinctTypes = new();
+    private string selectedType = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        allLookups = await LookupValueApi.GetAll();
+        filteredLookups = allLookups;
+        // استخراج الأنواع الفريدة فقط
+        distinctTypes = allLookups.Select(x => x.ValueType).Distinct().ToList();
+    }
+
+    private void OnTypeFilterChanged(ChangeEventArgs e)
+    {
+        selectedType = e.Value?.ToString() ?? "";
+        if (string.IsNullOrEmpty(selectedType))
+        {
+            filteredLookups = allLookups;
+        }
+        else
+        {
+            filteredLookups = allLookups.Where(x => x.ValueType == selectedType).ToList();
+        }
+    }
+}

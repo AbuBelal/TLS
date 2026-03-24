@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>إدارة الموظفين | المعمار الأكاديمي</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;family=Tajawal:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e0e3e5",
+              "surface": "#f8f9fb",
+              "primary": "#00658e",
+              "on-secondary-fixed-variant": "#005313",
+              "tertiary-fixed": "#ffdfa0",
+              "secondary": "#006e1c",
+              "on-surface": "#191c1e",
+              "on-secondary-fixed": "#002204",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#83cfff",
+              "error": "#ba1a1a",
+              "secondary-fixed-dim": "#78dc77",
+              "secondary-fixed": "#94f990",
+              "surface-container-highest": "#e0e3e5",
+              "outline": "#6e7881",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "tertiary": "#795900",
+              "surface-bright": "#f8f9fb",
+              "on-primary-fixed": "#001e2e",
+              "on-tertiary-fixed": "#261a00",
+              "background": "#f8f9fb",
+              "tertiary-fixed-dim": "#fbbc00",
+              "surface-tint": "#00658e",
+              "on-primary-container": "#003046",
+              "surface-dim": "#d8dadc",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#e6e8ea",
+              "surface-container": "#eceef0",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "inverse-surface": "#2d3133",
+              "on-tertiary-container": "#3b2a00",
+              "primary-fixed": "#c7e7ff",
+              "on-background": "#191c1e",
+              "primary-container": "#009edb",
+              "inverse-on-surface": "#eff1f3",
+              "on-primary-fixed-variant": "#004c6c",
+              "outline-variant": "#bec8d1",
+              "secondary-container": "#91f78e",
+              "surface-container-lowest": "#ffffff",
+              "on-surface-variant": "#3e4850",
+              "tertiary-container": "#bc8c00",
+              "on-secondary-container": "#00731e",
+              "inverse-primary": "#83cfff",
+              "surface-container-low": "#f2f4f6",
+              "on-tertiary-fixed-variant": "#5c4300"
+            },
+            fontFamily: {
+              "headline": ["Tajawal", "sans-serif"],
+              "body": ["IBM Plex Sans Arabic", "sans-serif"],
+              "label": ["IBM Plex Sans Arabic", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .tonal-layering {
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body antialiased overflow-x-hidden">
+<!-- SideNavBar (Authority: Shared Components JSON) -->
+<aside class="bg-[#009EDB] dark:bg-sky-900 font-['IBM_Plex_Sans_Arabic'] text-sm font-medium leading-relaxed h-screen w-64 fixed right-0 top-0 z-40 border-l border-white/10 shadow-2xl shadow-sky-900/20 flex flex-col h-full py-6 rtl">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl">school</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-white tracking-tight">المعمار الأكاديمي</h1>
+<p class="text-white/60 text-[10px] leading-tight">نظام إدارة المدارس</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>لوحة القيادة</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">school</span>
+<span>الطلاب</span>
+</a>
+<a class="flex items-center gap-3 bg-white/15 text-white rounded-full px-4 py-2 mx-2 mb-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+<span>الموظفون</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>الجدول الزمني</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>التقارير</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>الإعدادات</span>
+</a>
+</nav>
+<div class="mt-auto px-4 border-t border-white/10 pt-4">
+<button class="w-full bg-white/20 hover:bg-white/30 text-white py-3 rounded-xl mb-4 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span>
+<span>إضافة سجل جديد</span>
+</button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>المساعدة</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>تسجيل الخروج</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="mr-64 min-h-screen bg-white transition-all duration-300">
+<!-- TopNavBar (Authority: Shared Components JSON) -->
+<header class="fixed top-0 left-0 right-64 h-16 z-30 bg-white/80 backdrop-blur-xl flex items-center justify-between px-8 w-full rtl no-line-rule bg-slate-50/50">
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">search</span>
+<input class="pr-10 pl-4 py-2 bg-surface-container-low border-none rounded-full w-80 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body" placeholder="بحث عن موظف..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-slate-50 rounded-lg transition-all text-[#00658e]">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-slate-50 rounded-lg transition-all text-slate-500">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 hover:bg-slate-50 rounded-lg transition-all text-slate-500">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-left">
+<p class="text-sm font-bold text-on-surface font-headline leading-none">أحمد المرزوقي</p>
+<p class="text-[10px] text-on-surface-variant font-body mt-1">مدير النظام</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary-fixed" data-alt="User profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzJqxk8knN-i7HX5ETRDTQ5NgGfHa1gkQ1jqa90d1QYNcJ1nw3XbbPHai3M0IKELciOfp7XEeBY5pWe_oxVbUZLRzWjWC2nhODCXlWWMB3pH-pAlKIHgIy6b-ql765w1aqYvaPCTwxmg66UTa9YUZNMdR5o8cIH2Rb1FONnnX5nXKY_8dkns6OsZ_fvC7TMc0WZPu2__4vxCI_KCC1fKWhZxtnR0KfN9i82wjlcDNLtDqfJl6zdnP4DCNepNjk79BRtn8svbaB9Z8"/>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="pt-24 pb-12 px-10">
+<!-- Headline Section -->
+<div class="flex items-center justify-between mb-10">
+<div>
+<h2 class="text-3xl font-extrabold text-on-surface font-headline tracking-tight">إدارة الموظفين والمعلمين</h2>
+<p class="text-on-surface-variant font-body mt-1">تتبع وإدارة طاقم العمل في المؤسسة التعليمية</p>
+</div>
+<button class="flex items-center gap-2 bg-gradient-to-br from-primary to-primary-container text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined">person_add</span>
+<span>إضافة موظف جديد</span>
+</button>
+</div>
+<!-- Dashboard Stats / Filters (Bento Style) -->
+<div class="grid grid-cols-12 gap-6 mb-10">
+<div class="col-span-8 bg-surface-container-low rounded-3xl p-6 flex items-center justify-between">
+<div class="flex gap-4">
+<button class="px-6 py-2.5 bg-white text-primary font-bold rounded-2xl shadow-sm border border-primary/10">الكل</button>
+<button class="px-6 py-2.5 text-on-surface-variant font-medium hover:bg-white/50 rounded-2xl transition-all">الإدارة</button>
+<button class="px-6 py-2.5 text-on-surface-variant font-medium hover:bg-white/50 rounded-2xl transition-all">هيئة التدريس</button>
+<button class="px-6 py-2.5 text-on-surface-variant font-medium hover:bg-white/50 rounded-2xl transition-all">الخدمات</button>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant bg-white/50 px-4 py-2 rounded-2xl">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+<span class="text-sm font-medium">تصفية متقدمة</span>
+</div>
+</div>
+<div class="col-span-4 bg-primary text-white rounded-3xl p-6 relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-white/80 text-sm font-medium mb-1">إجمالي الطاقم</p>
+<h3 class="text-4xl font-black font-headline tracking-tighter">142</h3>
+<p class="text-white/60 text-xs mt-2">+5 تم انضمامهم هذا الشهر</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-6 -left-6 text-9xl text-white/10 select-none">groups</span>
+</div>
+</div>
+<!-- Staff Table (The Editorial List) -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-none">
+<th class="px-8 py-5 font-bold text-on-surface-variant text-sm font-headline">الموظف</th>
+<th class="px-6 py-5 font-bold text-on-surface-variant text-sm font-headline">المنصب الوظيفي</th>
+<th class="px-6 py-5 font-bold text-on-surface-variant text-sm font-headline">القسم</th>
+<th class="px-6 py-5 font-bold text-on-surface-variant text-sm font-headline">تاريخ التعيين</th>
+<th class="px-6 py-5 font-bold text-on-surface-variant text-sm font-headline">الحالة</th>
+<th class="px-8 py-5 font-bold text-on-surface-variant text-sm font-headline text-center">الإجراءات</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container-low/50 transition-all">
+<td class="px-8 py-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-2xl object-cover shadow-sm" data-alt="Portrait of a professional staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM28xiUjDqRFJm6YzT2Y1DUT31dspmuVl0BrIFVvWTQlpQol_clveN_9Dm_qzH_SsY5b87NMAe_WdgRXYp-d_I3yqEphajSNE33XQT1Nn7edh-CiUob0P6p2ZoVVXT84kE-hY276c-1WIi0zteabQna-LpPN9miL-ItaLVKFsGZeu3g6ZU4YphEsRSwWYOmu1LIEp5kzo7XFmF2zFm2om68nOU7JbEBUAPaIFjfcfTYNfAm2MAehhxl1jtQJurq69ze_QYcPO6Ne4"/>
+<div>
+<p class="font-bold text-on-surface font-headline">د. يوسف القحطاني</p>
+<p class="text-xs text-on-surface-variant font-body">yousef.q@academy.edu</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-medium text-on-surface">مشرف أكاديمي</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span>
+                                    الإدارة
+                                </span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">12 سبتمبر 2018</td>
+<td class="px-6 py-4">
+<span class="inline-flex px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold">نشط</span>
+</td>
+<td class="px-8 py-4">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-all"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-2 hover:bg-error/10 text-error rounded-lg transition-all"><span class="material-symbols-outlined text-lg">delete</span></button>
+<button class="p-2 hover:bg-slate-100 text-slate-400 rounded-lg transition-all"><span class="material-symbols-outlined text-lg">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container-low/50 transition-all">
+<td class="px-8 py-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-2xl object-cover shadow-sm" data-alt="Portrait of a teacher" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq2Llz7V2Inl1CXBMZ4b3kOuxTgiGDpoPHKx5NWnfvcQEcFsF-jjaEwymf1BnDL4v2LClEplPH6dvgPySeAiJVrCEeswwnKOSsgrHFhL5GyXKH0i_gHEr-qbvrGW1v0L-6D6gf5qlpt8wvRuCxW6usmWclxsw4Li_UeIYxAg4pn4ahdaun1Ot1_qQA2AIB7R3hGnZJZAARyUoAQtAKH46u3qd8x1iT5MH7QB9xFatrpTrUboEkjHJUBZ-2OcKLr2gC5NPermbs1Mg"/>
+<div>
+<p class="font-bold text-on-surface font-headline">أ. نورة الشهري</p>
+<p class="text-xs text-on-surface-variant font-body">noura.s@academy.edu</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-medium text-on-surface">معلمة رياضيات</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                                    هيئة التدريس
+                                </span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">05 يناير 2021</td>
+<td class="px-6 py-4">
+<span class="inline-flex px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold">نشط</span>
+</td>
+<td class="px-8 py-4">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-all"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-2 hover:bg-error/10 text-error rounded-lg transition-all"><span class="material-symbols-outlined text-lg">delete</span></button>
+<button class="p-2 hover:bg-slate-100 text-slate-400 rounded-lg transition-all"><span class="material-symbols-outlined text-lg">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container-low/50 transition-all">
+<td class="px-8 py-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-2xl object-cover shadow-sm" data-alt="Male staff member portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjVDRVKa_G8CPhjA6BHboRwCCyLiCXSMjoKczolY6KvLqfgrjvDCd4lSHrhH-PpDCu1vZxZIEDcbdiyRzy5iSFdr3NlT6zy_q3dcbXjVI_MI7maf-k2Cj39hTAbdAKH6JNlWwmiFuqDVKxajba760TDf08MxK0DEIeOCFqcg5Sl5fb1Ca3P-sjiHQyuk-gZdVuEWkOHuTqMINX7CEFytAFhJvWdHpboFm1P7cVUC0lt1REXrkcTf1X2MhBFYi0-UIyOmJv_gvOc2g"/>
+<div>
+<p class="font-bold text-on-surface font-headline">م. خالد العمري</p>
+<p class="text-xs text-on-surface-variant font-body">khalid.a@academy.edu</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-medium text-on-surface">مدير تقني</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                    الخدمات
+                                </span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">22 نوفمبر 2019</td>
+<td class="px-6 py-4">
+<span class="inline-flex px-3 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold">إجازة</span>
+</td>
+<td class="px-8 py-4">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-all"><span class="material-symbols-outlined text-lg">edit</span></button>
+<button class="p-2 hover:bg-error/10 text-error rounded-lg transition-all"><span class="material-symbols-outlined text-lg">delete</span></button>
+<button class="p-2 hover:bg-slate-100 text-slate-400 rounded-lg transition-all"><span class="material-symbols-outlined text-lg">more_vert</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="px-8 py-6 bg-surface-container-low flex items-center justify-between border-t border-surface-container">
+<p class="text-sm text-on-surface-variant font-body">عرض 1 إلى 10 من أصل 142 موظف</p>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white text-on-surface transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-white font-bold shadow-md shadow-primary/20">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white text-on-surface transition-all">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white text-on-surface transition-all">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white text-on-surface transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Chip / FAB (Conditional Visibility) -->
+<div class="fixed bottom-10 left-10 z-50">
+<button class="p-4 bg-primary-container text-white rounded-full shadow-2xl hover:scale-110 active:scale-90 transition-all flex items-center justify-center group">
+<span class="material-symbols-outlined text-3xl">mail</span>
+<span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap px-0 group-hover:px-2 text-sm font-bold">مراسلة الطاقم</span>
+</button>
+</div>
+</body></html>

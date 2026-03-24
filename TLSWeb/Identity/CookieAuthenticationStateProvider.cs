@@ -74,6 +74,7 @@ public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFact
     {
         try
         {
+            //?useCookies=true
             var result = await _httpClient.PostAsJsonAsync("login?useCookies=true", new
             {
                 credentials.Email,

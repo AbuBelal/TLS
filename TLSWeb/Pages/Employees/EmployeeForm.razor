@@ -1,0 +1,118 @@
+﻿@* @page "/employees/add"
+@page "/employees/edit/{Id:long}" *@
+
+@attribute [Route(PagesUris.EmployeesPages.Edit+"/{Id:long}")]
+@attribute [Route(PagesUris.EmployeesPages.Add)]
+
+
+<h3>@(Id == 0 ? "إضافة موظف جديد" : "تعديل بيانات الموظف")</h3>
+
+<EditForm Model="@employee" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <!-- البيانات الأساسية -->
+        <div class="col-md-6 mb-3">
+            <label>الاسم (مطلوب)</label>
+            <InputText class="form-control" @bind-Value="employee.Name" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>الرقم المدني (مطلوب)</label>
+            <InputText class="form-control" @bind-Value="employee.CivilId" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>رقم الموظف (مطلوب)</label>
+            <InputText class="form-control" @bind-Value="employee.EmpId" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>تاريخ الميلاد</label>
+            <InputDate class="form-control" @bind-Value="employee.BirthDate" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>الجوال</label>
+            <InputText class="form-control" @bind-Value="employee.Mobile" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>العنوان</label>
+            <InputText class="form-control" @bind-Value="employee.Address" />
+        </div>
+
+        <!-- البيانات الوظيفية (القوائم المنسدلة) -->
+        <div class="col-md-6 mb-3">
+            <label>الجنس</label>
+            <InputSelect class="form-control" @bind-Value="employee.GenderId">
+                <option value="">-- اختر الجنس --</option>
+                @foreach (var item in genders)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>المسمى الوظيفي</label>
+            <InputSelect class="form-control" @bind-Value="employee.JobId">
+                <option value="">-- اختر الوظيفة --</option>
+                @foreach (var item in jobs)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>المسمى الوظيفي الأصلي</label>
+            <InputSelect class="form-control" @bind-Value="employee.OrgJobId">
+                <option value="">-- اختر الوظيفة الأصلية --</option>
+                @foreach (var item in jobs)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>المدرسة الأصلية</label>
+            <InputText class="form-control" @bind-Value="employee.OrgSchool" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>التخصص</label>
+            <InputSelect class="form-control" @bind-Value="employee.SpecializationId">
+                <option value="">-- اختر التخصص --</option>
+                @foreach (var item in specs)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">حفظ البيانات</button>
+    <a class="btn btn-secondary" href="/employees">إلغاء</a>
+</EditForm>
+
+@code {
+    [Parameter] public long Id { get; set; }
+    private Employee employee = new();
+
+    // قوائم الـ Lookups
+    private List<LookupValue> genders = new();
+    private List<LookupValue> jobs = new();
+    private List<LookupValue> specs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // جلب البيانات للقوائم المنسدلة (يجب التأكد من أسماء الـ Types في API)
+        genders = await LookupValueApi.GetByValueType("Gender");
+        jobs = await LookupValueApi.GetByValueType("Job");
+        specs = await LookupValueApi.GetByValueType("Specialization");
+
+        if (Id != 0) employee = await EmployeeApi.GetById(Id);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id == 0) await EmployeeApi.Insert(employee);
+        else await EmployeeApi.Update(employee);
+
+        NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
+    }
+}

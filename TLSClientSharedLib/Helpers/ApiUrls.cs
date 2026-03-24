@@ -7,7 +7,13 @@ namespace TLSClientSharedLib.Helpers
 {
     public static class ApiUrls
     {
-        public const string BaseUrl = "https://localhost:7075";
+        //public const string BaseUrl = "https://manapi.runasp.net/";    // "https://localhost:7075";
+
+        #if DEBUG
+                public const string BaseUrl = "https://localhost:7075";
+        #else
+                public const string BaseUrl = "https://manapi.runasp.net/";
+        #endif
         public static class Auth
         {
                 //post ///register
@@ -83,9 +89,12 @@ namespace TLSClientSharedLib.Helpers
         }
         public static class LookupValue
         {
+            /// <summary>
+            ///    /api/LookupValue/type/{typeName}
+            /// </summary>
             public const string PriorUrl = "/api/LookupValue";
             public const string GetAll = PriorUrl;
-            public const string GetByValueType = PriorUrl+"/{TypeName}";
+            public const string GetByValueType = PriorUrl+"/type/{TypeName}";
             public const string GetById = PriorUrl + "/{id}";
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;

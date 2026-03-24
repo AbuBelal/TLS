@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>إدارة المدارس والفروع | المعمار الأكاديمي</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;family=Tajawal:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e0e3e5",
+              "surface": "#f8f9fb",
+              "primary": "#00658e",
+              "on-secondary-fixed-variant": "#005313",
+              "tertiary-fixed": "#ffdfa0",
+              "secondary": "#006e1c",
+              "on-surface": "#191c1e",
+              "on-secondary-fixed": "#002204",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#83cfff",
+              "error": "#ba1a1a",
+              "secondary-fixed-dim": "#78dc77",
+              "secondary-fixed": "#94f990",
+              "surface-container-highest": "#e0e3e5",
+              "outline": "#6e7881",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "tertiary": "#795900",
+              "surface-bright": "#f8f9fb",
+              "on-primary-fixed": "#001e2e",
+              "on-tertiary-fixed": "#261a00",
+              "background": "#f8f9fb",
+              "tertiary-fixed-dim": "#fbbc00",
+              "surface-tint": "#00658e",
+              "on-primary-container": "#003046",
+              "surface-dim": "#d8dadc",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#e6e8ea",
+              "surface-container": "#eceef0",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "inverse-surface": "#2d3133",
+              "on-tertiary-container": "#3b2a00",
+              "primary-fixed": "#c7e7ff",
+              "on-background": "#191c1e",
+              "primary-container": "#009edb",
+              "inverse-on-surface": "#eff1f3",
+              "on-primary-fixed-variant": "#004c6c",
+              "outline-variant": "#bec8d1",
+              "secondary-container": "#91f78e",
+              "surface-container-lowest": "#ffffff",
+              "on-surface-variant": "#3e4850",
+              "tertiary-container": "#bc8c00",
+              "on-secondary-container": "#00731e",
+              "inverse-primary": "#83cfff",
+              "surface-container-low": "#f2f4f6",
+              "on-tertiary-fixed-variant": "#5c4300"
+            },
+            fontFamily: {
+              "headline": ["Tajawal", "sans-serif"],
+              "body": ["IBM Plex Sans Arabic", "sans-serif"],
+              "label": ["IBM Plex Sans Arabic", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-layering {
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+        }
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<!-- SideNavBar (The Anchor) -->
+<aside class="h-screen w-64 fixed right-0 top-0 z-40 border-l border-white/10 bg-[#009EDB] dark:bg-sky-900 flex flex-col py-6 rtl shadow-2xl shadow-sky-900/20 font-['IBM_Plex_Sans_Arabic'] text-sm font-medium leading-relaxed">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">architecture</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-white tracking-tight leading-none">المعمار الأكاديمي</h1>
+<p class="text-white/70 text-[10px] mt-1">نظام إدارة المدارس</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>لوحة القيادة</span>
+</a>
+<a class="flex items-center gap-3 bg-white/15 text-white rounded-full px-4 py-2 mx-2 mb-1 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span>الطلاب</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span>الموظفون</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>الجدول الزمني</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>التقارير</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 mb-1 transition-colors hover:bg-white/10 hover:scale-[1.02] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>الإعدادات</span>
+</a>
+</nav>
+<div class="px-4 mt-auto pt-6 border-t border-white/10">
+<button class="w-full bg-white text-primary font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-fixed transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">add_circle</span>
+<span>إضافة سجل جديد</span>
+</button>
+<div class="mt-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-2 py-2 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>المساعدة</span>
+</a>
+<a class="flex items-center gap-3 text-white/70 hover:text-white px-2 py-2 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>تسجيل الخروج</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="mr-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 right-64 h-16 z-30 bg-white/80 backdrop-blur-xl flex items-center justify-between px-8 w-full rtl no-line-rule bg-slate-50/50">
+<div class="flex items-center gap-6">
+<div class="relative w-96 group">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pr-11 py-2 text-sm focus:ring-2 focus:ring-primary/20 font-['Tajawal']" placeholder="البحث في الفروع والطلاب..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-outline hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-3 hover:bg-surface-container p-1 pr-3 rounded-full transition-all cursor-pointer">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface leading-none">د. أحمد سلطان</p>
+<p class="text-[10px] text-outline mt-1">مدير عام النظام</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border-2 border-primary-fixed" data-alt="User profile portrait of a smiling middle aged man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMzU6TVQA-TVLHdEhMn9Jtz4lXJiwD7YmxVsiG1IXB-ThhP1FkyxV1exRVu6mweBRuVPBLp1gtLJHYAW_9HzT0qSceWhwVSRQB36TSjRd3ghh5nJe1bl6Qj7oQ2cLJiciYj2GpvtfEWz1Gukm1qrOzqAAoe2CbvPQKwAMAmF0HBg0KNacTcDBiGjrZXMhzwLMCYoqLpPp7Yp9g9mp9Am7opKP4BAo_3fh_E3IijcaR5QxBcKVIkiPq1JzF0MTNu1EUU0WwA_bussM"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="pt-24 px-10 pb-10">
+<!-- Header Section -->
+<div class="flex items-end justify-between mb-10">
+<div class="space-y-2">
+<nav class="flex items-center gap-2 text-xs text-outline mb-2">
+<span>الرئيسية</span>
+<span class="material-symbols-outlined text-[14px]">chevron_left</span>
+<span class="text-primary font-medium">إدارة الفروع</span>
+</nav>
+<h2 class="text-3xl font-extrabold text-on-surface font-['Tajawal'] tracking-tight">إدارة المدارس والفروع</h2>
+<p class="text-on-surface-variant max-w-xl leading-relaxed">قم بإدارة فروع مؤسستك التعليمية، تتبع أعداد الطلاب، وتحديث معلومات الاتصال والبيانات الإدارية لكل موقع.</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined">add_business</span>
+<span>إضافة فرع جديد</span>
+</button>
+</div>
+<!-- Dashboard Stats Brief -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10">
+<p class="text-xs text-outline mb-1">إجمالي الفروع</p>
+<p class="text-3xl font-bold text-primary font-['Tajawal']">12</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10">
+<p class="text-xs text-outline mb-1">إجمالي الطلاب</p>
+<p class="text-3xl font-bold text-secondary font-['Tajawal']">4,850</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10">
+<p class="text-xs text-outline mb-1">الفروع النشطة</p>
+<p class="text-3xl font-bold text-tertiary font-['Tajawal']">10</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10">
+<p class="text-xs text-outline mb-1">السعة الإجمالية</p>
+<p class="text-3xl font-bold text-on-surface font-['Tajawal']">85%</p>
+</div>
+</div>
+<!-- Branches Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Branch Card 1 -->
+<div class="group bg-surface-container-lowest rounded-[2rem] p-8 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
+<div class="absolute top-0 left-0 w-24 h-24 bg-primary/5 rounded-br-[4rem] -translate-x-6 -translate-y-6"></div>
+<div class="flex justify-between items-start relative z-10 mb-6">
+<div class="w-14 h-14 bg-primary-fixed rounded-2xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">location_city</span>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2 font-['Tajawal']">فرع الرياض الرئيسي</h3>
+<div class="flex items-center gap-2 text-outline text-sm mb-6">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span>حي النخيل، طريق الملك فهد</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between text-sm p-4 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">groups</span>
+<span class="text-on-surface-variant">عدد الطلاب</span>
+</div>
+<span class="font-bold text-on-surface">1,240 طالب</span>
+</div>
+<div class="flex items-center justify-between text-sm p-4 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">call</span>
+<span class="text-on-surface-variant">رقم التواصل</span>
+</div>
+<span class="font-bold text-on-surface" dir="ltr">+966 11 456 7890</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+<div class="flex -space-x-2 space-x-reverse">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Professional female educator headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfc-Rha_pt9QP2vBIdUHjPwRoy7wVtRC8aRtxLhSleHRLHhxPN1gNza3HI1yXJtX0IJPuc3MLDxWZnIHYlez9jG5Z80C4WMfkJFETAlH87uCjxcbPGgSL9MYj4rzphg954J0KxmkK3Lx8Nkhd9XCM6zcCa5tBw0tYsqwju85e25ZEWog_781DrleJq7Lh6qqo_cb4AfK-jmDrV-nxxhsaHJfIC_LHvinGMuH8GrgtiY-fc_YxiYZ_XhtL4d9X6nECsDf1HcK966U0"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Young male student headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrqqZ9SfrulYxZP8aLUZQpCg6nEH8J3vClkLCmoXZMw296jY8oRvzvziRYikBASU46L5UrDQK08u4PIFP5SUOVyNmJIt7IEIR3KcUohHFar-0pKTaPH6IwBOr3BDgCQMsB8QD2-3EnQzA_eri00_rvcazlqEN5FIbMY-FpjKRpz4jy5MdnfRwGQjA8lOx2eDSL5gyGUYa01CB5KUO4_dPjWrRdsHc7bx3r7GOK0kPniJhZlpANWPtAgTh4aUuhkiUvpuCVWUISLaU"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Middle aged teacher professional headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZqphqU1QFUXkhGd8mIqG--dZmoeBcY8Svole0stiSseUnXmqTeJA1_b46KRUo8Aqx0h6KD7CN3zgrzVdiNIf6PS2ZCC8J63HgSEnia2lESm_1-bIwXLL87A33V0oQiT_z527clA_16A6UKo451HoP2R7qKxEEViwXQAGPI_6_8XDAk4fgUSbLDWG4I_m7sD3l0DRApNdCvkBX_lxAoQsvyHyrFw1S0eK2T5XoKRTKRNap1vnJ3onyVtMUr6X3EC4EgM9iAIxzrC0"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-outline">+12</div>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded-full">نشط الآن</span>
+</div>
+</div>
+<!-- Branch Card 2 -->
+<div class="group bg-surface-container-lowest rounded-[2rem] p-8 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
+<div class="absolute top-0 left-0 w-24 h-24 bg-tertiary/5 rounded-br-[4rem] -translate-x-6 -translate-y-6"></div>
+<div class="flex justify-between items-start relative z-10 mb-6">
+<div class="w-14 h-14 bg-tertiary-fixed rounded-2xl flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">corporate_fare</span>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2 font-['Tajawal']">فرع جدة - الكورنيش</h3>
+<div class="flex items-center gap-2 text-outline text-sm mb-6">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span>طريق الكورنيش، حي الشاطئ</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between text-sm p-4 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">groups</span>
+<span class="text-on-surface-variant">عدد الطلاب</span>
+</div>
+<span class="font-bold text-on-surface">850 طالب</span>
+</div>
+<div class="flex items-center justify-between text-sm p-4 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">call</span>
+<span class="text-on-surface-variant">رقم التواصل</span>
+</div>
+<span class="font-bold text-on-surface" dir="ltr">+966 12 654 3210</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+<div class="flex -space-x-2 space-x-reverse">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Academic administrator profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_9m2nfqIbp48m50_vXITI85t9cfEtvbgpXXt9RR8uuN6W-WOsy8ONCdRJ0HRHxeiWgIy1aoaedR6r2XelRX8Qq5H6iNDp1oh656VmQQaiPbPfka6tbSFsbfcKQNrFr7R3GPNX1k9-wGw887viqHmXhq-tdckeyCqSj2Jlzv3VocTtFqMwWek-g3YLy1bkyzmY6GxySctA1tq--pUF4w0tgJrUk5gLK7li4ydi7-KrzgqITQ8_HUxa3xFgH5WWFRc94_s2oykIXZY"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Student ambassador portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUSbG-3w1rtcYk0aYWhlB8PvJY-MU_TInpkUkMFP6RR6-AGKUNaiCT_DIW4NePSGex92q9sH3E4ren4BFSWsoEbxM6Wnfj0U8Z7i4whXrV8nn-Fum6eBzOzZqF99Ld1RhIsdF37miPddZLzsEmk-77nlQyxLCb17iyeJD9UE-0U6K8-GGSe_E91lko-I78gi7wcOtwUDLYmWqHS0FivqPoV2FdkY8akMkooviHXg7zdB3l0vdEF-bIbRirgl3vjFX5XPtVg4jXVa4"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-outline">+8</div>
+</div>
+<span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container text-[11px] font-bold rounded-full">قيد التوسعة</span>
+</div>
+</div>
+<!-- Branch Card 3 -->
+<div class="group bg-surface-container-lowest rounded-[2rem] p-8 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
+<div class="absolute top-0 left-0 w-24 h-24 bg-secondary/5 rounded-br-[4rem] -translate-x-6 -translate-y-6"></div>
+<div class="flex justify-between items-start relative z-10 mb-6">
+<div class="w-14 h-14 bg-secondary-fixed rounded-2xl flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">domain</span>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2 font-['Tajawal']">فرع المنطقة الشرقية</h3>
+<div class="flex items-center gap-2 text-outline text-sm mb-6">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span>الدمام، حي الزهور</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between text-sm p-4 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">groups</span>
+<span class="text-on-surface-variant">عدد الطلاب</span>
+</div>
+<span class="font-bold text-on-surface">620 طالب</span>
+</div>
+<div class="flex items-center justify-between text-sm p-4 bg-surface-container-low rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">call</span>
+<span class="text-on-surface-variant">رقم التواصل</span>
+</div>
+<span class="font-bold text-on-surface" dir="ltr">+966 13 888 2222</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+<div class="flex -space-x-2 space-x-reverse">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Staff member profile image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUx3bY-ANTMwUeJeH3LVVNu9lV5YbxDBPDEsQMN-WeYtyRJmI-YVt2kcN975OSxT9bE3g-DD9IjIethnujouN-sxdjlYwCWju77bPKxsaRcvbnjC2d-6pYK9Li8PwvsuYsCJlKMbd5rYK39RWex6Y8G6-3ira8-7E4vhfVEcOJShJ63A9XqkZDV83kO_72a34FDptlNBUrmC6A-xRF4agKWIJFgVuwNB03FGNkV1I5_P1LAeCD2mFH-39hzkquZ3kaMQOEKTAFaWE"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Student profile image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-CVTkws3C1R9ZjZALj6mZhuQyxH_ccuyKT3253jeSVtHZPbdZDqdVuDdxstrC8niw9SIA-pF-0fAiSdMC6XTVSa5099hFfjAWudIdOJGNBE5fByAOWd2U5kMixnA1qIArjW2Q_cFZ7o2yRK6PRQJKKukIZ0I5ED6CYFgFeNYFJOhEPinQZgIVb83xQDeCZYUY66mhsl7yuJpq_0rdP0i2pdgKLhrK39FhI_ziu1O0BDMMPknOqTpASiZAtVA6zJODCSqfem62Khw"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-outline">+5</div>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded-full">مكتمل السعة</span>
+</div>
+</div>
+</div>
+<!-- Management Tools (Bento Style) -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="md:col-span-2 bg-primary-container/10 p-8 rounded-[2.5rem] flex items-center gap-8 border border-primary/10">
+<div class="flex-1 space-y-4">
+<h4 class="text-2xl font-bold text-primary-container font-['Tajawal'] text-primary">خريطة الفروع والطلاب</h4>
+<p class="text-sm text-on-primary-container/80 leading-relaxed">عرض توزيع الفروع جغرافياً وتتبع مؤشرات الأداء الحية لكل منطقة حسب الكثافة الطلابية.</p>
+<button class="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold mt-4 hover:shadow-lg hover:shadow-primary/30 transition-all">فتح الخريطة التفاعلية</button>
+</div>
+<div class="w-48 h-32 bg-white rounded-3xl overflow-hidden shadow-inner border border-outline-variant/20">
+<img class="w-full h-full object-cover opacity-60 grayscale" data-alt="A stylized minimalist map of Saudi Arabia showing regions" data-location="Saudi Arabia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABIuH1iBYIEfqUc9P_aiegFwHqmYZNbcKwMyv-cp2SVKM2BnITkLNgy6faO9-CTlRBuv0PmVspb50239XV0J78EfcdPnT8VX3PSrGTl1niR9ZYG2ZcH_a8D3lNtlx3SgI_6teZydLVZQ1QFLZPfmEE3cp20dC7fnM4sisDUmvvp4AMob3Ke2LxbC1LsGcKAV9RJI95pVmcz65HxSJO-XCmlMYgh_fMYBLgDALSsHoqpuUPYemDFeTpgeWe0ETiBXH-N9-YY9Zq6-8"/>
+</div>
+</div>
+<div class="bg-white p-8 rounded-[2.5rem] border border-outline-variant/20 flex flex-col justify-center text-center">
+<div class="w-16 h-16 bg-error-container text-error rounded-full flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-3xl">report_problem</span>
+</div>
+<h4 class="font-bold text-on-surface mb-2 font-['Tajawal']">طلبات الصيانة</h4>
+<p class="text-xs text-outline mb-4">هناك 4 طلبات صيانة عاجلة من فروع المنطقة الوسطى.</p>
+<button class="text-primary font-bold text-sm border-b-2 border-primary/20 hover:border-primary transition-all self-center">مراجعة الطلبات</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -16,5 +16,20 @@
             public const string Add = PriorUrl+ "/Add";
             public const string Edit = PriorUrl+ "/Edit";
         }
+
+        public static class EmployeesPages
+        {
+            public const string PriorUrl = "Employees";
+            public const string Manage = PriorUrl + "/Manage";
+            public const string Add = PriorUrl + "/Add";
+            public const string Edit = PriorUrl + "/Edit";
+        }
+        public static class LookupsValuePages
+        {
+            public const string PriorUrl = "Lookups";
+            public const string Manage = PriorUrl + "/Manage";
+            public const string Add = PriorUrl + "/Add";
+            public const string Edit = PriorUrl + "/Edit";
+        }
     }
 }
