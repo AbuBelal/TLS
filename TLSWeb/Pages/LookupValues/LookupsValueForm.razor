@@ -1,4 +1,5 @@
-﻿@* @page "/lookups/add"
+﻿@using System.Reflection
+@* @page "/lookups/add"
 @page "/lookups/edit/{Id:long}" *@
 @attribute [Route(PagesUris.LookupsValuePages.Add)]
 @attribute [Route(PagesUris.LookupsValuePages.Edit + "/{Id:long}")]
@@ -25,9 +26,9 @@
                 <label>النوع (مثال: Gender, Job)</label>
                 <InputSelect class="form-control" @bind-Value="lookup.ValueType">
                     <option value="">-- اختر النوع --</option>
-                    @foreach (var item in Types)
+                @foreach (var item in lookupValues)
                     {
-                        <option value="@item.Id">@item.Name</option>
+                        <option value="@item">@item</option>
                     }
                 </InputSelect>
         </div>
@@ -61,14 +62,21 @@
 
 
 @code {
-        
+
     [Parameter] 
     public long Id { get; set; }
     private LookupValue lookup = new() { IsActive = true }; // افتراضي: نشط
+    private List<string> lookupValues = new();
     List<(string Id, string Name)> Types = new();
 
     protected override async Task OnInitializedAsync()
     {
+         lookupValues = typeof(LookupTypes)
+        .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+        .Where(f => f.IsLiteral && !f.IsInitOnly) // التأكد أنها const وليست readonly
+        .Select(f => f.Name)
+        .ToList();
+
         await LookupValueApi.GetAll().ContinueWith(task =>
         {
             if (task.IsCompletedSuccessfully)

@@ -52,6 +52,8 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<List<LookupValue>> GetByLookupType(string ValueType)
         {
+            if(string.IsNullOrEmpty(ValueType))
+                return new List<LookupValue>();
             return await _context.LookupValues.Where(_=>_.ValueType == ValueType).ToListAsync();
         }
     }

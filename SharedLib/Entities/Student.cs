@@ -8,11 +8,11 @@ namespace SharedLib.Entities
     public  class Student:BaseEntity
     {
         public string CivilId { get; set; } = string.Empty;
-        public string EnName { get; set; } = string.Empty;
+        public string? EnName { get; set; } = string.Empty;
         public string? Mobile { get; set; } 
         public DateOnly? BirthDate { get; set; }
-        public bool? IsUnrwa { get; set; }
-        public bool? IsSpecialNeeds { get; set; }
+        public bool IsUnrwa { get; set; }=false;
+        public bool IsSpecialNeeds { get; set; }=false;
         public string? SpecialNeeds { get; set; }
 
         //gender

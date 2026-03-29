@@ -22,7 +22,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<Employee> GetById(long id)
         {
-            return await _context.Employees.FindAsync(id);
+            return await _context.Employees.Where(x=> x.Id == id).Include(x=>x.EmpCenters).FirstOrDefaultAsync();
         }
 
         public async Task<GeneralResponse> Insert(Employee item)

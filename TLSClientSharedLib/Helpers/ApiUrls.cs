@@ -53,10 +53,12 @@ namespace TLSClientSharedLib.Helpers
             public const string GetAll = PriorUrl;
             public const string GetById = PriorUrl + "/{id}";
             public const string Insert = PriorUrl;
+            public const string AddWithCenter = PriorUrl+ "AddWithCenter";
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             //   /api/Student/StudentCenterCount/{CenterId})
             public const string StudentsCenterCount = PriorUrl + "/StudentCenterCount/{id}";
+            public const string paginated = PriorUrl + "/paginated";
         }
         public static class Center
         {

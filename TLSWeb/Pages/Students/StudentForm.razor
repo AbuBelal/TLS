@@ -1,0 +1,133 @@
+﻿@attribute [Route(PagesUris.StudentsPages.Add)]
+@attribute [Route(PagesUris.StudentsPages.Edit + "/{Id:long}")]
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">إضافة طالب جديد للمساحة التعليمية</h4>
+        </div>
+        <div class="card-body">
+            <EditForm Model="@student" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                
+                <div class="row g-3">
+                    @* الاسم بالعربي والانجليزي *@
+                    <div class="col-md-6">
+                        <label class="form-label">الاسم الكامل (بالعربي)</label>
+                        <InputText @bind-Value="student.Name" class="form-control" placeholder="أدخل الاسم رباعي" />
+                        <ValidationMessage For="@(() => student.Name)" class="text-danger" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">الاسم بالإنجليزية</label>
+                        <InputText @bind-Value="student.EnName" class="form-control" />
+                    </div>
+
+                    @* رقم الهوية والموبايل *@
+                    <div class="col-md-6">
+                        <label class="form-label">رقم الهوية</label>
+                        <InputText @bind-Value="student.CivilId" class="form-control" />
+                        <ValidationMessage For="@(() => student.CivilId)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">رقم الموبايل</label>
+                        <InputText @bind-Value="student.Mobile" class="form-control" placeholder="059XXXXXXX" />
+                    </div>
+
+                    @* المنسدلات (Lookups) *@
+                    <div class="col-md-4">
+                        <label class="form-label">الجنس</label>
+                        <InputSelect @bind-Value="student.GenderId" class="form-select">
+                            <option value="">-- اختر الجنس --</option>
+                            @foreach (var g in genders)
+                            {
+                                <option value="@g.Id">@g.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => student.GenderId)" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">المستوى الدراسي</label>
+                        <InputSelect @bind-Value="student.LevelId" class="form-select">
+                            <option value="">-- اختر المستوى --</option>
+                            @foreach (var l in levels)
+                            {
+                                <option value="@l.Id">@l.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">تاريخ الميلاد</label>
+                        <InputDate TValue="DateOnly?" @bind-Value="student.BirthDate" class="form-control" />
+                    </div>
+
+                    @* خيارات إضافية *@
+                    <div class="col-md-12 mt-3">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="IsUnrwa">هل من طلاب الأنروا؟</label>
+                            <InputCheckbox @bind-Value="student.IsUnrwa" class="form-check-input" id="IsUnrwa" />
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="special">ذوي احتياجات خاصة؟</label>
+                            <InputCheckbox @bind-Value="student.IsSpecialNeeds" class="form-check-input" id="special" />
+                        </div>
+                    </div>
+
+                    @* حقل مشروط للاحتياجات الخاصة *@
+                    @if (student.IsSpecialNeeds == true)
+                    {
+                        <div class="col-md-12 animate__animated animate__fadeIn">
+                            <label class="form-label">تفاصيل الاحتياجات الخاصة</label>
+                            <InputTextArea @bind-Value="student.SpecialNeeds" class="form-control" rows="2" />
+                        </div>
+                    }
+
+                    <div class="col-12 mt-4 text-end">
+                        <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">إلغاء</button>
+                        <button type="submit" class="btn btn-primary px-5">حفظ الطالب</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public long Id { get; set; }
+    private Student student = new();
+    private List<LookupValue> genders = new();
+    private List<LookupValue> levels = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0) student = await StudentApi.GetById(Id);
+        // جلب البيانات للمنسدلات من الـ API
+        genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
+        levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (Id != 0)
+        {
+            var response = await StudentApi.Update(student);
+            if (response.Success)
+            {
+                NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+            }
+            MudSnackbar.Add(response.Message, Severity.Success);
+        }
+        else
+        {
+            var response = await StudentApi.Insert(student);
+            if (response.Success)
+            {
+                NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+            }
+            MudSnackbar.Add(response.Message, Severity.Error);
+        }
+    }
+
+    private void Cancel() => NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+}

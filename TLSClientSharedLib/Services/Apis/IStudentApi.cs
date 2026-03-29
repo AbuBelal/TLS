@@ -1,5 +1,6 @@
 // TLSClientSharedLib\Services\Apis\IStudentApi.cs
 using Refit;
+using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Responses;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.Student.Insert)]
         Task<GeneralResponse> Insert([Body] Student student);
 
+        [Post(ApiUrls.Student.AddWithCenter)]
+        Task<GeneralResponse> AddWithCenter([Body] StdWithCenterId student);
+
         [Put(ApiUrls.Student.Update)]
         Task<GeneralResponse> Update([Body] Student student);
 
@@ -27,5 +31,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Get(ApiUrls.Student.StudentsCenterCount)]
         Task<int> GetStudentCountByCenterId(long id);
+
+        [Get(ApiUrls.Student.paginated)]
+        Task<PaginatedResponse<Student>> GetPaginated(StudentFilterRequest request);
     }
 }

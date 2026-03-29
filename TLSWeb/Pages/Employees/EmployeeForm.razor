@@ -101,9 +101,9 @@
     protected override async Task OnInitializedAsync()
     {
         // جلب البيانات للقوائم المنسدلة (يجب التأكد من أسماء الـ Types في API)
-        genders = await LookupValueApi.GetByValueType("Gender");
-        jobs = await LookupValueApi.GetByValueType("Job");
-        specs = await LookupValueApi.GetByValueType("Specialization");
+        genders = await LookupValueApi.GetByValueType(LookupTypes.Gender);
+        jobs = await LookupValueApi.GetByValueType(LookupTypes.Jobs);
+        specs = await LookupValueApi.GetByValueType(LookupTypes.Specialization);
 
         if (Id != 0) employee = await EmployeeApi.GetById(Id);
     }

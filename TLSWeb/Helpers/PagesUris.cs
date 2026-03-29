@@ -24,6 +24,13 @@
             public const string Add = PriorUrl + "/Add";
             public const string Edit = PriorUrl + "/Edit";
         }
+        public static class StudentsPages
+        {
+            public const string PriorUrl = "Students";
+            public const string Manage = PriorUrl + "/Manage";
+            public const string Add = PriorUrl + "/Add";
+            public const string Edit = PriorUrl + "/Edit";
+        }
         public static class LookupsValuePages
         {
             public const string PriorUrl = "Lookups";
