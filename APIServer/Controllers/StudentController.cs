@@ -25,6 +25,23 @@ namespace APIServer.Controllers
             _userRepository = UserRepository;
             _employeeRepository = EmployeeRepository;
         }
+        #region CurUser CurEmp Details
+        private async Task<ApplicationUser> CurrentUser ()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _userRepository.GetById(userId);
+        }
+        private async Task<Employee> CurrentEmployee ()
+        {
+            var CurUser = await CurrentUser();
+            return await _employeeRepository.GetById(CurUser.EmployeeId ?? 0);
+        }
+        private async Task<long> CurrentCenterId ()
+        {
+            var Employee = await CurrentEmployee();
+            return  Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId??0;
+        }
+        #endregion
 
         [HttpGet]
         //[AllowAnonymous]
@@ -46,14 +63,15 @@ namespace APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<GeneralResponse>> Insert(Student student)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var FullUser = await _userRepository.GetById(userId);
-            var Employee = await _employeeRepository.GetById(FullUser.EmployeeId ?? 0);
-
-            if (Employee is not null)
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var FullUser = await _userRepository.GetById(userId);
+            //var Employee = await _employeeRepository.GetById(FullUser.EmployeeId ?? 0);
+            //var Employee = await CurrentEmployee();
+            var CurCenter = await CurrentCenterId();
+            if (CurCenter >0)
             { 
-                var centerid= Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId;
-                var response = await _studentRepository.AddStudentWithCenter(student , centerid??0);
+                //var centerid= Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId;
+                var response = await _studentRepository.AddStudentWithCenter(student , CurCenter);
 
               return Ok(response);
             }
@@ -98,7 +116,8 @@ namespace APIServer.Controllers
         public async Task<ActionResult<PaginatedResponse<Student>>>
             GetPaginated([FromQuery] StudentFilterRequest request)
         {
-            var response = await _studentRepository.GetPaginatedStudentsAsync(request);
+            var CurCenter = await CurrentCenterId() ;
+            var response = await _studentRepository.GetPaginatedStudentsAsync(request, CurCenter);
             return Ok(response);
         }
 

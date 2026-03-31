@@ -54,7 +54,8 @@ namespace APIServerLib.Repositories.Implemntations
         {
             if(string.IsNullOrEmpty(ValueType))
                 return new List<LookupValue>();
-            return await _context.LookupValues.Where(_=>_.ValueType == ValueType).ToListAsync();
+            var R =  await _context.LookupValues.Where(_=>_.ValueType == ValueType).ToListAsync();
+            return R;
         }
     }
 }

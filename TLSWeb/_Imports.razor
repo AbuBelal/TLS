@@ -21,6 +21,7 @@
 @using Refit
 @using SharedLib.Responses
 @using SharedLib.Fixed
+@using SharedLib.Mappers
 
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider authenticationStateProvider
@@ -28,6 +29,7 @@
 @inject IDialogService MudDialogService
 
 @inject IUserApi UserApi
+@inject IDashboardApi DashboardApi
 @inject IEmployeeApi EmployeeApi
 @inject IStudentApi StudentApi
 @inject IAccountApi AccountApi

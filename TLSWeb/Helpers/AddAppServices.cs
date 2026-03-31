@@ -72,6 +72,12 @@ namespace TLSWeb.Helpers
                    c.BaseAddress = new Uri(ApiUrls.BaseUrl);
                }).AddHttpMessageHandler<CookieHandler>();
 
+            builder.Services.AddRefitClient<IDashboardApi>()
+               .ConfigureHttpClient(c =>
+               {
+                   c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+               }).AddHttpMessageHandler<CookieHandler>();
+
 
 
 

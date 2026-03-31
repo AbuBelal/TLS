@@ -1,8 +1,12 @@
+using APIServerLib.Repositories.Implemntations;
 using APIServerLib.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharedLib.Responses;
+using Microsoft.EntityFrameworkCore;
+using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Responses;
+using System.Security.Claims;
 
 namespace APIServer.Controllers
 {
@@ -12,11 +16,36 @@ namespace APIServer.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IStudentRepository _studentRepository;
+        private readonly IUserRepository _userRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        public EmployeeController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository)
         {
-            _employeeRepository = employeeRepository;
+            _employeeRepository = EmployeeRepository;
+            _userRepository = UserRepository;
+            _employeeRepository = EmployeeRepository;
         }
+
+        #region CurUser CurEmp Details
+        private async Task<ApplicationUser> CurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _userRepository.GetById(userId);
+        }
+        private async Task<Employee> CurrentEmployee()
+        {
+            var CurUser = await CurrentUser();
+            return await _employeeRepository.GetById(CurUser.EmployeeId ?? 0);
+        }
+        private async Task<long> CurrentCenterId()
+        {
+            var Employee = await CurrentEmployee();
+            return Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId ?? 0;
+        }
+        #endregion
+
+
+
 
         [HttpGet]
         //[AllowAnonymous]
@@ -35,17 +64,32 @@ namespace APIServer.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<GeneralResponse>> Insert(Employee employee)
+
+        [HttpGet("GetByCivilId/{CivilId}")]
+        public async Task<ActionResult<EmployeeUpsertDto?>> GetByCivilId(string CivilId)
         {
-            var response = await _employeeRepository.Insert(employee);
+            var result = await _employeeRepository.GetByCivilId(CivilId);
+            if (result == null)
+                return NotFound(null);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<GeneralResponse>> Insert(EmployeeUpsertDto employee)
+        {
+            var employeeToSave = (new EmployeeMapper()).ToEntity(employee);
+            
+            employeeToSave.EmpCenters.Add(new EmpCenter() { EmployeeId = employeeToSave.Id, CenterId = await CurrentCenterId() });
+            var response = await _employeeRepository.Insert(employeeToSave);
             return Ok(response);
         }
 
         [HttpPut]
-        public async Task<ActionResult<GeneralResponse>> Update(Employee employee)
+        public async Task<ActionResult<GeneralResponse>> Update(EmployeeUpsertDto employee)
         {
-            var response = await _employeeRepository.Update(employee);
+            var employeeToSave = (new EmployeeMapper()).ToEntity(employee);
+            
+            var response = await _employeeRepository.Update(employeeToSave);
             return Ok(response);
         }
 
@@ -61,6 +105,14 @@ namespace APIServer.Controllers
         {
             var result = await _employeeRepository.GetCenterEmployeesCountAsync(id);
             return Ok(result);
+        }
+
+
+        [HttpPost("paginated")]
+        public async Task<ActionResult<EmployeePaginatedResponse>> GetPaginated([FromBody] EmployeeFilterRequest request)
+        {
+            var employeespaginated =await _employeeRepository.GetPaginatedEmployesAsync(request , await CurrentCenterId());
+            return Ok(employeespaginated);
         }
     }
 }

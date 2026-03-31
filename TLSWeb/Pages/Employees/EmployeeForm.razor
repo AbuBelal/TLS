@@ -1,10 +1,155 @@
 ﻿@* @page "/employees/add"
 @page "/employees/edit/{Id:long}" *@
-
-@attribute [Route(PagesUris.EmployeesPages.Edit+"/{Id:long}")]
 @attribute [Route(PagesUris.EmployeesPages.Add)]
+@attribute [Route(PagesUris.EmployeesPages.Edit + "/{Id:long}")]
+@* @inherits EmployeeFormBase *@
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">@PageTitle</h4>
+        </div>
+        <div class="card-body">
+            <EditForm Model="@employee" OnSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                @* رسالة التكرار *@
+                @if (!string.IsNullOrWhiteSpace(DuplicateMessage))
+                {
+                    <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>@DuplicateMessage</span>
+                    </div>
+                }
+
+                <div class="row g-3">
+
+                    @* الاسم بالعربي والإنجليزي *@
+                    <div class="col-md-6">
+                        <label class="form-label">الاسم الكامل (بالعربي)</label>
+                        <InputText @bind-Value="employee.Name"
+                                   class="form-control"
+                                   placeholder="أدخل الاسم رباعي" />
+                        <ValidationMessage For="@(() => employee.Name)" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">الاسم بالإنجليزية</label>
+                        <InputText @bind-Value="employee.EnName" class="form-control" />
+                    </div>
+
+                    @* رقم الهوية *@
+                    <div class="col-md-6">
+                        <label class="form-label">رقم الهوية</label>
+                        <InputText @bind-Value="employee.CivilId"
+                                   class="form-control"
+                                   @onblur="CheckDuplicateAsync" />
+                        <ValidationMessage For="@(() => employee.CivilId)" class="text-danger" />
+                        @if (IsCheckingDuplicate)
+                        {
+                            <small class="text-muted">
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                جاري التحقق...
+                            </small>
+                        }
+                    </div>
+
+                    @* الرقم الوظيفي *@
+                    <div class="col-md-6">
+                        <label class="form-label">الرقم الوظيفي</label>
+                        <InputText @bind-Value="employee.EmpId" class="form-control" />
+                    </div>
+
+                    @* الجوال *@
+                    <div class="col-md-6">
+                        <label class="form-label">رقم الجوال</label>
+                        <InputText @bind-Value="employee.Mobile"
+                                   class="form-control"
+                                   placeholder="059XXXXXXX" />
+                    </div>
+
+                    @* تاريخ الميلاد *@
+                    <div class="col-md-6">
+                        <label class="form-label">تاريخ الميلاد</label>
+                        <InputDate TValue="DateOnly?" @bind-Value="employee.BirthDate" class="form-control" />
+                    </div>
+
+                    @* المنسدلات (Lookups) *@
+                    <div class="col-md-4">
+                        <label class="form-label">الجنس</label>
+                        <InputSelect @bind-Value="employee.GenderId" class="form-select">
+                            <option value="">-- اختر الجنس --</option>
+                            @foreach (var g in genders)
+                            {
+                                <option value="@g.Id">@g.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => employee.GenderId)" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">الوظيفة</label>
+                        <InputSelect @bind-Value="employee.JobId" class="form-select">
+                            <option value="">-- اختر الوظيفة --</option>
+                            @foreach (var j in jobs)
+                            {
+                                <option value="@j.Id">@j.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => employee.JobId)" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">التخصص</label>
+                        <InputSelect @bind-Value="employee.SpecializationId" class="form-select">
+                            <option value="">-- اختر التخصص --</option>
+                            @foreach (var s in specializations)
+                            {
+                                <option value="@s.Id">@s.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    @* ملاحظات *@
+                    <div class="col-12">
+                        <label class="form-label">ملاحظات</label>
+                        <InputTextArea @bind-Value="employee.Comments"
+                                       class="form-control"
+                                       rows="3" />
+                    </div>
+
+                    @* أزرار الإجراءات *@
+                    <div class="col-12 mt-4 text-end">
+                        <button type="button"
+                                class="btn btn-secondary me-2"
+                                @onclick="Cancel">
+                            إلغاء
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary px-5"
+                                disabled="@(IsSaving || IsDuplicate)">
+                            @if (IsSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>جاري الحفظ...</span>
+                            }
+                            else
+                            {
+                                <span>@SaveButtonText</span>
+                            }
+                        </button>
+                    </div>
+
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
 
 
+
+
+@* 
 <h3>@(Id == 0 ? "إضافة موظف جديد" : "تعديل بيانات الموظف")</h3>
 
 <EditForm Model="@employee" OnValidSubmit="HandleValidSubmit">
@@ -115,4 +260,4 @@
 
         NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
     }
-}
+} *@

@@ -35,16 +35,23 @@ namespace TLSClientSharedLib.Helpers
             public const string UserInfo = PriorUrl + "/manage/info";
             public const string Logout = PriorUrl + "/auth/logout";
         }
-        public static class Employee
+        public static class DashBoard
+        {
+            public const string PriorUrl = "/api/Dashboard";
+            public const string Get = PriorUrl;
+        }
+            public static class Employee
         {
             public const string PriorUrl = "/api/Employee";
             public const string GetAll = PriorUrl;
             public const string GetById = PriorUrl+"/{id}";
+            public const string GetByCivilId = PriorUrl+ "/GetByCivilId/{CivilId}";
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             //    /api/Employee/EmployeeCenterCount/{CenterId}
             public const string EmployeesCenterCount = PriorUrl + "/EmployeeCenterCount/{id}";
+            public const string Paginated = PriorUrl + "/paginated";
 
         }
         public static class Student

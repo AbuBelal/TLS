@@ -104,10 +104,10 @@ namespace APIServerLib.Repositories.Implemntations
             return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {Std.StdCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
         }
 
-        public async Task<PaginatedResponse<Student>> GetPaginatedStudentsAsync(StudentFilterRequest request)
+        public async Task<PaginatedResponse<Student>> GetPaginatedStudentsAsync(StudentFilterRequest request,long CenterId=0)
         {
             // 1. بناء الاستعلام الأساسي مع Include
-            var query = _context.Students
+            var query = _context.Students.Where(x=>x.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().CenterId == CenterId)
                 .Include(s => s.Gender)
                 .Include(s => s.Level)
                 .AsNoTracking()

@@ -15,7 +15,7 @@ namespace SharedLib.Fixed
     {
         public const string Gender = "Gender";
         public const string Level = "Level";
-        public const string Jobs = "Jobs";
+        public const string Job = "Job";
         public const string Specialization = "Specialization";
 
     }

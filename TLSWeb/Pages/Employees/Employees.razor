@@ -1,0 +1,275 @@
+﻿@attribute [Route(PagesUris.EmployeesPages.Manage)]
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi bi-person-badge-fill me-2 text-primary"></i>إدارة الموظفين
+        </h3>
+        <button class="btn btn-primary shadow-sm" @onclick="OpenAddPage">
+            <i class="bi bi-plus-circle me-1"></i> إضافة موظف جديد
+        </button>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-funnel text-primary"></i>
+                <h6 class="mb-0 fw-bold text-secondary">تصفية وبحث</h6>
+            </div>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold text-muted small">بحث بالاسم أو رقم الهوية</label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="ابحث هنا..."
+                           @bind="searchText"
+                           @bind:event="oninput"
+                           @bind:after="OnSearchChanged" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-muted small">الجنس</label>
+                    <select class="form-select" @bind="selectedGender" @bind:after="OnFilterChangedAsync">
+                        <option value="">الكل</option>
+                        @foreach (var gender in genderOptions)
+                        {
+                            <option value="@gender">@gender</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-muted small">الوظيفة</label>
+                    <select class="form-select" @bind="selectedJob" @bind:after="OnFilterChangedAsync">
+                        <option value="">الكل</option>
+                        @foreach (var job in jobOptions)
+                        {
+                            <option value="@job">@job</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" @onclick="ResetFiltersAsync">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> إعادة تعيين
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">
+            <i class="bi bi-clipboard-data me-1"></i> عدد النتائج: <strong>@totalCount</strong>
+        </span>
+
+        <div class="d-flex align-items-center gap-2 text-muted small">
+            <span>عرض:</span>
+            <select class="form-select form-select-sm" style="width: 80px;"
+                    @bind="pageSize"
+                    @bind:after="OnPageSizeChangedAsync">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <span>لكل صفحة</span>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+            <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
+        </div>
+    }
+    else if (!employees.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="fs-5 fw-semibold">لا توجد بيانات للعرض</p>
+            <p class="small">جرب تغيير الفلاتر</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>الاسم</th>
+                            <th>رقم الهوية</th>
+                            <th>الجوال</th>
+                            <th>الجنس</th>
+                            <th>الوظيفة</th>
+                            <th>التخصص</th>
+                            <th style="width: 170px;" class="text-center">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var row = 0; }
+                        @foreach (var employee in employees)
+                        {
+                            row++;
+                            <tr>
+                                <td class="text-muted small">@(((currentPage - 1) * pageSize) + row)</td>
+                                <td>
+                                    <div class="fw-semibold">@employee.Name</div>
+                                    @if (!string.IsNullOrWhiteSpace(employee.EnName))
+                                    {
+                                        <small class="text-muted">@employee.EnName</small>
+                                    }
+                                </td>
+                                <td><code class="bg-light text-dark px-2 py-1 rounded">@employee.CivilId</code></td>
+                                <td>@employee.Mobile</td>
+                                <td>@(employee.GenderName ?? "-")</td>
+                                <td>@(employee.JobName ?? "-")</td>
+                                <td>@(employee.SpecializationName ?? "-")</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" @onclick="@(() => OpenEditPage(employee.Id))">
+                                            <i class="bi bi-pencil-square"></i> تعديل
+                                        </button>
+                                        <button class="btn btn-outline-danger" @onclick="@(() => ConfirmDelete(employee))">
+                                            <i class="bi bi-trash"></i> حذف
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">
+                            عرض @(((currentPage - 1) * pageSize) + 1)
+                            إلى @(Math.Min(currentPage * pageSize, totalCount))
+                            من أصل @totalCount
+                        </span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(1))">
+                                        <i class="bi bi-chevron-double-right"></i>
+                                    </button>
+                                </li>
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(currentPage - 1))">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </li>
+
+                                @foreach (var page in GetPageNumbers())
+                                {
+                                    <li class="page-item @(page == currentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="@(() => GoToPageAsync(page))"> page </button>
+                                    </li>
+                                }
+
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(currentPage + 1))">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                </li>
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(totalPages))">
+                                        <i class="bi bi-chevron-double-left"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@if (showDeleteModal && employeeToDelete is not null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">تأكيد الحذف</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">
+                        هل أنت متأكد من حذف الموظف <strong>@employeeToDelete.Name</strong>؟
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" @onclick="CancelDelete" disabled="@isDeleting">إلغاء</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteConfirmedAsync" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@* 
+<h3>إدارة الموظفين</h3>
+<a class="btn btn-primary" href="@PagesUris.EmployeesPages.Add">إضافة موظف جديد</a>
+
+@if (employees == null)
+{
+    <p>جاري التحميل...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>رقم الموظف</th>
+                <th>الاسم</th>
+                <th>رقم الموظف</th>
+                <th>رقم الجوال</th>
+                <th>المركز</th>
+                <th>العمليات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emp in employees)
+            {
+                <tr>
+                    <td>@emp.EmpId</td>
+                    <td>@emp.Name</td>
+                    <td>@emp.EmpId</td>
+                    <td>@emp.Mobile</td>
+                    <td>@emp.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault()?.Center.Name</td>
+                    <td>
+                        <a class="btn btn-sm btn-info" href="@PagesUris.EmployeesPages.Edit/@emp.Id">تعديل</a>
+                        <a class="btn btn-sm btn-warning" href="">حذف</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Employee>? employees;
+    protected override async Task OnInitializedAsync() => employees = await EmployeeApi.GetAll();
+}
+ *@
