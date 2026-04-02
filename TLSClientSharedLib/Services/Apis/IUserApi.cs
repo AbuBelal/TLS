@@ -26,6 +26,9 @@ namespace TLSClientSharedLib.Services.Apis
         [Get(ApiUrls.User.GetUserRole)]
         Task<List<string>?> GetUserRole(string id);
 
+        [Get(ApiUrls.User.GetCurUserRole)]
+        Task<List<string>?> GetCurUserRole();
+
         [Get(ApiUrls.User.GetById)]
         Task<ApplicationUser> GetById(string id);
 

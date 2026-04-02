@@ -20,7 +20,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TLSWeb.Identity;
 
-public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFactory) : AuthenticationStateProvider, IAccountManagement
+public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFactory , IUserApi UserApi) : AuthenticationStateProvider, IAccountManagement
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("Auth");
 
@@ -46,7 +46,7 @@ public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFact
 
             var userJson = await userResponse.Content.ReadAsStringAsync();
             var userInfo = JsonSerializer.Deserialize<UserInfo>(userJson, _jsonSerializerOptions);
-
+           
             if (userInfo is not null)
             {
                 _authenticated = true;
@@ -56,8 +56,17 @@ public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFact
                     new(ClaimTypes.NameIdentifier, userInfo.Email),
                     new(ClaimTypes.Name, userInfo.Email),
                     new(ClaimTypes.Email, userInfo.Email),
+                   
                 };
 
+                //CHEK IF ADMIN
+                var Rols =await  UserApi.GetCurUserRole();
+                foreach (var rol in Rols)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, rol));
+                }
+                //claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+               
                 var claimsIdentity = new ClaimsIdentity(claims, nameof(CookieAuthenticationStateProvider));
                 user = new ClaimsPrincipal(claimsIdentity);
             }

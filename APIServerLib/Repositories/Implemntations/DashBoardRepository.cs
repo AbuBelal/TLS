@@ -1,6 +1,7 @@
 ﻿using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SharedLib.DTOs;
 
 namespace APIServerLib.Services;
@@ -78,9 +79,13 @@ public class DashboardRepository : IDashboardRepository
 
         // 6. توزيع المستويات
         var levelColors = new[] {
-            "bg-indigo-500","bg-primary","bg-info",
-            "bg-teal","bg-success","bg-warning","bg-danger"
+            "bg-red-500","bg-lime-500","bg-cyan-500",
+            "bg-indigo-500","bg-rose-500","bg-green-500","bg-red-500","bg-lime-500","bg-cyan-500"
         };
+
+        var Levels= await _context.LookupValues
+            .Where(lv => lv.ValueType == "Level")
+            .ToListAsync();
 
         var levelDist = students
             .Where(s => s.Level != null)
@@ -88,6 +93,7 @@ public class DashboardRepository : IDashboardRepository
             .Select((g, i) => new DistributionItem
             {
                 Label = g.Key ?? "-",
+                Order = Levels.Where(x=>x.Name==g.Key).Select(x=>x.SortOrder).FirstOrDefault()??0,
                 Count = g.Count(),
                 Percent = total == 0 ? 0 : (int)Math.Round((double)g.Count() / total * 100),
                 ColorClass = i < levelColors.Length ? levelColors[i] : "bg-secondary"
@@ -123,7 +129,7 @@ public class DashboardRepository : IDashboardRepository
                 Job = e.Job?.Name,
                 Specialization = e.Specialization?.Name,
                 Gender = e.Gender?.Name,
-            }).Take(10).ToList(),
+            }).Take(5).ToList(),
 
             RecentStudents = students
                 .OrderByDescending(s => s.Id)
@@ -139,4 +145,6 @@ public class DashboardRepository : IDashboardRepository
                 }).ToList(),
         };
     }
+
+   
 }

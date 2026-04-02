@@ -116,6 +116,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetAll = PriorUrl;
             public const string GetAllWithRoles = PriorUrl+ "/GetAllWithRoles";
             public const string GetUserRole = PriorUrl+ "/GetUserRoles/{id}";
+            public const string GetCurUserRole = PriorUrl+ "/GetCurUserRoles";
             public const string Profile = PriorUrl + "/profile";
             public const string Logout = PriorUrl + "/logout";
             public const string LogIn = PriorUrl + "/Login";
@@ -137,6 +138,11 @@ namespace TLSClientSharedLib.Helpers
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
+        }
+        public static class AdminDashBoard
+        {
+            public const string PriorUrl = "/api/AdminDashboard";
+            public const string Get = PriorUrl;
         }
     }
 }

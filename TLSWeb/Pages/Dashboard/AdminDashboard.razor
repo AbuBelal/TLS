@@ -1,0 +1,403 @@
+@* ╔══════════════════════════════════════════════════════════════╗ *@
+@* ║  TLSWeb/Pages/Dashboard/AdminDashboard.razor  (v2)           ║ *@
+@* ║  متوافق مع تصميم النظام — Bootstrap + text-primary          ║ *@
+@* ╚══════════════════════════════════════════════════════════════╝ *@
+
+@* @page "/admin-dashboard" *@
+@attribute [Route(PagesUris.Admin.DashBoard)]
+@* [Authorize(Roles = "Admin")] *@
+
+<div class="container-fluid px-4" dir="rtl">
+
+    @if (IsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="min-height:60vh">
+            <div class="text-center">
+                <div class="spinner-border text-primary" style="width:3rem;height:3rem" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-3 text-muted small">جاري تحميل بيانات المراكز...</p>
+            </div>
+        </div>
+    }
+    else if (ErrorMsg is not null)
+    {
+        <div class="alert alert-danger d-flex align-items-center gap-2 mt-4">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@ErrorMsg</span>
+        </div>
+    }
+    else if (Stats is null)
+    {
+        <div class="alert alert-warning mt-4">
+            <i class="bi bi-database-x me-2"></i>لا توجد بيانات متاحة.
+        </div>
+    }
+    else
+    {
+        @* ══ رأس الصفحة ══ *@
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+            <h3 class="mb-0">
+                <i class="bi bi-grid-1x2-fill me-2 text-primary"></i>لوحة تحكم المدير العام
+            </h3>
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">
+                <i class="bi bi-building me-1"></i>
+                <strong>@Stats.TotalCenters</strong> مراكز مسجلة
+            </span>
+        </div>
+
+        @* ══ بطاقات الإحصائيات الكلية ══ *@
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-xl-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 bg-primary bg-opacity-10">
+                            <i class="bi bi-mortarboard-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold text-primary">@Stats.TotalStudents</div>
+                            <div class="text-muted small">إجمالي الطلاب</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 bg-primary bg-opacity-10">
+                            <i class="bi bi-person-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold text-primary">@Stats.TotalMaleStudents</div>
+                            <div class="text-muted small">ذكور الطلاب</div>
+                            <div class="small text-primary">
+                                @(Stats.TotalStudents == 0 ? 0 : Math.Round((double)Stats.TotalMaleStudents / Stats.TotalStudents * 100, 1))%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 bg-danger bg-opacity-10">
+                            <i class="bi bi-person-fill text-danger fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold text-danger">@Stats.TotalFemaleStudents</div>
+                            <div class="text-muted small">إناث الطلاب</div>
+                            <div class="small text-danger">
+                                @(Stats.TotalStudents == 0 ? 0 : Math.Round((double)Stats.TotalFemaleStudents / Stats.TotalStudents * 100, 1))%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 bg-success bg-opacity-10">
+                            <i class="bi bi-people-fill text-success fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold text-success">@Stats.TotalEmployees</div>
+                            <div class="text-muted small">إجمالي الموظفين</div>
+                            <div class="text-muted" style="font-size:.72rem">
+                                @Stats.TotalMaleEmployees ذكر / @Stats.TotalFemaleEmployees أنثى
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 bg-warning bg-opacity-10">
+                            <i class="bi bi-star-fill text-warning fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold text-warning">@Stats.TotalSpecialNeeds</div>
+                            <div class="text-muted small">احتياجات خاصة</div>
+                            <div class="text-muted" style="font-size:.72rem">
+                                @(Stats.TotalStudents == 0 ? 0 : Math.Round((double)Stats.TotalSpecialNeeds / Stats.TotalStudents * 100, 1))% من الإجمالي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-2">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3" style="background:rgba(111,66,193,.10)">
+                            <i class="bi bi-book-fill fs-4" style="color:#6f42c1"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold" style="color:#6f42c1">@Stats.TotalUnrwa</div>
+                            <div class="text-muted small">طلاب الأنروا</div>
+                            <div class="text-muted" style="font-size:.72rem">
+                                @(Stats.TotalStudents == 0 ? 0 : Math.Round((double)Stats.TotalUnrwa / Stats.TotalStudents * 100, 1))% من الإجمالي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ══ توزيع الجنس + مخطط المستويات ══ *@
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom fw-semibold">
+                        <i class="bi bi-pie-chart me-2 text-primary"></i>توزيع الطلاب حسب الجنس (كلي)
+                    </div>
+                    <div class="card-body">
+                        @{
+                            var t  = Stats.TotalStudents;
+                            var mP = t == 0 ? 0 : (int)Math.Round((double)Stats.TotalMaleStudents   / t * 100);
+                            var fP = t == 0 ? 0 : (int)Math.Round((double)Stats.TotalFemaleStudents / t * 100);
+                        }
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold">ذكور</span>
+                                <span class="text-muted">@Stats.TotalMaleStudents طالب (@mP%)</span>
+                            </div>
+                            <div class="progress" style="height:12px;border-radius:6px">
+                                <div class="progress-bar bg-primary" style="width:@mP%;border-radius:6px"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold">إناث</span>
+                                <span class="text-muted">@Stats.TotalFemaleStudents طالبة (@fP%)</span>
+                            </div>
+                            <div class="progress" style="height:12px;border-radius:6px">
+                                <div class="progress-bar bg-danger" style="width:@fP%;border-radius:6px"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex rounded-3 overflow-hidden mt-3" style="height:20px">
+                            @if (mP > 0)
+                            {
+                                <div class="d-flex align-items-center justify-content-center text-white small fw-semibold bg-primary"
+                                     style="width:@mP%">@mP%</div>
+                            }
+                            @if (fP > 0)
+                            {
+                                <div class="d-flex align-items-center justify-content-center text-white small fw-semibold bg-danger"
+                                     style="width:@fP%">@fP%</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom fw-semibold">
+                        <i class="bi bi-bar-chart me-2 text-primary"></i>توزيع الطلاب حسب المستوى (كلي)
+                    </div>
+                    <div class="card-body">
+                        @if (Stats.LevelDistribution.Any())
+                        {
+                            <div class="row g-2 align-items-end" style="height:160px">
+                                @foreach (var level in Stats.LevelDistribution)
+                                {
+                                    <div class="col text-center d-flex flex-column justify-content-end align-items-center h-100">
+                                        <small class="text-muted mb-1">@level.Count</small>
+                                        <div class="rounded-top w-100 @level.ColorClass"
+                                             style="height:@(Math.Max(level.Percent * 1.4, 8))px;transition:height .4s">
+                                        </div>
+                                        <small class="mt-1 fw-semibold text-truncate w-100" style="font-size:.7rem">@level.Label</small>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-4 small">لا توجد بيانات مستويات</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ══ عنوان قسم المراكز ══ *@
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-building me-2 text-primary"></i>تفاصيل المراكز
+            </h5>
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                <i class="bi bi-clipboard-data me-1"></i>
+                <strong>@Stats.Centers.Count</strong> مركز
+            </span>
+        </div>
+
+        @* ══ بطاقات المراكز ══ *@
+        <div class="row g-3 mb-4">
+            @foreach (var center in Stats.Centers)
+            {
+                var isSelected = SelectedCenterId == center.CenterId;
+                <div class="col-12 col-lg-6">
+                    <div class="card border-0 shadow-sm h-100 @(isSelected ? "border border-primary" : "")"
+                         style="cursor:pointer"
+                         @onclick="() => SelectCenter(center.CenterId)">
+
+                        @* رأس البطاقة *@
+                        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-building-fill text-primary fs-5"></i>
+                                <div>
+                                    <div class="fw-bold">@center.CenterName</div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-upc me-1"></i>@center.CenterCode
+                                        &nbsp;|&nbsp;
+                                        <i class="bi bi-geo-alt me-1"></i>@center.Address
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill">
+                                    <i class="bi bi-calendar-week me-1"></i>@center.DaysOfWeek
+                                </span>
+                                <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill">
+                                    <i class="bi bi-circle-fill me-1" style="font-size:.45rem"></i>نشط
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+                            @* أرقام الطلاب *@
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <div class="card border-0 h-100 bg-primary bg-opacity-10">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="fs-4 fw-bold text-primary">@center.TotalStudents</div>
+                                            <div class="text-muted small">إجمالي الطلاب</div>
+                                            @if (center.NewStudentsThisMonth > 0)
+                                            {
+                                                <div class="text-success" style="font-size:.7rem">
+                                                    <i class="bi bi-arrow-up"></i> @center.NewStudentsThisMonth جديد
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-0 h-100 bg-primary bg-opacity-10">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="fs-4 fw-bold text-primary">@center.MaleStudents</div>
+                                            <div class="text-muted small">ذكور</div>
+                                            <div class="small text-primary" style="font-size:.7rem">@center.MalePercent%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-0 h-100 bg-danger bg-opacity-10">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="fs-4 fw-bold text-danger">@center.FemaleStudents</div>
+                                            <div class="text-muted small">إناث</div>
+                                            <div class="small text-danger" style="font-size:.7rem">@center.FemalePercent%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* شريط الجنس *@
+                            <div class="progress mb-3" style="height:10px;border-radius:5px">
+                                @if (center.MalePercent > 0)
+                                {
+                                    <div class="progress-bar bg-primary" style="width:@center.MalePercent%"></div>
+                                }
+                                @if (center.FemalePercent > 0)
+                                {
+                                    <div class="progress-bar bg-danger" style="width:@center.FemalePercent%"></div>
+                                }
+                            </div>
+
+                            @* الموظفون *@
+                            <div class="d-flex justify-content-between align-items-center p-2 rounded-3 mb-3 bg-success-subtle">
+                                <span class="text-muted small">
+                                    <i class="bi bi-people-fill text-success me-1"></i>الموظفون
+                                </span>
+                                <div class="d-flex gap-3 small">
+                                    <span class="fw-semibold text-success">@center.TotalEmployees إجمالي</span>
+                                    <span class="text-primary">@center.MaleEmployees ذكر</span>
+                                    <span class="text-danger">@center.FemaleEmployees أنثى</span>
+                                </div>
+                            </div>
+
+                            @* توزيع المستويات — عند النقر *@
+                            @if (isSelected && center.LevelDistribution.Any())
+                            {
+                                <div class="border-top pt-3 mt-1">
+                                    <div class="fw-semibold small text-muted mb-2">
+                                        <i class="bi bi-bar-chart me-1 text-primary"></i>توزيع الطلاب حسب المستوى
+                                    </div>
+                                    @foreach (var level in center.LevelDistribution)
+                                    {
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <small class="fw-semibold">@level.Label</small>
+                                                <small class="text-muted">@level.Count (@level.Percent%)</small>
+                                            </div>
+                                            <div class="progress" style="height:8px;border-radius:4px">
+                                                <div class="progress-bar @level.ColorClass"
+                                                     style="width:@level.Percent%;border-radius:4px"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            @* شارات إضافية *@
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                @if (center.SpecialNeedsCount > 0)
+                                {
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning-subtle">
+                                        <i class="bi bi-star me-1"></i>@center.SpecialNeedsCount احتياجات خاصة
+                                    </span>
+                                }
+                                @if (center.UnrwaCount > 0)
+                                {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">
+                                        <i class="bi bi-book me-1"></i>@center.UnrwaCount أنروا
+                                    </span>
+                                }
+                                @if (center.Rooms.GetValueOrDefault() > 0)
+                                {
+                                    <span class="badge bg-light text-secondary border">
+                                        <i class="bi bi-door-open me-1"></i>@center.Rooms غرفة
+                                    </span>
+                                }
+                                @if (center.Tarpaulins.GetValueOrDefault() > 0)
+                                {
+                                    <span class="badge bg-light text-secondary border">
+                                        <i class="bi bi-grid me-1"></i>@center.Tarpaulins خيمة
+                                    </span>
+                                }
+                            </div>
+
+                            @if (!isSelected)
+                            {
+                                <div class="text-center mt-3">
+                                    <small class="text-muted fst-italic">
+                                        <i class="bi bi-hand-index me-1"></i>انقر لعرض توزيع المستويات
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code { }

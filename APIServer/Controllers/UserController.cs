@@ -9,6 +9,7 @@ using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Fixed;
 using SharedLib.Responses;
+using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace APIServer.Controllers
@@ -30,6 +31,7 @@ namespace APIServer.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
         }
+
 
         [HttpGet("profile")]
         public async Task<ActionResult<UserProfileDto>> GetProfile()
@@ -113,6 +115,7 @@ namespace APIServer.Controllers
             {
                 user.PhoneNumber = Profile.PhoneNumber;
                 user.UserName = Profile.UserName;
+                user.EmployeeId = Profile.EmployeeId;
                 // ... other properties ...
 
                 // Update the user data
@@ -264,6 +267,16 @@ namespace APIServer.Controllers
         public async Task<ActionResult<List<string>?>> GetUserRoles(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound("User not found");
+            var roles = await _userManager.GetRolesAsync(user);
+            return Ok(roles);
+        }
+
+        [HttpGet("GetCurUserRoles")]
+        public async Task<ActionResult<List<string>?>> GetCurUserRoles()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound("User not found");
             var roles = await _userManager.GetRolesAsync(user);
             return Ok(roles);

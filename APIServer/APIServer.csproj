@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\APIServerLib\APIServerLib.csproj" />
     <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
+    <ProjectReference Include="..\TLSClientSharedLib\TLSClientSharedLib.csproj" />
   </ItemGroup>
 
 </Project>

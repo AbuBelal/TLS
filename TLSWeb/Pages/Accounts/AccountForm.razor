@@ -1,0 +1,174 @@
+﻿@attribute [Route(PagesUris.UsersPages.Add)]
+@attribute [Route(PagesUris.UsersPages.Edit + "/{Id}")]
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi @(IsEditMode ? "bi-pencil-square" : "bi-person-plus-fill") me-2"></i>@PageTitle
+            </h4>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="alert alert-danger d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>@ErrorMessage</span>
+                </div>
+            }
+
+            <EditForm Model="@Model" OnSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="row g-3">
+
+                    @* ====== بيانات الحساب ====== *@
+                    <div class="col-12">
+                        <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                            <i class="bi bi-person-badge me-1"></i> بيانات الحساب
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">البريد الإلكتروني <span class="text-danger">*</span></label>
+                        <InputText @bind-Value="Model.Email" class="form-control" placeholder="example@domain.com" />
+                        <ValidationMessage For="@(() => Model.Email)" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">اسم المستخدم <span class="text-danger">*</span></label>
+                        <InputText @bind-Value="Model.UserName" class="form-control" placeholder="أدخل اسم المستخدم" />
+                        <ValidationMessage For="@(() => Model.UserName)" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            كلمة المرور
+                            @if (!IsEditMode)
+                            {
+                                <span class="text-danger">*</span>
+                            }
+                            else
+                            {
+                                <small class="text-muted">(اتركها فارغة إذا لا تريد التغيير)</small>
+                            }
+                        </label>
+                        <InputText @bind-Value="Model.Password" type="password" class="form-control" placeholder="******" />
+                        <ValidationMessage For="@(() => Model.Password)" class="text-danger" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">رقم الهاتف</label>
+                        <InputText @bind-Value="Model.PhoneNumber" class="form-control" placeholder="05XXXXXXXX" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">الصلاحية <span class="text-danger">*</span></label>
+                        <InputSelect @bind-Value="Model.Role" class="form-select">
+                            <option value="">-- اختر الصلاحية --</option>
+                            @foreach (var role in AvailableRoles)
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Model.Role)" class="text-danger" />
+                    </div>
+
+                    @* ====== ربط الموظف ====== *@
+                    <div class="col-12 mt-4">
+                        <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                            <i class="bi bi-link-45deg me-1"></i> الموظف المرتبط
+                        </h6>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label">البحث عن موظف</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="ابحث بالاسم أو رقم الموظف..."
+                               @bind="employeeSearchText"
+                               @bind:event="oninput"
+                               @bind:after="OnEmployeeSearchChanged" />
+                        @if (IsSearchingEmployees)
+                        {
+                            <small class="text-muted">
+                                <span class="spinner-border spinner-border-sm me-1"></span> جاري البحث...
+                            </small>
+                        }
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">الموظف المحدد</label>
+                        @if (Model.EmployeeId.HasValue && SelectedEmployee is not null)
+                        {
+                            <div class="alert alert-success py-2 mb-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-person-check-fill me-1"></i>
+                                    <strong>@SelectedEmployee.Name</strong>
+                                    <br />
+                                    <small class="text-muted">رقم: @SelectedEmployee.EmpId</small>
+                                </div>
+                                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="ClearEmployee">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-secondary py-2 mb-0 text-muted">
+                                <i class="bi bi-person-x me-1"></i> لم يتم اختيار موظف
+                            </div>
+                        }
+                    </div>
+
+                    @if (FilteredEmployees.Any() && !string.IsNullOrWhiteSpace(employeeSearchText))
+                    {
+                        <div class="col-12">
+                            <div class="list-group shadow-sm" style="max-height: 250px; overflow-y: auto;">
+                                @foreach (var emp in FilteredEmployees)
+                                {
+                                    <button type="button"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.EmployeeId == emp.Id ? "active" : "")"
+                                            @onclick="() => SelectEmployee(emp)">
+                                        <div>
+                                            <strong>@emp.Name</strong>
+                                            @if (!string.IsNullOrWhiteSpace(emp.EnName))
+                                            {
+                                                <br />
+                                                <small>@emp.EnName</small>
+                                            }
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info text-dark">@emp.EmpId</span>
+                                            <br />
+                                            <small>@emp.CivilId</small>
+                                        </div>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @* ====== أزرار الإجراءات ====== *@
+                    <div class="col-12 mt-4 text-end">
+                        <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">
+                            <i class="bi bi-x-circle me-1"></i> إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-primary px-5" disabled="@IsSaving">
+                            @if (IsSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>جاري الحفظ...</span>
+                            }
+                            else
+                            {
+                                <i class="bi @(IsEditMode ? "bi-check-circle" : "bi-plus-circle") me-1"></i>
+                                <span>@SaveButtonText</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>

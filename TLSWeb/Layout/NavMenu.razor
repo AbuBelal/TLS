@@ -18,6 +18,35 @@
                 <span class="flex-1">الرئيسية</span>
             </a>
         </div>
+
+        <AuthorizeView Roles="Admin">
+            <Authorized> 
+                <div class="menu-item">
+                    <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
+                        <span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
+                        <span class="flex-1">الإدارة</span>
+                        <span class="material-symbols-outlined text-sm chevron-icon" data-icon="manage_accounts">expand_more</span>
+                    </button>
+
+                    <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
+                        <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.Admin.DashBoard">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                            <span>بيانات جميع المراكز</span>
+                        </a>
+                    </div>
+
+                    <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
+                        <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.UsersPages.Manage">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                            <span>إدارة المستخدمين</span>
+                        </a>
+                    </div>
+                </div>
+
+               
+             </Authorized>
+        </AuthorizeView>
+
         <!-- Students (Collapsible) -->
         <div class="menu-item">
             <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
@@ -34,10 +63,7 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
                     <span>إضافة طالب جديد</span>
                 </a>
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="#">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>توزيع الصفوف</span>
-                </a>
+                
             </div>
         </div>
         <!-- Staff (Collapsible) -->

@@ -20,6 +20,7 @@ namespace APIServerLib.ProgramSettings
             builder.Services.AddScoped<ILookupValueRepository, LookupValueRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+            builder.Services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
             //builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 
             return builder;

@@ -8,5 +8,8 @@ namespace APIServerLib.Repositories.Interfaces
     public  interface IDashboardRepository
     {
         Task<CenterDashboardDto?> GetCenterDashboardAsync(string userId);
+
+
+       
     }
 }

@@ -1,0 +1,353 @@
+﻿@attribute [Route(PagesUris.UsersPages.Manage)]
+
+<PageTitle>إدارة المستخدمين</PageTitle>
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi bi-people-fill me-2 text-primary"></i>إدارة المستخدمين
+        </h3>
+        <button class="btn btn-primary shadow-sm" @onclick="OpenAddPage">
+            <i class="bi bi-plus-circle me-1"></i> إضافة مستخدم جديد
+        </button>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-funnel text-primary"></i>
+                <h6 class="mb-0 fw-bold text-secondary">بحث</h6>
+            </div>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted small">بحث بالاسم أو البريد الإلكتروني</label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="ابحث هنا..."
+                           @bind="searchText"
+                           @bind:event="oninput"
+                           @bind:after="OnSearchChanged" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold text-muted small">الصلاحية</label>
+                    <select class="form-select" @bind="selectedRole" @bind:after="OnFilterChangedAsync">
+                        <option value="">الكل</option>
+                        @foreach (var role in availableRoles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" @onclick="ResetFiltersAsync">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> إعادة تعيين
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">
+            <i class="bi bi-clipboard-data me-1"></i> عدد النتائج: <strong>@filteredUsers.Count</strong>
+        </span>
+
+        <div class="d-flex align-items-center gap-2 text-muted small">
+            <span>عرض:</span>
+            <select class="form-select form-select-sm" style="width: 80px;"
+                    @bind="pageSize"
+                    @bind:after="OnPageSizeChangedAsync">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <span>لكل صفحة</span>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+            <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
+        </div>
+    }
+    else if (!filteredUsers.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="fs-5 fw-semibold">لا توجد بيانات للعرض</p>
+            <p class="small">جرب تغيير الفلاتر</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>اسم المستخدم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>اسم الموظف</th>
+                            <th>رقم الموظف</th>
+                            <th>الصلاحيات</th>
+                            <th style="width: 170px;" class="text-center">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var row = 0; }
+                        @foreach (var user in PaginatedUsers)
+                        {
+                            row++;
+                            <tr>
+                                <td class="text-muted small">@(((currentPage - 1) * pageSize) + row)</td>
+                                <td>
+                                    <div class="fw-semibold">@user.UserName</div>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>@(user.Employee?.Name ?? "-")</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(user.Employee?.EmpId))
+                                    {
+                                        <code class="bg-light text-dark px-2 py-1 rounded">@user.Employee.EmpId</code>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.Roles != null && user.Roles.Any())
+                                    {
+                                        @foreach (var role in user.Roles)
+                                        {
+                                            <span class="badge bg-info text-dark me-1">@role</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">user</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" @onclick="@(() => EditUser(user))">
+                                            <i class="bi bi-pencil-square"></i> تعديل
+                                        </button>
+                                        <button class="btn btn-outline-danger" @onclick="@(() => DeleteUser(user.Id))">
+                                            <i class="bi bi-trash"></i> حذف
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">
+                            عرض @(((currentPage - 1) * pageSize) + 1)
+                            إلى @(Math.Min(currentPage * pageSize, filteredUsers.Count))
+                            من أصل @filteredUsers.Count
+                        </span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(1))">
+                                        <i class="bi bi-chevron-double-right"></i>
+                                    </button>
+                                </li>
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(currentPage - 1))">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </li>
+
+                                @foreach (var page in GetPageNumbers())
+                                {
+                                    <li class="page-item @(page == currentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="@(() => GoToPageAsync(page))"> page </button>
+                                    </li>
+                                }
+
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(currentPage + 1))">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                </li>
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(totalPages))">
+                                        <i class="bi bi-chevron-double-left"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<UserWithRoles> users = new();
+    private List<UserWithRoles> filteredUsers = new();
+    private bool isLoading = true;
+    private string searchText = "";
+    private string selectedRole = "";
+    private List<string> availableRoles = new();
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalPages => (int)Math.Ceiling((double)filteredUsers.Count / pageSize);
+
+    private IEnumerable<UserWithRoles> PaginatedUsers =>
+        filteredUsers.Skip((currentPage - 1) * pageSize).Take(pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            availableRoles = await RolesApi.GetAll() ?? new List<string>();
+            var result = await UserApi.GetAllWithRoles();
+            users = result?.Where(u => u != null).ToList() ?? new List<UserWithRoles>();
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading users: {ex.Message}");
+            MudSnackbar.Add("حدث خطأ أثناء تحميل المستخدمين", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ApplyFilters()
+    {
+        var query = users.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(searchText))
+        {
+            var search = searchText.Trim().ToLower();
+            query = query.Where(u =>
+                (u.UserName?.ToLower().Contains(search) ?? false) ||
+                (u.Email?.ToLower().Contains(search) ?? false) ||
+                (u.Employee?.Name?.ToLower().Contains(search) ?? false)
+            );
+        }
+
+        if (!string.IsNullOrWhiteSpace(selectedRole))
+        {
+            query = query.Where(u => u.Roles != null && u.Roles.Contains(selectedRole));
+        }
+
+        filteredUsers = query.ToList();
+        currentPage = 1;
+    }
+
+    private Task OnSearchChanged()
+    {
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private Task OnFilterChangedAsync()
+    {
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private Task OnPageSizeChangedAsync()
+    {
+        currentPage = 1;
+        return Task.CompletedTask;
+    }
+
+    private Task ResetFiltersAsync()
+    {
+        searchText = "";
+        selectedRole = "";
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private Task GoToPageAsync(int page)
+    {
+        if (page >= 1 && page <= totalPages)
+        {
+            currentPage = page;
+        }
+        return Task.CompletedTask;
+    }
+
+    private List<int> GetPageNumbers()
+    {
+        var pages = new List<int>();
+        int start = Math.Max(1, currentPage - 2);
+        int end = Math.Min(totalPages, currentPage + 2);
+
+        for (int i = start; i <= end; i++)
+        {
+            pages.Add(i);
+        }
+        return pages;
+    }
+
+    private void OpenAddPage()
+    {
+        NavManager.NavigateTo(PagesUris.UsersPages.Add);
+    }
+
+    private void EditUser(UserWithRoles user)
+    {
+        NavManager.NavigateTo($"{PagesUris.UsersPages.Edit}/{user.Id}");
+    }
+
+    private async Task DeleteUser(string userId)
+    {
+        bool? result = await MudDialogService.ShowMessageBoxAsync(
+          "تحذير",
+          "هل أنت متأكد أنك تريد حذف هذا المستخدم؟",
+          yesText: "حذف!",
+          cancelText: "إلغاء"
+           );
+        if (result == true)
+        {
+            try
+            {
+                var response = await UserApi.DeleteById(userId);
+                if (response.Success)
+                {
+                    MudSnackbar.Add("تم حذف المستخدم بنجاح", Severity.Success);
+                    var refreshedUsers = await UserApi.GetAllWithRoles();
+                    users = refreshedUsers?.Where(u => u != null).ToList() ?? new List<UserWithRoles>();
+                    ApplyFilters();
+                }
+                else
+                {
+                    MudSnackbar.Add("حدث خطأ أثناء حذف المستخدم", Severity.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting user: {ex.Message}");
+                MudSnackbar.Add("حدث خطأ أثناء حذف المستخدم", Severity.Error);
+            }
+        }
+    }
+}

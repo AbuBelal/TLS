@@ -38,5 +38,10 @@
             public const string Add = PriorUrl + "/Add";
             public const string Edit = PriorUrl + "/Edit";
         }
+        public static class Admin
+        {
+            public const string PriorUrl = "Admin";
+            public const string DashBoard = PriorUrl + "/admin-dashboard";
+        }
     }
 }

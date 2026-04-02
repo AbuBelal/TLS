@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SharedLib.Fixed
 {
-    public static class Fixed
+    public static class Roles
     {
         public const string Admin = "Admin";
         public const string User = "User";
