@@ -16,7 +16,8 @@ public class StudentDto
     public string? Mobile { get; set; }
     public string? GenderName { get; set; }
     public string? LevelName { get; set; }
-    public DateTime? BirthDate { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    public string? CenterName { get; set; }
     public bool IsUnrwa { get; set; }
     public bool IsSpecialNeeds { get; set; }
 }

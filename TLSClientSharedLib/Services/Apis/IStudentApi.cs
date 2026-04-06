@@ -33,6 +33,6 @@ namespace TLSClientSharedLib.Services.Apis
         Task<int> GetStudentCountByCenterId(long id);
 
         [Get(ApiUrls.Student.paginated)]
-        Task<PaginatedResponse<Student>> GetPaginated(StudentFilterRequest request);
+        Task<PaginatedResponse<StudentDto>> GetPaginated(StudentFilterRequest request);
     }
 }

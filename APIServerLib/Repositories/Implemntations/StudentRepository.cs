@@ -104,12 +104,14 @@ namespace APIServerLib.Repositories.Implemntations
             return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {Std.StdCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
         }
 
-        public async Task<PaginatedResponse<Student>> GetPaginatedStudentsAsync(StudentFilterRequest request,long CenterId=0)
+        public async Task<PaginatedResponse<StudentDto>> GetPaginatedStudentsAsync(StudentFilterRequest request,long CenterId=0)
         {
             // 1. بناء الاستعلام الأساسي مع Include
-            var query = _context.Students.Where(x=>x.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().CenterId == CenterId)
+            var query = _context.Students
+                .Where(x=> CenterId==0?true: x.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().CenterId == CenterId)
                 .Include(s => s.Gender)
                 .Include(s => s.Level)
+                //.Include(x => x.StdCenters).ThenInclude(x => x.Center)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -137,6 +139,12 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(s =>
                     s.Level != null && s.Level.Name == request.Level);
             }
+            // فلتر المركز
+            if (!string.IsNullOrWhiteSpace(request.Center))
+            {
+                query = query.Where(s =>
+                    s.Level != null && s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
+            }
           
             // 3. حساب العدد الإجمالي (بعد الفلترة)
             var totalCount =await query.CountAsync();
@@ -148,15 +156,27 @@ namespace APIServerLib.Repositories.Implemntations
                               Math.Max(1, totalPages));
 
             var items = await query
+                .Include(x => x.StdCenters).ThenInclude(x => x.Center)
                 .OrderBy(s => s.Name)
                 .Skip((currentPage - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // 5. بناء الاستجابة
-            var response = new PaginatedResponse<Student>
+            var studentDtos = items.Select(s => new StudentDto()
             {
-                Items = items,
+                Id=s.Id,
+                Name = s.Name,
+                CivilId = s.CivilId,
+                Mobile = s.Mobile,
+                GenderName=s.Gender.Name,
+                LevelName=s.Level.Name,
+                CenterName=s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
+            }).ToList();
+
+            // 5. بناء الاستجابة
+            var response = new PaginatedResponse<StudentDto>
+            {
+                Items = studentDtos,
                 TotalCount = totalCount,
                 CurrentPage = currentPage,
                 PageSize = pageSize

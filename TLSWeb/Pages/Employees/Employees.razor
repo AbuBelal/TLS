@@ -109,6 +109,7 @@
                             <th>الجنس</th>
                             <th>الوظيفة</th>
                             <th>التخصص</th>
+                            <th>المركز</th>
                             <th style="width: 170px;" class="text-center">إجراءات</th>
                         </tr>
                     </thead>
@@ -131,6 +132,7 @@
                                 <td>@(employee.GenderName ?? "-")</td>
                                 <td>@(employee.JobName ?? "-")</td>
                                 <td>@(employee.SpecializationName ?? "-")</td>
+                                <td>@(employee.CenterName ?? "-")</td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
                                         <button class="btn btn-outline-primary" @onclick="@(() => OpenEditPage(employee.Id))">
@@ -171,10 +173,10 @@
                                     </button>
                                 </li>
 
-                                @foreach (var page in GetPageNumbers())
+                                @foreach (var pageNo in GetPageNumbers())
                                 {
-                                    <li class="page-item @(page == currentPage ? "active" : "")">
-                                        <button class="page-link" @onclick="@(() => GoToPageAsync(page))"> page </button>
+                                    <li class="page-item @(pageNo == currentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="@(() => GoToPageAsync(pageNo))"> @pageNo </button>
                                     </li>
                                 }
 

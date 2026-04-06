@@ -8,17 +8,19 @@ namespace TLSWeb.Pages.Students;
 public partial class Students : ComponentBase
 {
     // ====== البيانات ======
-    private List<Student> students = [];
+    private List<StudentDto> students = [];
     private bool isLoading = true;
 
     // ====== الفلاتر ======
     private string searchText = string.Empty;
     private string selectedGender = string.Empty;
     private string selectedLevel = string.Empty;
+    private string selectedCenter = string.Empty;
 
     // خيارات الفلاتر (من الـ LookupValues)
     private List<string> genderOptions = [];
     private List<string> levelOptions = [];
+    private List<string> CenterOptions = [];
 
     // ====== Server-Side Pagination ======
     private int currentPage = 1;
@@ -29,7 +31,7 @@ public partial class Students : ComponentBase
     // ====== الحذف ======
     private bool showDeleteModal;
     private bool isDeleting;
-    private Student? studentToDelete;
+    private StudentDto? studentToDelete;
 
     // ====== دورة الحياة ======
     protected override async Task OnInitializedAsync()
@@ -57,6 +59,10 @@ public partial class Students : ComponentBase
                 .OrderBy(l => l.SortOrder)
                 .Select(l => l.Name!)
                 .ToList();
+
+            CenterOptions = (await CenterApi.GetAll())
+                .Select(c => c.Name!)
+                .ToList();
         }
         catch (Exception ex)
         {
@@ -80,7 +86,8 @@ public partial class Students : ComponentBase
                 PageSize = pageSize,
                 SearchText = searchText,
                 Gender = selectedGender,
-                Level = selectedLevel
+                Level = selectedLevel,
+                Center = selectedCenter
             };
 
             var response = await StudentApi.GetPaginated(request);
@@ -158,7 +165,7 @@ public partial class Students : ComponentBase
         NavManager.NavigateTo($"{PagesUris.StudentsPages.Edit}/{id}");
 
     // ====== الحذف ======
-    private void ConfirmDelete(Student student)
+    private void ConfirmDelete(StudentDto student)
     {
         studentToDelete = student;
         showDeleteModal = true;

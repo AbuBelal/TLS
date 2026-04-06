@@ -1,0 +1,40 @@
+﻿@attribute [Route(PagesUris.Admin.EditCenters)]
+@using Microsoft.AspNetCore.Authorization
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+
+<h3>تعديل بيانات المراكز</h3>
+
+@foreach (var center in centers)
+{
+    string BackgroundColor = center.Id>0 ? "white" : "lightblue";
+    <CenterEdit Center="center"  BackgroundColor="@BackgroundColor"/>
+    <br />
+    @* <span style="text-align: center;">ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ</span> *@
+    <br />
+}
+@code {
+    List<Center> centers = new List<Center>();
+    override protected async Task OnInitializedAsync()
+    {
+        centers = await CenterApi.GetAll();
+
+        bool IsAdmin = false;
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+        {
+            var roles = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value!;
+            IsAdmin = roles == SharedLib.Fixed.Roles.Admin;
+        }
+
+        if(IsAdmin)
+         AddCenter();
+    }
+    private void AddCenter()
+    {
+
+        centers.Add(new Center());
+    }
+
+}

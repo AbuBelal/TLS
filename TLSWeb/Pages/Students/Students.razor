@@ -24,14 +24,14 @@
                             <i class="bi bi-search text-muted"></i>
                         </span>
                         <input type="text"
-                               class="form-control border-start-0"
+                               class="form-control border-start-1"
                                placeholder="ابحث هنا..."
                                @bind="searchText"
                                @bind:event="oninput"
                                @bind:after="OnFilterChanged" />
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label fw-semibold text-muted small">
                         <i class="bi bi-gender-ambiguous me-1"></i> الجنس
                     </label>
@@ -45,7 +45,7 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label fw-semibold text-muted small">
                         <i class="bi bi-bar-chart-steps me-1"></i> المستوى
                     </label>
@@ -59,6 +59,23 @@
                         }
                     </select>
                 </div>
+                
+                <AuthorizeView Roles=@SharedLib.Fixed.Roles.Admin>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="bi bi-bar-chart-steps me-1"></i> المركز
+                        </label>
+                        <select class="form-select"
+                                @bind="selectedCenter"
+                                @bind:after="OnFilterChanged">
+                            <option value="">— الكل —</option>
+                            @foreach (var Center in CenterOptions)
+                            {
+                                <option value="@Center">@Center</option>
+                            }
+                        </select>
+                    </div>
+                </AuthorizeView>
                 <div class="col-md-2">
                     <button class="btn btn-outline-secondary w-100"
                             @onclick="ResetFilters">
@@ -124,6 +141,7 @@
                             <th><i class="bi bi-phone me-1"></i>الجوال</th>
                             <th>الجنس</th>
                             <th><i class="bi bi-mortarboard me-1"></i>المستوى</th>
+                            <th><i class="bi bi-mortarboard me-1"></i>المركز</th>
                             <th class="text-center" style="width:160px">إجراءات</th>
                         </tr>
                     </thead>
@@ -151,7 +169,7 @@
                                     @student.Mobile
                                 </td>
                                 <td>
-                                    @if (student.Gender?.Name == "ذكر")
+                                    @if (student.GenderName == "ذكر")
                                     {
                                         <span class="badge bg-primary bg-opacity-10
                                             text-primary border border-primary
@@ -172,9 +190,17 @@
                                     <span class="badge bg-success bg-opacity-10
                                         text-success border border-success
                                         border-opacity-25">
-                                        <i class="bi bi-mortarboard me-1"></i>
-                                        @student.Level?.Name
+                                        @* <i class="bi bi-mortarboard me-1"></i> *@
+                                        @student.LevelName
                                     </span>
+                                </td>
+                                <td>
+                                    @* <span class="badge bg-success bg-opacity-10
+                                        text-success border border-success
+                                        border-opacity-25">
+                                        <i class="bi bi-mortarboard me-1"></i> *@
+                                        @student.CenterName
+                                    @* </span> *@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">

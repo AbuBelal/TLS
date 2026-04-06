@@ -159,7 +159,8 @@ public partial class AccountForm : ComponentBase
             Email = Model.Email,
             UserName = Model.UserName,
             Password = Model.Password,
-            Role = Model.Role
+            Role = Model.Role,
+            EmployeeId=Model.EmployeeId
         };
 
         var result = await UserApi.Insert(input);

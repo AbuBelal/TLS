@@ -59,7 +59,7 @@ public partial class EmployeeForm : ComponentBase
     protected async Task CheckDuplicateAsync()
     {
         //تجاهل الفحص إذا كان حقل الهوية فارغاً
-        if (string.IsNullOrWhiteSpace(employee.CivilId))
+        if (string.IsNullOrWhiteSpace(employee.CivilId) && string.IsNullOrWhiteSpace(employee.EmpId))
         {
             ResetDuplicateState();
             return;
@@ -81,17 +81,29 @@ public partial class EmployeeForm : ComponentBase
 
         try
         {
-            var result = await EmployeeApi.GetByCivilId(employee.CivilId);
-
-            if (result is not null)
+            if (!string.IsNullOrWhiteSpace(employee.CivilId))
             {
-                IsDuplicate = true;
-                DuplicateMessage = $"هذا الموظف مسجل مسبقاً باسم: {result.Name}";
+                var result = await EmployeeApi.GetByCivilId(employee.CivilId);
+
+                if (result is not null)
+                {
+                    IsDuplicate = true;
+                    DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الهوية مسبقاً باسم: {result.Name}";
+                }
             }
             else
-            {
-                ResetDuplicateState();
-            }
+                if (!string.IsNullOrWhiteSpace(employee.EmpId))
+                {
+                    var result = await EmployeeApi.GetByEmpId(employee.EmpId);
+
+                    if (result is not null)
+                    {
+                        IsDuplicate = true;
+                        DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الوظيفة مسبقاً باسم: {result.Name}";
+                    }
+                    else
+                        ResetDuplicateState();
+                }
         }
         catch
         {

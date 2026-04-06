@@ -1,319 +1,344 @@
-﻿<aside class="bg-[#009EDB] dark:bg-[#00658e] font-['IBM_Plex_Sans_Arabic'] text-sm font-medium leading-relaxed tracking-wide fixed top-0 right-0 h-full w-auto flex flex-col z-40 shadow-[-12px_0_32px_rgba(25,28,30,0.06)] py-6 rtl">
-    <div class="px-6 mb-8">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                <span class="material-symbols-outlined text-white" data-icon="school">school</span>
-            </div>
-            <div>
-                <h1 class="text-1l font-bold text-white font-['Tajawal'] tracking-tight">مساحات التعليم المؤقتة</h1>
-                <p class="text-white/60 text-[10px] leading-tight">جباليا</p>
-            </div>
-        </div>
+@* ╔══════════════════════════════════════════════════════════════╗ *@
+@* ║  TLSWeb/Layout/NavMenu.razor  — Responsive                  ║ *@
+@* ║  يعتمد على Tailwind (كما في المشروع الأصلي)                 ║ *@
+@* ║  + material-symbols-outlined للأيقونات                      ║ *@
+@* ╚══════════════════════════════════════════════════════════════╝ *@
+
+@implements IDisposable
+
+@* ══ زر Hamburger — يظهر فقط على الجوال ══ *@
+<button id="hamburger-btn"
+        class="fixed top-3 right-3 z-[400] flex items-center justify-center w-10 h-10
+               bg-white rounded-xl shadow-md border border-gray-200
+               lg:hidden transition-all duration-200 hover:bg-gray-50"
+        @onclick="ToggleSidebar"
+        aria-label="فتح القائمة">
+    <span class="material-symbols-outlined text-[#009EDB]" style="font-size:22px">
+        @(IsOpen ? "close" : "menu")
+    </span>
+</button>
+
+@* ══ Overlay ══ *@
+@if (IsOpen)
+{
+    <div class="fixed inset-0 bg-black/50 z-[290] lg:hidden"
+         @onclick="CloseSidebar"
+         style="animation: fadeIn 0.2s ease">
     </div>
-    <nav class="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-        <!-- Dashboard (Active) -->
-        <div class="menu-item">
-            <a class="bg-white/15 text-white rounded-full mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:scale-[1.01]" href="/">
-                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                <span class="flex-1">الرئيسية</span>
+}
+
+@* ══ القائمة الجانبية ══ *@
+<aside class="@SidebarClasses" dir="rtl">
+
+    @* ── الشعار ── *@
+    <div class="flex items-center gap-3 px-4 py-5 border-b border-white/10 flex-shrink-0">
+        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-content-center flex-shrink-0"
+             style="display:flex;align-items:center;justify-content:center">
+            <span class="material-symbols-outlined text-white" style="font-size:22px">school</span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <h1 class="text-sm font-bold text-white font-['Tajawal'] leading-tight truncate">
+                مساحات التعليم المؤقتة
+            </h1>
+            <p class="text-white/55 text-[10px] leading-tight mt-0.5">جباليا</p>
+        </div>
+        @* زر الإغلاق — جوال فقط *@
+        <button class="lg:hidden flex items-center justify-center w-7 h-7 rounded-lg
+                       text-white/60 hover:text-white hover:bg-white/15 transition-colors"
+                @onclick="CloseSidebar">
+            <span class="material-symbols-outlined" style="font-size:18px">close</span>
+        </button>
+    </div>
+
+    @* ── منطقة التنقل ── *@
+    <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5"
+         style="scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.2) transparent">
+
+        @* الرئيسية *@
+        <a href="/"
+           class="@NavLinkClass("/")" 
+           @onclick="CloseSidebar"
+           @onclick:preventDefault="false">
+            <span class="material-symbols-outlined" style="font-size:20px">dashboard</span>
+            <span class="flex-1">الرئيسية</span>
+        </a>
+
+        @* @* لوحة المدير — للمدير فقط *@
+        @* <AuthorizeView Roles="@Roles.Admin"> 
+            <a href="/"
+               class="@NavLinkClass("/")"
+               @onclick="CloseSidebar"
+               @onclick:preventDefault="false">
+                <span class="material-symbols-outlined" style="font-size:20px">admin_panel_settings</span>
+                <span class="flex-1">لوحة التحكم </span>
             </a>
+         </AuthorizeView> *@ 
+
+        <AuthorizeView Roles="@Roles.User"> 
+        <a href="/Center/Edit"
+       class="@NavLinkClass(PagesUris.CenterPages.Edit)"
+       @onclick="CloseSidebar"
+       @onclick:preventDefault="false">
+        <span class="material-symbols-outlined" style="font-size:20px">edit_square</span>
+        <span class="flex-1">بيانات مركزي</span>
+    </a>
+        </AuthorizeView>
+        @* الطلاب *@
+        <div>
+            <button class="@GroupBtnClass("students")"
+                    @onclick='() => ToggleGroup("students")'>
+                <span class="material-symbols-outlined" style="font-size:20px">school</span>
+                <span class="flex-1 text-right">الطلاب</span>
+                <span class="material-symbols-outlined @ChevronClass("students")" style="font-size:18px">
+                    expand_more
+                </span>
+            </button>
+            @if (openGroup == "students")
+            {
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <a href="@PagesUris.StudentsPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>عرض جميع الطلاب</span>
+                    </a>
+                    <a href="@PagesUris.StudentsPages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>إضافة طالب جديد</span>
+                    </a>
+                </div>
+            }
         </div>
 
-        <AuthorizeView Roles="Admin">
-            <Authorized> 
-                <div class="menu-item">
-                    <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
-                        <span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
-                        <span class="flex-1">الإدارة</span>
-                        <span class="material-symbols-outlined text-sm chevron-icon" data-icon="manage_accounts">expand_more</span>
-                    </button>
+        @* الموظفون *@
+        <div>
+            <button class="@GroupBtnClass("staff")"
+                    @onclick='() => ToggleGroup("staff")'>
+                <span class="material-symbols-outlined" style="font-size:20px">badge</span>
+                <span class="flex-1 text-right">الموظفون</span>
+                <span class="material-symbols-outlined @ChevronClass("staff")" style="font-size:18px">
+                    expand_more
+                </span>
+            </button>
+            @if (openGroup == "staff")
+            {
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <a href="@PagesUris.EmployeesPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>عرض الموظفين</span>
+                    </a>
+                    <a href="@PagesUris.EmployeesPages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>إضافة موظف</span>
+                    </a>
+                </div>
+            }
+        </div>
 
-                    <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                        <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.Admin.DashBoard">
-                            <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                            <span>بيانات جميع المراكز</span>
-                        </a>
-                    </div>
+        <AuthorizeView Roles="@Roles.Admin">
+        @* الثوابت *@
+        <div>
+            <button class="@GroupBtnClass("lookups")"
+                    @onclick='() => ToggleGroup("lookups")'>
+                <span class="material-symbols-outlined" style="font-size:20px">calendar_month</span>
+                <span class="flex-1 text-right">الثوابت</span>
+                <span class="material-symbols-outlined @ChevronClass("lookups")" style="font-size:18px">
+                    expand_more
+                </span>
+            </button>
+            @if (openGroup == "lookups")
+            {
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <a href="@PagesUris.LookupsValuePages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>عرض الثوابت</span>
+                    </a>
+                    <a href="@PagesUris.LookupsValuePages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>إضافة ثابت</span>
+                    </a>
+                </div>
+            }
+        </div>
 
-                    <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                        <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.UsersPages.Manage">
-                            <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+
+        @* المستخدمون — للمدير فقط *@
+            <div>
+                <button class="@GroupBtnClass("users")"
+                        @onclick='() => ToggleGroup("users")'>
+                    <span class="material-symbols-outlined" style="font-size:20px">manage_accounts</span>
+                    <span class="flex-1 text-right">المستخدمون</span>
+                    <span class="material-symbols-outlined @ChevronClass("users")" style="font-size:18px">
+                        expand_more
+                    </span>
+                </button>
+                @if (openGroup == "users")
+                {
+                    <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                        <a href="@PagesUris.UsersPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                             <span>إدارة المستخدمين</span>
                         </a>
+                        <a href="@PagesUris.UsersPages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>إضافة مستخدم</span>
+                        </a>
+                        <a href="@PagesUris.Admin.ResetPassword" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="material-symbols-outlined" style="font-size:20px">lock_reset</span>
+                            @* <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span> *@
+                            <span>إعادة ضبط كلمة المرور للمستخدمين</span>
+                        </a>
+
+
+                        
                     </div>
+                }
+            </div>
+  
+
+        @* التقارير *@
+       @*  <div>
+            <button class="@GroupBtnClass("reports")"
+                    @onclick='() => ToggleGroup("reports")'>
+                <span class="material-symbols-outlined" style="font-size:20px">analytics</span>
+                <span class="flex-1 text-right">التقارير</span>
+                <span class="material-symbols-outlined @ChevronClass("reports")" style="font-size:18px">
+                    expand_more
+                </span>
+            </button>
+            @if (openGroup == "reports")
+            {
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <a href="#" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>تقارير الأداء</span>
+                    </a>
+                    <a href="#" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>الإحصائيات السنوية</span>
+                    </a>
                 </div>
+            }
+        </div> *@
 
-               
-             </Authorized>
-        </AuthorizeView>
-
-        <!-- Students (Collapsible) -->
-        <div class="menu-item">
-            <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
-                <span class="material-symbols-outlined" data-icon="school">school</span>
-                <span class="flex-1">الطلاب</span>
-                <span class="material-symbols-outlined text-sm chevron-icon" data-icon="expand_more">expand_more</span>
+        @* الإعدادات *@
+        <div>
+            <button class="@GroupBtnClass("settings")"
+                    @onclick='() => ToggleGroup("settings")'>
+                <span class="material-symbols-outlined" style="font-size:20px">settings</span>
+                <span class="flex-1 text-right">الإعدادات</span>
+                <span class="material-symbols-outlined @ChevronClass("settings")" style="font-size:18px">
+                    expand_more
+                </span>
             </button>
-            <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.StudentsPages.Manage">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>عرض جميع الطلاب</span>
-                </a>
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.StudentsPages.Add">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>إضافة طالب جديد</span>
-                </a>
-                
-            </div>
+            @if (openGroup == "settings")
+            {
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <a href="@PagesUris.Admin.EditCenters" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>المراكز</span>
+                    </a>
+                   @*  <a href="#" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>إدارة الصلاحيات</span>
+                    </a> *@
+                    
+                </div>
+            }
         </div>
-        <!-- Staff (Collapsible) -->
-        <div class="menu-item">
-            <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
-                <span class="material-symbols-outlined" data-icon="badge">badge</span>
-                <span class="flex-1">الموظفون</span>
-                <span class="material-symbols-outlined text-sm chevron-icon" data-icon="expand_more">expand_more</span>
-            </button>
-            <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.EmployeesPages.Manage">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>عرض الموظفين</span>
-                </a>
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.EmployeesPages.Add">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>إضافة موظف</span>
-                </a>
-            </div>
-        </div>
-        <!-- Schedule (Collapsible) -->
-        <div class="menu-item">
-            <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
-                <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
-                <span class="flex-1">الثوابت</span>
-                <span class="material-symbols-outlined text-sm chevron-icon" data-icon="expand_more">expand_more</span>
-            </button>
-            <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.LookupsValuePages.Manage">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>عرض الثوابت</span>
-                </a>
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="@PagesUris.LookupsValuePages.Add">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>إضافة ثابت</span>
-                </a>
-            </div>
-        </div>
-        <!-- Reports (Collapsible) -->
-        <div class="menu-item">
-            <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
-                <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-                <span class="flex-1">التقارير</span>
-                <span class="material-symbols-outlined text-sm chevron-icon" data-icon="expand_more">expand_more</span>
-            </button>
-            <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="#">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>تقارير الأداء</span>
-                </a>
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="#">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>الإحصائيات السنوية</span>
-                </a>
-            </div>
-        </div>
-        <!-- Settings (Collapsible) -->
-        <div class="menu-item">
-            <button class="w-[calc(100%-1rem)] text-white/80 hover:text-white mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] rounded-xl text-right" onclick="this.parentElement.classList.toggle('active')">
-                <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                <span class="flex-1">الإعدادات</span>
-                <span class="material-symbols-outlined text-sm chevron-icon" data-icon="expand_more">expand_more</span>
-            </button>
-            <div class="menu-content pr-12 flex flex-col gap-1 mt-1">
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="#">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>إعدادات النظام</span>
-                </a>
-                <a class="text-white/60 hover:text-white py-2 text-xs transition-colors flex items-center gap-2" href="#">
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span>إدارة الصلاحيات</span>
-                </a>
-            </div>
-        </div>
+       </AuthorizeView>
     </nav>
-    <div class="mt-auto px-2 space-y-1">
-        <button class="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white rounded-xl px-4 py-3 transition-all mb-4 active:scale-95">
-            <span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
-            <span>إضافة سجل جديد</span>
-        </button>
-        <a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 transition-colors hover:bg-white/10 rounded-lg" href="#">
-            <span class="material-symbols-outlined" data-icon="help">help</span>
+
+    @* ── Footer القائمة ── *@
+    <div class="mt-auto px-2 pb-4 pt-2 border-t border-white/10 space-y-0.5 flex-shrink-0">
+        @* <a href="#"
+           class="flex items-center gap-3 text-white/65 hover:text-white px-3 py-2.5
+                  rounded-xl hover:bg-white/12 transition-colors text-sm">
+            <span class="material-symbols-outlined" style="font-size:18px">help</span>
             <span>المساعدة</span>
-        </a>
-        <a class="flex items-center gap-3 text-white/70 hover:text-white px-4 py-2 mx-2 transition-colors hover:bg-white/10 rounded-lg" href="#">
-            <span class="material-symbols-outlined" data-icon="logout">logout</span>
+        </a> *@
+        <a href="#" onclick="@(async ()=> { var customAuthStateProvider = (CookieAuthenticationStateProvider)authenticationStateProvider; await customAuthStateProvider.LogoutAsync();})"
+           class="flex items-center gap-3 text-white/65 hover:text-white px-3 py-2.5
+                  rounded-xl hover:bg-white/12 transition-colors text-sm">
+            <span class="material-symbols-outlined" style="font-size:18px">logout</span>
             <span>تسجيل الخروج</span>
         </a>
     </div>
+
 </aside>
 
-
-
-
-
-@* <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-end rotate-caret bg-gradient-dark ps ps__rtl bg-white" 
-       id="sidenav-main" style="position:relative; height: auto; overflow-y: auto;">
-    
-    <div class="sidenav-header">
-        <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute start-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-        <a class="navbar-brand m-0" href="" >
-            <img src="../assets/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">
-            <span class="me-1 font-weight-bold text-white">مراكز التعليم المؤقتة</span>
-        </a>
-    </div>
-
-    <hr class="horizontal light mt-0 mb-2">
-    <div class="  px-0 w-auto max-height-vh-100 ps ps__rtl ps--active-y" id="sidenav-collapse-main">
-        <ul>
-            <li>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> الرئيسية
-                    </NavLink>
-
-                </div>
-            </li>
-
-
-
-            @* المستخدمون 
-            <li class="nav-item">
-                <!-- العنصر الأب القابل للطي -->
-                <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse" aria-expanded="false">
-                    <div class="text-white text-center ms-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">people</i>
-                    </div>
-                    <span class="nav-link-text me-1">المستخدمون</span>
-                </a>
-    
-                <!-- القائمة الفرعية -->
-                <div class="collapse" id="usersCollapse">
-                    <ul class="nav flex-column ms-3">
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@PagesUris.UsersPages.Manage">
-                                <span class="sidenav-normal me-3"> إدارة المستخدمين </span>
-                            </NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@PagesUris.UsersPages.Add">
-                                <span class="sidenav-normal me-3"> إضافة مستخدم </span>
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-
-            @* الموظفين 
-            <li class="nav-item">
-                <!-- العنصر الأب القابل للطي -->
-                <a class="nav-link" data-bs-toggle="collapse" href="#EmployeesCollapse" aria-expanded="false">
-                    <div class="text-white text-center ms-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">people</i>
-                    </div>
-                    <span class="nav-link-text me-1">الموظفون</span>
-                </a>
-    
-                <!-- القائمة الفرعية -->
-                <div class="collapse" id="EmployeesCollapse">
-                    <ul class="nav flex-column ms-3">
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@PagesUris.EmployeesPages.Manage">
-                                <span class="sidenav-normal me-3"> إدارة الموظفين </span>
-                            </NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@PagesUris.EmployeesPages.Add">
-                                <span class="sidenav-normal me-3"> إضافة موظف </span>
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-
-            @* الثوابت 
-            <li class="nav-item">
-                <!-- العنصر الأب القابل للطي -->
-                <a class="nav-link" data-bs-toggle="collapse" href="#lookupCollapse" aria-expanded="false">
-                    <div class="text-white text-center ms-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">people</i>
-                    </div>
-                    <span class="nav-link-text me-1">الثوابت</span>
-                </a>
-    
-                <!-- القائمة الفرعية -->
-                <div class="collapse" id="lookupCollapse">
-                    <ul class="nav flex-column ms-3">
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@PagesUris.LookupsValuePages.Manage">
-                                <span class="sidenav-normal me-3"> إدارة الثوابت </span>
-                            </NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@PagesUris.LookupsValuePages.Add">
-                                <span class="sidenav-normal me-3"> إضافة ثابت </span>
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-        </ul>
-        @* <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 36px; right: 235px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 2px;"></div></div> 
-    </div>
-    @* <div class="sidenav-footer position-absolute w-100 bottom-0 ">
-        <div class="mx-3">
-            <a class="btn bg-gradient-primary mt-4 w-100" href="https://www.creative-tim.com/product/material-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a>
-        </div>
-    </div> 
-    <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 235px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div>
-</aside> *@
-
-@* <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">مراكز التعليم المؤقت</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="@PagesUris.UsersPages.Manage">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> إدارة المستخدمين
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="@PagesUris.UsersPages.Add">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> إضافة مستخدم
-            </NavLink>
-        </div>
-    </nav>
-</div> *@
+@* ══ CSS Animations — داخل style tag مباشرةً لأن Tailwind لا يدعمها ══ *@
+<style>
+    @@keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
+    @@keyframes slideDown { from { opacity:0; transform:translateY(-6px) } to { opacity:1; transform:translateY(0) } }
+</style>
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool   IsOpen    = false;
+    private string openGroup = string.Empty;
+    private string CurrentUrl = string.Empty;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    // ── Sidebar classes — تتغير بين Desktop (sticky) والجوال (fixed drawer) ──
+    private string SidebarClasses =>
+        "bg-[#009EDB] flex flex-col " +
+        "font-['IBM_Plex_Sans_Arabic'] text-sm font-medium " +
+        // Desktop (>= lg): sticky تأخذ مكانها الطبيعي في اللياوت ولا تغطي المحتوى
+        "lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:flex-shrink-0 lg:z-50 " +
+        // Mobile (< lg): fixed drawer ينزلق من اليمين
+        "fixed top-0 right-0 h-full w-64 z-[300] " +
+        "transition-transform duration-300 ease-in-out " +
+        (IsOpen ? "translate-x-0 shadow-2xl" : "translate-x-full lg:translate-x-0");
 
-    private void ToggleNavMenu()
+    // ── Classes رابط مفرد ──
+    private string NavLinkClass(string href)
     {
-        collapseNavMenu = !collapseNavMenu;
+        var isActive = CurrentUrl == href || (href == "/" && CurrentUrl == "/");
+        return "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 " +
+               "text-sm font-medium " +
+               (isActive
+                   ? "bg-white/20 text-white"
+                   : "text-white/80 hover:text-white hover:bg-white/12");
     }
+
+    // ── Classes زر المجموعة ──
+    private string GroupBtnClass(string group)
+    {
+        var isOpen = openGroup == group;
+        return "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium " +
+               "transition-all duration-200 " +
+               (isOpen
+                   ? "bg-white/15 text-white"
+                   : "text-white/80 hover:text-white hover:bg-white/12");
+    }
+
+    // ── Classes سهم التوسيع ──
+    private string ChevronClass(string group) =>
+        "transition-transform duration-200 text-white/50 " +
+        (openGroup == group ? "rotate-180 !text-white" : "");
+
+    // ── Classes الروابط الفرعية ──
+    private const string SubLinkClass =
+        "flex items-center gap-2 py-2 px-2.5 rounded-lg text-xs " +
+        "text-white/60 hover:text-white hover:bg-white/10 transition-colors";
+
+    protected override void OnInitialized()
+    {
+        CurrentUrl = "/" + NavManager.ToBaseRelativePath(NavManager.Uri);
+        NavManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender,
+        Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        CurrentUrl = "/" + NavManager.ToBaseRelativePath(e.Location);
+        IsOpen     = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleSidebar() => IsOpen = !IsOpen;
+    private void CloseSidebar()  => IsOpen = false;
+
+    private void ToggleGroup(string group)
+        => openGroup = (openGroup == group) ? string.Empty : group;
+
+    public void Dispose()
+        => NavManager.LocationChanged -= OnLocationChanged;
 }

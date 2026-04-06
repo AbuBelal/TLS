@@ -41,7 +41,16 @@
         public static class Admin
         {
             public const string PriorUrl = "Admin";
-            public const string DashBoard = PriorUrl + "/admin-dashboard";
+            public const string DashBoard = PriorUrl + "/dashboard";
+            public const string EditCenters = PriorUrl + "/EditCenters";
+            public const string ResetPassword = PriorUrl + "/ResetPassword";
+
+        }
+
+        public static class CenterPages
+        {
+            public const string PriorUrl = "Center";
+            public const string Edit = PriorUrl + "/Edit";
         }
     }
 }

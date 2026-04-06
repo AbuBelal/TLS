@@ -39,7 +39,12 @@ namespace APIServer.Controllers
         private async Task<long> CurrentCenterId ()
         {
             var Employee = await CurrentEmployee();
-            return  Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId??0;
+            return
+                Employee is null ? 0 :
+                Employee.EmpCenters
+                .OrderByDescending(ec => ec.FromDate)
+                .FirstOrDefault()?
+                .CenterId ?? 0;
         }
         #endregion
 
@@ -113,7 +118,7 @@ namespace APIServer.Controllers
         //  Server-Side Filtering + Pagination
         // ========================================
         [HttpGet("paginated")]
-        public async Task<ActionResult<PaginatedResponse<Student>>>
+        public async Task<ActionResult<PaginatedResponse<StudentDto>>>
             GetPaginated([FromQuery] StudentFilterRequest request)
         {
             var CurCenter = await CurrentCenterId() ;

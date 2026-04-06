@@ -20,5 +20,6 @@ namespace SharedLib.DTOs
 
         [Required(ErrorMessage = "يجب تحديد صلاحية")]
         public string Role { get; set; } = "";
+        public long? EmployeeId { get; set; } = 0;
     }
 }

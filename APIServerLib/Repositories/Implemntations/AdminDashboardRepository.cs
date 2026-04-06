@@ -48,8 +48,8 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         var levelColors = new[]
         {
             "bg-primary", "bg-success", "bg-info",
-            "bg-warning",  "bg-danger",  "bg-secondary",
-            "bg-dark"
+            "bg-warning",  "bg-danger","bg-primary",  "bg-secondary",
+            "bg-danger", "bg-success", "bg-info",
         };
 
         var centerSummaries = new List<CenterSummaryDto>();
@@ -95,7 +95,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                                  : (int)Math.Round((double)g.Count() / totalStd * 100),
                     ColorClass = i < levelColors.Length ? levelColors[i] : "bg-secondary"
                 })
-                .OrderBy(d => d.Label)
+                .OrderBy(d => d.Order)
                 .ToList();
 
             centerSummaries.Add(new CenterSummaryDto
@@ -142,7 +142,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                              : (int)Math.Round((double)g.Count() / grandTotal * 100),
                 ColorClass = i < levelColors.Length ? levelColors[i] : "bg-secondary"
             })
-            .OrderBy(d => d.Label)
+            .OrderBy(d => d.Order)
             .ToList();
 
         return new AdminDashboardDto

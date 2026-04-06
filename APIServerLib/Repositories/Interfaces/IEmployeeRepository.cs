@@ -10,5 +10,6 @@ namespace APIServerLib.Repositories.Interfaces
         Task<int> GetCenterEmployeesCountAsync(long CenterId);
         Task<EmployeePaginatedResponse> GetPaginatedEmployesAsync(EmployeeFilterRequest request, long CenterId = 0);
         Task<EmployeeUpsertDto?> GetByCivilId(string CivilId);
+        Task<EmployeeUpsertDto?> GetByEmpId(string EmpId);
     }
 }

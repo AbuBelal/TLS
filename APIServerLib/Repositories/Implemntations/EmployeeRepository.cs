@@ -61,13 +61,28 @@ namespace APIServerLib.Repositories.Implemntations
         {
             var pageNumber = request.PageNumber < 1 ? 1 : request.PageNumber;
             var pageSize = request.PageSize <= 0 ? 10 : request.PageSize;
+            IQueryable<Employee> query;
 
-            var query = _context.Employees.Where(e => e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().CenterId == CenterId)
-                .AsNoTracking()
-                .Include(e => e.Gender)
-                .Include(e => e.Job)
-                .Include(e => e.Specialization)
-                .AsQueryable();
+            //if (CenterId == 0)
+            //{
+            //     query = _context.Employees
+            //       .AsNoTracking()
+            //       .Include(e => e.Gender)
+            //       .Include(e => e.Job)
+            //       .Include(e => e.Specialization)
+            //       .AsQueryable();
+            //}
+            //else
+            //{
+                 query = _context.Employees
+                    .Where(e => CenterId==0 ? true: e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().CenterId == CenterId)
+                    .AsNoTracking()
+                    .Include(e => e.Gender)
+                    .Include(e => e.Job)
+                    .Include(e => e.Specialization)
+                    .Include(x=> x.EmpCenters).ThenInclude(x=>x.Center)
+                    .AsQueryable();
+            //}
 
             if (!string.IsNullOrWhiteSpace(request.SearchText))
             {
@@ -108,7 +123,9 @@ namespace APIServerLib.Repositories.Implemntations
                     Mobile = e.Mobile,
                     GenderName = e.Gender != null ? e.Gender.Name : null,
                     JobName = e.Job != null ? e.Job.Name : null,
-                    SpecializationName = e.Specialization != null ? e.Specialization.Name : null
+                    SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
+                    CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name
+
                 })
                 .ToListAsync();
 
@@ -145,10 +162,23 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<EmployeeUpsertDto?> GetByCivilId(string CivilId)
         {
-            var E = await _context.Employees.Where(x => x.CivilId == CivilId).FirstOrDefaultAsync();
+            var E = await _context.Employees.Where(x => x.CivilId == CivilId)
+                .Include(x=>x.EmpCenters).ThenInclude(x=>x.Center).FirstOrDefaultAsync();
             if (E is null) return null;
 
            var R =(new EmployeeMapper()).ToEmployeeUpsertDTO(E);
+            R.CenterName = E.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()?.Center.Name;
+            return R;
+        }
+
+        public async Task<EmployeeUpsertDto?> GetByEmpId(string EmpId)
+        {
+            var E = await _context.Employees.Where(x => x.EmpId == EmpId)
+                .Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
+            if (E is null) return null;
+
+           var R =(new EmployeeMapper()).ToEmployeeUpsertDTO(E);
+            R.CenterName = E.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()?.Center.Name;
             return R;
         }
     }

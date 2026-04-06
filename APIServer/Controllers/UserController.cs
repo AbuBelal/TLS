@@ -242,6 +242,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> AddUser(AdminUserInputModel Input)
         {
             var newUser = new ApplicationUser { UserName = Input.Email, Email = Input.Email, EmailConfirmed = true };
+            newUser.EmployeeId = Input.EmployeeId==0 ? null : Input.EmployeeId;
             //1.إنشاء المستخدم
             var result = await _userManager.CreateAsync(newUser, Input.Password);
 

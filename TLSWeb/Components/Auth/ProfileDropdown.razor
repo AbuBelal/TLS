@@ -51,8 +51,8 @@
         var customAuthStateProvider = (CookieAuthenticationStateProvider)authenticationStateProvider;
         // var logoutmodel = new UserSession();
         // await customAuthStateProvider.UpdateAuthenticationState(logoutmodel);
-
+        
         await customAuthStateProvider.LogoutAsync();
-        NavManager.NavigateTo("/", forceLoad: true);
+        // NavManager.NavigateTo("/", forceLoad: true);
     }
 }

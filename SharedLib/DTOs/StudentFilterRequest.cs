@@ -24,4 +24,5 @@ public class StudentFilterRequest
 
     /// <summary>فلتر المستوى</summary>
     public string? Level { get; set; }
+    public string? Center { get; set; }
 }

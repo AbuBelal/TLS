@@ -46,6 +46,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetAll = PriorUrl;
             public const string GetById = PriorUrl+"/{id}";
             public const string GetByCivilId = PriorUrl+ "/GetByCivilId/{CivilId}";
+            public const string GetByEmpId = PriorUrl+ "/GetByEmpId/{EmpId}";
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
@@ -75,6 +76,7 @@ namespace TLSClientSharedLib.Helpers
             public const string Insert = PriorUrl;
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
+            public const string MyCenter = PriorUrl + "/my-center";
         }
 
         public static class EmpCenter

@@ -57,7 +57,18 @@
                     @* الرقم الوظيفي *@
                     <div class="col-md-6">
                         <label class="form-label">الرقم الوظيفي</label>
-                        <InputText @bind-Value="employee.EmpId" class="form-control" />
+                        <InputText @bind-Value="employee.EmpId" 
+                                   class="form-control" 
+                                   @onblur="CheckDuplicateAsync" />
+
+                        <ValidationMessage For="@(() => employee.EmpId)" class="text-danger" />
+                        @if (IsCheckingDuplicate)
+                        {
+                            <small class="text-muted">
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                جاري التحقق...
+                            </small>
+                        }
                     </div>
 
                     @* الجوال *@

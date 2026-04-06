@@ -1,8 +1,11 @@
-using SharedLib.Entities;
 using APIServerLib.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharedLib.DTOs;
+using SharedLib.Entities;
 using SharedLib.Responses;
+using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 namespace APIServer.Controllers
 {
@@ -43,7 +46,7 @@ namespace APIServer.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<GeneralResponse>> Update(Center center)
+        public async Task<ActionResult<GeneralResponse>> Update(CenterUpsertDto center)
         {
             var response = await _centerRepository.Update(center);
             return Ok(response);
@@ -54,6 +57,39 @@ namespace APIServer.Controllers
         {
             var response = await _centerRepository.DeleteById(id);
             return Ok(response);
+        }
+
+        [HttpGet("my-center")]
+        [Authorize(Roles = $"{SharedLib.Fixed.Roles.User},{SharedLib.Fixed.Roles.User}")]
+        public async Task<ActionResult<Center>> GetMyCenter()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var center = await _centerRepository.GetByUserIdAsync(userId);
+            return center is null
+                ? NotFound(new GeneralResponse(false, "لا يوجد مركز مرتبط بحسابك.", 0))
+                : Ok(center);
+        }
+
+        /// <summary>
+        /// PUT /api/Center/my-center
+        /// يعدّل بيانات المركز — لمدير المركز فقط، مع التحقق من الملكية
+        /// </summary>
+        [HttpPut("my-center")]
+        [Authorize(Roles = SharedLib.Fixed.Roles.User)]
+        public async Task<ActionResult<GeneralResponse>> UpdateMyCenter([FromBody] CenterUpsertDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await _centerRepository.UpdateByUserAsync(dto, userId);
+            return Ok(result);
         }
     }
 }

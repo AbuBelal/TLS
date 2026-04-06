@@ -20,6 +20,9 @@ namespace TLSClientSharedLib.Services.Apis
         [Get(ApiUrls.Employee.GetByCivilId)]
         Task<EmployeeUpsertDto?> GetByCivilId(string CivilId);
 
+        [Get(ApiUrls.Employee.GetByEmpId)]
+        Task<EmployeeUpsertDto?> GetByEmpId(string EmpId);
+
         [Post(ApiUrls.Employee.Insert)]
         Task<GeneralResponse> Insert([Body] EmployeeUpsertDto employee);
 

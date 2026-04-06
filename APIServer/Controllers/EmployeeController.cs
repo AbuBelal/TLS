@@ -40,7 +40,12 @@ namespace APIServer.Controllers
         private async Task<long> CurrentCenterId()
         {
             var Employee = await CurrentEmployee();
-            return Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId ?? 0;
+            return 
+                Employee is null ? 0 :
+                Employee.EmpCenters
+                .OrderByDescending(ec => ec.FromDate)
+                .FirstOrDefault()?
+                .CenterId ?? 0;
         }
         #endregion
 
@@ -69,6 +74,15 @@ namespace APIServer.Controllers
         public async Task<ActionResult<EmployeeUpsertDto?>> GetByCivilId(string CivilId)
         {
             var result = await _employeeRepository.GetByCivilId(CivilId);
+            if (result == null)
+                return NotFound(null);
+            return Ok(result);
+        }
+
+        [HttpGet("GetByEmpId/{EmpId}")]
+        public async Task<ActionResult<EmployeeUpsertDto?>> GetByEmpId(string EmpId)
+        {
+            var result = await _employeeRepository.GetByEmpId(EmpId);
             if (result == null)
                 return NotFound(null);
             return Ok(result);

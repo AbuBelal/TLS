@@ -22,6 +22,7 @@ namespace SharedLib.DTOs
         public string? Mobile { get; set; }
         public string? GenderName { get; set; }
         public string? JobName { get; set; }
+        public string? CenterName { get; set; }
         public string? SpecializationName { get; set; }
     }
 
@@ -52,5 +53,6 @@ namespace SharedLib.DTOs
         public string? OrgSchool { get; set; }
         public long? SpecializationId { get; set; }
         public string? Comments { get; set; }
+        public string? CenterName { get; set; }
     }
 }
