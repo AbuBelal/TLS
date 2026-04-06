@@ -156,6 +156,26 @@
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
     <script src="_content/MudBlazor/MudBlazor.min.js?v=1"></script>
+    <script>
+        window.BlazorDownloadFile = (fileName, contentType, bytes) => {
+            // تحويل الـ bytes إلى Blob
+            const blob = new Blob([new Uint8Array(bytes)], { type: contentType });
+            const url = URL.createObjectURL(blob);
+
+            // إنشاء رابط مؤقت والنقر عليه
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+
+            // تنظيف
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        };
+    </script>
 </body>
 
 </html>

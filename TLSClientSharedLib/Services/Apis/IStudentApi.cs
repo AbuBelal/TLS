@@ -34,5 +34,15 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Get(ApiUrls.Student.paginated)]
         Task<PaginatedResponse<StudentDto>> GetPaginated(StudentFilterRequest request);
+
+        // ── جديد: تصدير ────────────────────────────────────────────
+
+        /// <summary>تصدير الطلاب المفلترة — يُعيد bytes الملف</summary>
+        [Get(ApiUrls.Student.ExportFiltered)]
+        Task<HttpResponseMessage> ExportFiltered([Query] StudentFilterRequest request);
+
+        /// <summary>تصدير جميع طلاب المركز</summary>
+        [Get(ApiUrls.Student.ExportAll)]
+        Task<HttpResponseMessage> ExportAll();
     }
 }

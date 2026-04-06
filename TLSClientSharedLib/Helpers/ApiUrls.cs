@@ -67,6 +67,8 @@ namespace TLSClientSharedLib.Helpers
             //   /api/Student/StudentCenterCount/{CenterId})
             public const string StudentsCenterCount = PriorUrl + "/StudentCenterCount/{id}";
             public const string paginated = PriorUrl + "/paginated";
+            public const string ExportFiltered = PriorUrl + "/export/filtered";
+            public const string ExportAll = PriorUrl + "/export/all";
         }
         public static class Center
         {

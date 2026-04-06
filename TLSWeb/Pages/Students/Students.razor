@@ -6,9 +6,80 @@
         <h3 class="mb-0">
             <i class="bi bi-people-fill me-2 text-primary"></i>إدارة الطلاب
         </h3>
-        <button class="btn btn-primary shadow-sm" @onclick="OpenAddModal">
+        @* <button class="btn btn-primary shadow-sm" @onclick="OpenAddModal">
             <i class="bi bi-plus-circle me-1"></i> إضافة طالب جديد
-        </button>
+        </button> *@
+        @* ── أزرار الإجراءات ── *@
+        <div class="d-flex gap-2" dir="rtl">
+
+            @* زر إضافة طالب *@
+            <button class="btn btn-primary shadow-sm" @onclick="OpenAddModal">
+                <i class="bi bi-plus-circle me-1"></i>إضافة طالب جديد
+            </button>
+
+            @* ── زر التصدير مع Dropdown ── *@
+            <div class="position-relative" @onclick:stopPropagation="true">
+                <button class="btn btn-success shadow-sm d-flex align-items-center gap-2"
+                        @onclick="ToggleExportMenu"
+                        disabled="@(isExportingFiltered || isExportingAll)">
+                    @if (isExportingFiltered || isExportingAll)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                        <span>جاري التصدير...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-file-earmark-excel-fill"></i>
+                        <span>تصدير Excel</span>
+                        <i class="bi bi-chevron-down" style="font-size:.75rem"></i>
+                    }
+                </button>
+
+                @* Dropdown القائمة *@
+                @if (showExportMenu)
+                {
+                    <div class="position-absolute bg-white border rounded-3 shadow-lg p-1"
+                         style="top:calc(100% + 6px);left:0;min-width:280px;z-index:200">
+
+                        @* الخيار 1: تصدير المعروض *@
+                        <button class="btn btn-light w-100 text-end d-flex align-items-start gap-3 p-3 rounded-2 mb-1 border-0"
+                                style="transition:background .15s"
+                                @onclick="ExportFiltered"
+                                disabled="@isExportingFiltered">
+
+                            <div class="rounded-2 p-2 bg-success bg-opacity-10 flex-shrink-0">
+                                <i class="bi bi-funnel-fill text-success fs-5"></i>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold small">تصدير المعروض حسب التصفية</div>
+                                <div class="text-muted" style="font-size:.72rem">
+                                    @totalCount طالب — @FilterDescription
+                                </div>
+                            </div>
+                        </button>
+
+                        <hr class="my-1" />
+
+                        @* الخيار 2: تصدير الكل *@
+                        <button class="btn btn-light w-100 text-end d-flex align-items-start gap-3 p-3 rounded-2 border-0"
+                                style="transition:background .15s"
+                                @onclick="ExportAll"
+                                disabled="@isExportingAll">
+
+                            <div class="rounded-2 p-2 bg-primary bg-opacity-10 flex-shrink-0">
+                                <i class="bi bi-people-fill text-primary fs-5"></i>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold small">تصدير جميع طلاب المركز</div>
+                                <div class="text-muted" style="font-size:.72rem">
+                                    بدون فلاتر — مرتّب حسب المستوى والاسم
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 
     @* ===== شريط البحث والفلاتر ===== *@

@@ -184,5 +184,93 @@ namespace APIServerLib.Repositories.Implemntations
 
             return response;
         }
+        public async Task<List<Student>> GetFilteredForExportAsync(
+        StudentFilterRequest request, long centerId)
+        {
+            IQueryable<Student> query;
+            if (centerId == 0)
+            {
+                 query = _context.Students
+                    .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
+                    .Include(s => s.Gender)
+                    .Include(s => s.Level)
+                    .AsNoTracking()
+                    .OrderBy(s => s.StdCenters
+                        .OrderByDescending(sc => sc.FromDate)
+                        .FirstOrDefault()!.CenterId)
+                    .ThenBy(s=>s.Level.SortOrder)
+                    .AsQueryable();
+            }
+            else
+            {
+                 query = _context.Students
+                    .Where(s => s.StdCenters
+                        .OrderByDescending(sc => sc.FromDate)
+                        .FirstOrDefault()!.CenterId == centerId)
+                    .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
+                    .Include(s => s.Gender)
+                    .Include(s => s.Level)
+                    .AsNoTracking()
+                    .OrderBy(s => s.StdCenters
+                        .OrderByDescending(sc => sc.FromDate)
+                        .FirstOrDefault()!.CenterId)
+                    .ThenBy(s => s.Level.SortOrder)
+                    .AsQueryable();
+            }
+
+            // نفس منطق الفلترة في GetPaginatedStudentsAsync
+            if (!string.IsNullOrWhiteSpace(request.SearchText))
+            {
+                var term = request.SearchText.Trim().ToLower();
+                query = query.Where(s =>
+                    (s.Name != null && s.Name.ToLower().Contains(term)) ||
+                    (s.EnName != null && s.EnName.ToLower().Contains(term)) ||
+                    (s.CivilId != null && s.CivilId.Contains(term)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Gender))
+                query = query.Where(s => s.Gender != null && s.Gender.Name == request.Gender);
+
+            if (!string.IsNullOrWhiteSpace(request.Level))
+                query = query.Where(s => s.Level != null && s.Level.Name == request.Level);
+
+            return await query.OrderBy(s => s.Name).ToListAsync();
+        }
+
+        public async Task<List<Student>> GetAllByCenterAsync(long centerId)
+        {
+            if (centerId == 0)
+            {
+                return await _context.Students
+                    .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
+                     .Include(s => s.Gender)
+                     .Include(s => s.Level)
+                     .AsNoTracking()
+                     .OrderBy(s => s.StdCenters
+                     .OrderByDescending(sc => sc.FromDate)
+                     .FirstOrDefault()!.CenterId)
+                     .ThenBy(s => s.Level.SortOrder)
+                     .ToListAsync();
+
+            }
+            else
+            {
+                return await _context.Students
+                    .Where(s => s.StdCenters
+                        .OrderByDescending(sc => sc.FromDate)
+                        .FirstOrDefault()!.CenterId == centerId)
+                    .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
+                    .Include(s => s.Gender)
+                    .Include(s => s.Level)
+                    .AsNoTracking()
+                    .OrderBy(s => s.StdCenters
+                   .OrderByDescending(sc => sc.FromDate)
+                   .FirstOrDefault()!.CenterId)
+                    .ThenBy(s => s.Level.SortOrder)
+                    .ToListAsync();
+            }
+
+             
+        }
     }
 }

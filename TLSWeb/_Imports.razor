@@ -22,6 +22,7 @@
 @using SharedLib.Responses
 @using SharedLib.Fixed
 @using SharedLib.Mappers
+@using TLSWeb.Services
 
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider authenticationStateProvider
@@ -37,3 +38,4 @@
 @inject IUserService UserService
 @inject ILookupValueApi LookupValueApi
 @inject ICenterApi CenterApi
+@inject ExcelDownloadService ExcelDownloader

@@ -11,5 +11,16 @@ namespace APIServerLib.Repositories.Interfaces
         Task<int> GetCenterStudentsCountAsync(long CenterId);
         Task<GeneralResponse> AddStudentWithCenter(Student student , long centerid);
         Task<PaginatedResponse<StudentDto>> GetPaginatedStudentsAsync(StudentFilterRequest request, long CenterId=0);
+        // ── جديد: للتصدير ──────────────────────────────────────────
+
+        /// <summary>
+        /// جلب الطلاب المفلترة بدون pagination — لتصدير المعروض
+        /// </summary>
+        Task<List<Student>> GetFilteredForExportAsync(StudentFilterRequest request, long centerId);
+
+        /// <summary>
+        /// جلب جميع طلاب المركز بدون فلاتر — للتصدير الكامل
+        /// </summary>
+        Task<List<Student>> GetAllByCenterAsync(long centerId);
     }
 }

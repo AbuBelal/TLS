@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using SharedLib.DTOs;
 using SharedLib.Entities;
 using TLSWeb.Helpers;
@@ -32,6 +33,10 @@ public partial class Students : ComponentBase
     private bool showDeleteModal;
     private bool isDeleting;
     private StudentDto? studentToDelete;
+    // ====== حالة التصدير ======
+    private bool isExportingFiltered = false;
+    private bool isExportingAll = false;
+    private bool showExportMenu = false;
 
     // ====== دورة الحياة ======
     protected override async Task OnInitializedAsync()
@@ -197,6 +202,89 @@ public partial class Students : ComponentBase
             isDeleting = false;
             showDeleteModal = false;
             studentToDelete = null;
+        }
+    }
+
+    // ====== التصدير ======
+
+    /// <summary>تصدير الطلاب المعروضين حسب الفلاتر الحالية</summary>
+    /// 
+     // ── بناء طلب الفلترة ────────────────────────────────────────
+    private StudentFilterRequest BuildRequest() => new()
+    {
+        Page = currentPage,
+        PageSize = pageSize,
+        SearchText = searchText,
+        Gender = selectedGender,
+        Level = selectedLevel,
+    };
+    private async Task ExportFiltered()
+    {
+        if (isExportingFiltered) return;
+        isExportingFiltered = true;
+        showExportMenu = false;
+
+        try
+        {
+            var request = BuildRequest();
+            var response = await StudentApi.ExportFiltered(request);
+
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "طلاب_مفلتر.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExportingFiltered = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>تصدير جميع طلاب المركز بدون فلاتر</summary>
+    private async Task ExportAll()
+    {
+        if (isExportingAll) return;
+        isExportingAll = true;
+        showExportMenu = false;
+
+        try
+        {
+            var response = await StudentApi.ExportAll();
+
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "جميع_الطلاب.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExportingAll = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleExportMenu() => showExportMenu = !showExportMenu;
+    private void CloseExportMenu() => showExportMenu = false;
+
+    // نص وصف التصفية الحالية — يظهر في زر التصدير
+    private string FilterDescription
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(searchText)) parts.Add($"بحث: {searchText}");
+            if (!string.IsNullOrWhiteSpace(selectedGender)) parts.Add(selectedGender);
+            if (!string.IsNullOrWhiteSpace(selectedLevel)) parts.Add(selectedLevel);
+            return parts.Count > 0 ? string.Join(" | ", parts) : "بدون فلاتر";
         }
     }
 }

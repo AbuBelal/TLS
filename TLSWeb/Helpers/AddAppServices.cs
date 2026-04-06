@@ -7,6 +7,7 @@ using Refit;
 using TLSClientSharedLib.Helpers;
 using TLSClientSharedLib.Services.Apis;
 using TLSWeb.Identity;
+using TLSWeb.Services;
 
 
 
@@ -26,8 +27,8 @@ namespace TLSWeb.Helpers
             builder.Services.AddScoped(sp => (IAccountManagement)sp.GetRequiredService<AuthenticationStateProvider>());
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            
-           
+            builder.Services.AddScoped<ExcelDownloadService>();
+
             builder.Services.AddMudServices();
 
             builder.Services.AddHttpClient("Auth", options =>

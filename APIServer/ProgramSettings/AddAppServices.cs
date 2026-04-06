@@ -3,8 +3,6 @@ using APIServerLib.Repositories.Interfaces;
 using APIServerLib.Services;
 using Microsoft.AspNetCore.Identity;
 using SharedLib.Entities;
-
-
 namespace APIServerLib.ProgramSettings
 {
     public static class AddAppServices
@@ -21,6 +19,8 @@ namespace APIServerLib.ProgramSettings
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+
+            // أضف هذا السطر مع باقي تسجيلات الخدمات:
             //builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 
             return builder;
