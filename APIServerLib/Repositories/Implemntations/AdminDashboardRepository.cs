@@ -48,9 +48,21 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         var levelColors = new[]
         {
             "bg-primary", "bg-success", "bg-info",
-            "bg-warning",  "bg-danger","bg-primary",  "bg-secondary",
+            "bg-warning",  "bg-danger","bg-primary","bg-secondary",
             "bg-danger", "bg-success", "bg-info",
         };
+        //var levelColors = new[]
+        //{
+        //    "DeepSkyBlue",
+        //    "DeepPink",
+        //    "ForestGreen",
+        //    "FireBrick",
+        //    "DarkSeaGreen",
+        //    "DarkSalmon",
+        //    "DarkSlateBlue",
+        //    "DarkOrange",
+        //    "GreenYellow"
+        //};
 
         var centerSummaries = new List<CenterSummaryDto>();
 

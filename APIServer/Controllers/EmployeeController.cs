@@ -128,5 +128,91 @@ namespace APIServer.Controllers
             var employeespaginated =await _employeeRepository.GetPaginatedEmployesAsync(request , await CurrentCenterId());
             return Ok(employeespaginated);
         }
+
+
+        /// <summary>
+        /// POST /api/Employee/export/filtered
+        /// تصدير الموظفين المعروضين حسب التصفية الحالية
+        /// ملاحظة: نستخدم POST لأن paginated يستخدم POST (اتساق مع الـ API)
+        /// </summary>
+        [HttpPost("export/filtered")]
+        public async Task<IActionResult> ExportFiltered([FromBody] EmployeeFilterRequest request)
+        {
+
+            var centerId = await CurrentCenterId();
+            //if (centerId == 0) return BadRequest("لا يوجد مركز مرتبط بحسابك.");
+
+            var centerName = await GetCenterNameAsync(centerId);
+            var employees = await _employeeRepository.GetFilteredForExportAsync(request, centerId);
+            var sheetTitle = BuildSheetTitle(request);
+
+            var bytes = EmployeeExportService.GenerateExcel(employees, sheetTitle, centerName);
+            var fileName = $"موظفون_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
+        /// <summary>
+        /// GET /api/Employee/export/all
+        /// تصدير جميع موظفي المركز بدون فلاتر
+        /// </summary>
+        [HttpGet("export/all")]
+        public async Task<IActionResult> ExportAll()
+        {
+            var centerId = await CurrentCenterId();
+            //if (centerId == 0) return BadRequest("لا يوجد مركز مرتبط بحسابك.");
+
+            var centerName = await GetCenterNameAsync(centerId);
+            var employees = await _employeeRepository.GetAllByCenterAsync(centerId);
+
+            var bytes = EmployeeExportService.GenerateExcel(employees, "جميع الموظفين", centerName);
+            var fileName = $"جميع_موظفي_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
+        // ── دالة مساعدة ────────────────────────────────────────────────
+        private async Task<string> GetCenterNameAsync(long centerId)
+        {
+            //try
+            //{
+            //    var user = await CurrentUser();
+            //    return user?.Employee?.EmpCenters
+            //        .OrderByDescending(x => x.FromDate)
+            //        .FirstOrDefault()?.Center?.Name ?? "المركز";
+            //}
+            //catch { return "المركز"; }
+
+
+            if (centerId == 0) return "بدون_مركز";
+            try
+            {
+                var user = await CurrentUser();
+                var emp = user?.Employee;
+                var ec = emp?.EmpCenters
+                    .OrderByDescending(x => x.FromDate)
+                    .FirstOrDefault();
+                return ec?.Center?.Name ?? centerId.ToString();
+            }
+            catch { return centerId.ToString(); }
+
+        }
+
+        private static string BuildSheetTitle(EmployeeFilterRequest req)
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(req.SearchText)) parts.Add($"بحث: {req.SearchText}");
+            if (!string.IsNullOrWhiteSpace(req.Gender)) parts.Add($"الجنس: {req.Gender}");
+            if (!string.IsNullOrWhiteSpace(req.Job)) parts.Add($"الوظيفة: {req.Job}");
+
+            return parts.Count > 0
+                ? "تصفية: " + string.Join(" | ", parts)
+                : "المعروض على الشاشة";
+        }
+
     }
 }

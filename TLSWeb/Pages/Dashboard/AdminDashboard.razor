@@ -211,7 +211,7 @@
                                     <div class="col text-center d-flex flex-column justify-content-end align-items-center h-100">
                                         <small class="text-muted mb-1">@level.Count</small>
                                         <div class="rounded-top w-100 @level.ColorClass"
-                                             style="height:@(Math.Max(level.Percent * 1.4, 8))px;transition:height .4s">
+                                             style="height:@( Math.Truncate(Math.Max(level.Percent * 1.4 *3, 8)) )px;transition:height .9s">
                                         </div>
                                         <small class="mt-1 fw-semibold text-truncate w-100" style="font-size:.7rem">@level.Label</small>
                                     </div>

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using SharedLib.DTOs;
+using System.Diagnostics.Metrics;
 using TLSWeb.Helpers;
 
 namespace TLSWeb.Pages.Employees;
@@ -13,9 +15,11 @@ public partial class Employees : ComponentBase
     private string searchText = string.Empty;
     private string selectedGender = string.Empty;
     private string selectedJob = string.Empty;
+    private string selectedCenter = string.Empty;
 
     private List<string> genderOptions = [];
     private List<string> jobOptions = [];
+    private List<string> CenterOptions = [];
 
     private int currentPage = 1;
     private int pageSize = 10;
@@ -25,6 +29,12 @@ public partial class Employees : ComponentBase
     private bool showDeleteModal;
     private bool isDeleting;
     private EmployeeListItemDto? employeeToDelete;
+
+    // ====== التصدير ======
+    private bool isExportingFiltered = false;
+    private bool isExportingAll = false;
+    private bool showExportMenu = false;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,6 +50,7 @@ public partial class Employees : ComponentBase
             {
                 SearchText = searchText,
                 Gender = selectedGender,
+                Center=selectedCenter,
                 Job = selectedJob,
                 PageNumber = currentPage,
                 PageSize = pageSize
@@ -54,6 +65,7 @@ public partial class Employees : ComponentBase
 
             genderOptions = response.GenderOptions;
             jobOptions = response.JobOptions;
+            CenterOptions = response.CenterOptions;
         }
         finally
         {
@@ -166,6 +178,85 @@ public partial class Employees : ComponentBase
         {
             isDeleting = false;
             employeeToDelete = null;
+        }
+    }
+
+    // ====== التصدير ======
+
+    /// <summary>تصدير الموظفين المعروضين حسب الفلاتر الحالية</summary>
+    /// 
+    private EmployeeFilterRequest BuildRequest() => new()
+    {
+        SearchText = searchText,
+        Gender = selectedGender,
+        Job = selectedJob,
+        Center = selectedCenter,
+        PageNumber = currentPage,
+        PageSize = pageSize,
+    };
+    private async Task ExportFiltered()
+    {
+        if (isExportingFiltered) return;
+        isExportingFiltered = true;
+        showExportMenu = false;
+
+        try
+        {
+            var response = await EmployeeApi.ExportFiltered(BuildRequest());
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "موظفون_مفلتر.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExportingFiltered = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>تصدير جميع موظفي المركز بدون فلاتر</summary>
+    private async Task ExportAll()
+    {
+        if (isExportingAll) return;
+        isExportingAll = true;
+        showExportMenu = false;
+
+        try
+        {
+            var response = await EmployeeApi.ExportAll();
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "جميع_الموظفين.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExportingAll = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleExportMenu() => showExportMenu = !showExportMenu;
+    private void CloseExportMenu() => showExportMenu = false;
+
+    private string FilterDescription
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(searchText)) parts.Add($"بحث: {searchText}");
+            if (!string.IsNullOrWhiteSpace(selectedGender)) parts.Add(selectedGender);
+            if (!string.IsNullOrWhiteSpace(selectedJob)) parts.Add(selectedJob);
+            return parts.Count > 0 ? string.Join(" | ", parts) : "بدون فلاتر";
         }
     }
 }

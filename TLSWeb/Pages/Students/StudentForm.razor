@@ -14,7 +14,8 @@
                     @* الاسم بالعربي والانجليزي *@
                     <div class="col-md-6">
                         <label class="form-label">الاسم الكامل (بالعربي)</label>
-                        <InputText @bind-Value="student.Name" class="form-control" placeholder="أدخل الاسم رباعي" />
+                        <InputText @bind-Value="student.Name" class="form-control" placeholder="أدخل الاسم رباعي" 
+                                   @onblur="TranslateName" />
                         <ValidationMessage For="@(() => student.Name)" class="text-danger" />
                     </div>
                     <div class="col-md-6">
@@ -106,7 +107,11 @@
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
     }
-
+    private async Task TranslateName()
+    {
+        // HttpClient client = new HttpClient();
+        // var text =await client.GetFromJsonAsync<GoogleTranslateJson>("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=father&ie=UTF-8&oe=UTF-8https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=father&ie=UTF-8&oe=UTF-8");
+    }
     private async Task HandleSubmit()
     {
         if (Id != 0)

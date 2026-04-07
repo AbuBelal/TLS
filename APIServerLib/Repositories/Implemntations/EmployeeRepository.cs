@@ -103,6 +103,11 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(e => e.Job != null && e.Job.Name == request.Job);
             }
 
+            if (!string.IsNullOrWhiteSpace(request.Center))
+            {
+                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
+            }
+
             var totalCount = await query.CountAsync();
             var totalPages = Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
             if (pageNumber > totalPages)
@@ -147,6 +152,7 @@ namespace APIServerLib.Repositories.Implemntations
                 .Distinct()
                 .OrderBy(v => v)
                 .ToListAsync();
+            
 
             return new EmployeePaginatedResponse
             {
@@ -156,7 +162,8 @@ namespace APIServerLib.Repositories.Implemntations
                 PageSize = pageSize,
                 TotalPages = totalPages,
                 GenderOptions = genderOptions,
-                JobOptions = jobOptions
+                JobOptions = jobOptions,
+                CenterOptions = await _context.Centers.AsNoTracking().Select(c => c.Name!).ToListAsync()
             };
         }
 
@@ -180,6 +187,130 @@ namespace APIServerLib.Repositories.Implemntations
            var R =(new EmployeeMapper()).ToEmployeeUpsertDTO(E);
             R.CenterName = E.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()?.Center.Name;
             return R;
+        }
+
+        // ╔══════════════════════════════════════════════════════════════╗
+        // ║  APIServerLib/Repositories/Implemntations/EmployeeRepository ║
+        // ║  أضف هاتين الدالتين في نهاية الـ class الموجود              ║
+        // ╚══════════════════════════════════════════════════════════════╝
+
+        public async Task<List<EmployeeListItemDto>> GetFilteredForExportAsync(
+            EmployeeFilterRequest request, long centerId)
+        {
+            IQueryable<Employee> query;
+            if (centerId == 0)
+            {
+                query = _context.Employees
+                    .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
+                .AsNoTracking()
+                .Include(e => e.Gender)
+                .Include(e => e.Job)
+                .Include(e => e.OrgJob)
+                .Include(e => e.Specialization)
+                .AsQueryable();
+            }
+            else
+            {
+                query = _context.Employees
+                    .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
+                .Where(e => e.EmpCenters
+                    .OrderByDescending(ec => ec.FromDate)
+                    .FirstOrDefault()!.CenterId == centerId)
+                .AsNoTracking()
+                .Include(e => e.Gender)
+                .Include(e => e.Job)
+                .Include(e => e.OrgJob)
+                .Include(e => e.Specialization)
+                .AsQueryable();
+            }
+
+            // نفس منطق الفلترة في GetPaginatedEmployesAsync
+            if (!string.IsNullOrWhiteSpace(request.SearchText))
+            {
+                var term = request.SearchText.Trim();
+                query = query.Where(e =>
+                    e.Name.Contains(term) ||
+                    (e.EnName != null && e.EnName.Contains(term)) ||
+                    (e.CivilId != null && e.CivilId.Contains(term)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Gender))
+                query = query.Where(e => e.Gender != null && e.Gender.Name == request.Gender);
+
+            if (!string.IsNullOrWhiteSpace(request.Job))
+                query = query.Where(e => e.Job != null && e.Job.Name == request.Job);
+
+            if (!string.IsNullOrWhiteSpace(request.Center))
+                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
+
+            return await query
+                .OrderBy(e => e.Name)
+                .Select(e => new EmployeeListItemDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    EnName = e.EnName,
+                    CivilId = e.CivilId,
+                    Mobile = e.Mobile,
+                    GenderName = e.Gender != null ? e.Gender.Name : null,
+                    JobName = e.Job != null ? e.Job.Name : null,
+                    SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
+                    CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<EmployeeListItemDto>> GetAllByCenterAsync(long centerId)
+        {
+            if (centerId == 0)
+            {
+                return await _context.Employees
+                    .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
+               .AsNoTracking()
+               .Include(e => e.Gender)
+               .Include(e => e.Job)
+               .Include(e => e.Specialization)
+               .OrderBy(e => e.Job!.Name)
+               .ThenBy(e => e.Name)
+               .Select(e => new EmployeeListItemDto
+               {
+                   Id = e.Id,
+                   Name = e.Name,
+                   EnName = e.EnName,
+                   CivilId = e.CivilId,
+                   Mobile = e.Mobile,
+                   GenderName = e.Gender != null ? e.Gender.Name : null,
+                   JobName = e.Job != null ? e.Job.Name : null,
+                   SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
+                   CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name
+               })
+               .ToListAsync();
+            }
+            else
+            return await _context.Employees
+                    .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
+                .Where(e => e.EmpCenters
+                    .OrderByDescending(ec => ec.FromDate)
+                    .FirstOrDefault()!.CenterId == centerId)
+                .AsNoTracking()
+                .Include(e => e.Gender)
+                .Include(e => e.Job)
+                .Include(e => e.Specialization)
+                .OrderBy(e => e.Job!.Name)
+                .ThenBy(e => e.Name)
+                .Select(e => new EmployeeListItemDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    EnName = e.EnName,
+                    CivilId = e.CivilId,
+                    Mobile = e.Mobile,
+                    GenderName = e.Gender != null ? e.Gender.Name : null,
+                    JobName = e.Job != null ? e.Job.Name : null,
+                    SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
+                    CenterName=e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name
+                })
+                .ToListAsync();
         }
     }
 }

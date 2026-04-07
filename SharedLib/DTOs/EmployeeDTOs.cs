@@ -9,6 +9,7 @@ namespace SharedLib.DTOs
         public string SearchText { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public string Job { get; set; } = string.Empty;
+        public string Center { get; set; } = string.Empty;
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
@@ -35,6 +36,7 @@ namespace SharedLib.DTOs
         public int TotalPages { get; set; } = 1;
         public List<string> GenderOptions { get; set; } = [];
         public List<string> JobOptions { get; set; } = [];
+        public List<string> CenterOptions { get; set; } = [];
     }
 
     public class EmployeeUpsertDto

@@ -5,9 +5,70 @@
         <h3 class="mb-0">
             <i class="bi bi-person-badge-fill me-2 text-primary"></i>إدارة الموظفين
         </h3>
+        <div class="d-flex gap-2" dir="rtl">
         <button class="btn btn-primary shadow-sm" @onclick="OpenAddPage">
             <i class="bi bi-plus-circle me-1"></i> إضافة موظف جديد
         </button>
+
+            @* ── زر التصدير مع Dropdown ── *@
+            <div class="position-relative" @onclick:stopPropagation="true">
+                <button class="btn btn-success shadow-sm d-flex align-items-center gap-2"
+                        @onclick="ToggleExportMenu"
+                        disabled="@(isExportingFiltered || isExportingAll)">
+                    @if (isExportingFiltered || isExportingAll)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                        <span>جاري التصدير...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-file-earmark-excel-fill"></i>
+                        <span>تصدير Excel</span>
+                        <i class="bi bi-chevron-down" style="font-size:.75rem"></i>
+                    }
+                </button>
+
+                @if (showExportMenu)
+                {
+                    <div class="position-absolute bg-white border rounded-3 shadow-lg p-1"
+                         style="top:calc(100% + 6px);left:0;min-width:280px;z-index:200">
+
+                        @* الخيار 1: تصدير المعروض *@
+                        <button class="btn btn-light w-100 text-end d-flex align-items-start gap-3 p-3 rounded-2 mb-1 border-0"
+                                @onclick="ExportFiltered"
+                                disabled="@isExportingFiltered">
+                            <div class="rounded-2 p-2 bg-success bg-opacity-10 flex-shrink-0">
+                                <i class="bi bi-funnel-fill text-success fs-5"></i>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold small">تصدير المعروض حسب التصفية</div>
+                                <div class="text-muted" style="font-size:.72rem">
+                                    @totalCount موظف — @FilterDescription
+                                </div>
+                            </div>
+                        </button>
+
+                        <hr class="my-1" />
+
+                        @* الخيار 2: تصدير الكل *@
+                        <button class="btn btn-light w-100 text-end d-flex align-items-start gap-3 p-3 rounded-2 border-0"
+                                @onclick="ExportAll"
+                                disabled="@isExportingAll">
+                            <div class="rounded-2 p-2 bg-primary bg-opacity-10 flex-shrink-0">
+                                <i class="bi bi-people-fill text-primary fs-5"></i>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold small">تصدير جميع موظفي المركز</div>
+                                <div class="text-muted" style="font-size:.72rem">
+                                    بدون فلاتر — مرتّب حسب الوظيفة والاسم
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+
     </div>
 
     <div class="card shadow-sm mb-4 border-0">
@@ -28,7 +89,7 @@
                            @bind:after="OnSearchChanged" />
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label fw-semibold text-muted small">الجنس</label>
                     <select class="form-select" @bind="selectedGender" @bind:after="OnFilterChangedAsync">
                         <option value="">الكل</option>
@@ -39,7 +100,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label fw-semibold text-muted small">الوظيفة</label>
                     <select class="form-select" @bind="selectedJob" @bind:after="OnFilterChangedAsync">
                         <option value="">الكل</option>
@@ -49,6 +110,19 @@
                         }
                     </select>
                 </div>
+
+                <AuthorizeView Roles=@SharedLib.Fixed.Roles.Admin>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold text-muted small">المركز</label>
+                        <select class="form-select" @bind="selectedCenter" @bind:after="OnFilterChangedAsync">
+                            <option value="">الكل</option>
+                            @foreach (var center in CenterOptions)
+                            {
+                                <option value="@center">@center</option>
+                            }
+                        </select>
+                    </div>
+                </AuthorizeView>
 
                 <div class="col-md-2">
                     <button class="btn btn-outline-secondary w-100" @onclick="ResetFiltersAsync">
