@@ -243,7 +243,8 @@
             @foreach (var center in Stats.Centers)
             {
                 var isSelected = SelectedCenterId == center.CenterId;
-                <div class="col-12 col-lg-6">
+                @* <AdminCenterCard center="center" isSelected="isSelected" OnSelect="SelectCenter" /> *@
+                 <div class="col-12 col-lg-6">
                     <div class="card border-0 shadow-sm h-100 @(isSelected ? "border border-primary" : "")"
                          style="cursor:pointer"
                          @onclick="() => SelectCenter(center.CenterId)">
@@ -283,7 +284,13 @@
                                             @if (center.NewStudentsThisMonth > 0)
                                             {
                                                 <div class="text-success" style="font-size:.7rem">
-                                                    <i class="bi bi-arrow-up"></i> @center.NewStudentsThisMonth جديد
+                                                    <i class="bi bi-arrow-up"></i> @center.NewStudentsThisMonth جديد الشهر
+                                                </div>
+                                            }
+                                            @if (center.NewStudentsThisWeek > 0)
+                                            {
+                                                <div class="text-success" style="font-size:.7rem">
+                                                    <i class="bi bi-arrow-up"></i> @center.NewStudentsThisWeek جديد الأسبوع
                                                 </div>
                                             }
                                         </div>
@@ -394,7 +401,7 @@
                             }
                         </div>
                     </div>
-                </div>
+                </div> 
             }
         </div>
     }

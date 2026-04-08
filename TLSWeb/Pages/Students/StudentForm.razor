@@ -110,7 +110,12 @@
     private async Task TranslateName()
     {
         // HttpClient client = new HttpClient();
-        // var text =await client.GetFromJsonAsync<GoogleTranslateJson>("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=father&ie=UTF-8&oe=UTF-8https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=father&ie=UTF-8&oe=UTF-8");
+        // var text =await client.GetAsync("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=father&ie=UTF-8&oe=UTF-8https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=father&ie=UTF-8&oe=UTF-8");
+        // var text1 = text.Content;
+        // // .ForEach(t =>
+        // {
+        //     student.EnName += t[0];
+        // });
     }
     private async Task HandleSubmit()
     {

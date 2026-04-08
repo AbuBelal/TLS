@@ -44,6 +44,12 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         var now          = DateOnly.FromDateTime(DateTime.Now);
         var firstOfMonth = new DateOnly(now.Year, now.Month, 1);
 
+        // حساب الفرق: السبت في C# يأخذ القيمة 6 في ترتيب DayOfWeek
+        // نقوم بحساب الإزاحة لضمان العودة إلى أقرب يوم سبت مضى
+        int diff = (now.DayOfWeek - DayOfWeek.Saturday + 7) % 7;
+
+        DateOnly startOfWeek = now.AddDays(-diff);
+
         // ── 4. بناء ملخص كل مركز ────────────────────────────────────
         var levelColors = new[]
         {
@@ -83,6 +89,10 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             // حساب الطلاب الجدد هذا الشهر عبر StdCenter.FromDate
             var newThisMonth = allStdCenters
                 .Where(sc => sc.CenterId == center.Id && sc.FromDate >= firstOfMonth)
+                .Count();
+
+            var newThisWeek = allStdCenters
+                .Where(sc => sc.CenterId == center.Id && sc.FromDate >= startOfWeek)
                 .Count();
 
             // موظفو هذا المركز
@@ -127,6 +137,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                 SpecialNeedsCount   = specialStd,
                 UnrwaCount          = unrwaStd,
                 NewStudentsThisMonth= newThisMonth,
+                NewStudentsThisWeek = newThisWeek,
 
                 TotalEmployees      = totalEmp,
                 MaleEmployees       = maleEmp,

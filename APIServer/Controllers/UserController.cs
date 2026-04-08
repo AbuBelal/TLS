@@ -166,16 +166,16 @@ namespace APIServer.Controllers
             var userId = passwordInputModel.UserId;
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            if (user == null) return NotFound(new GeneralResponse(false, $"user not found", 0));
+            if (user == null) return NotFound(new GeneralResponse(false, $"المستخدم غير موجود", 0));
 
             var result = await _userManager.ChangePasswordAsync(user, passwordInputModel.OldPassword, passwordInputModel.NewPassword);
             if (!result.Succeeded)
             {
                 var errors = string.Join("; ", result.Errors.Select(e => e.Description));
-                return BadRequest(new GeneralResponse(false, $"Password change failed: {errors}", 0));
+                return BadRequest(new GeneralResponse(false, $"فشل تغيير كلمة المرور: {errors}", 0));
             }
 
-            return Ok(new GeneralResponse(true, "Password changed successfully", 0));
+            return Ok(new GeneralResponse(true, "تم تغيير كلمة المرور بنجاح", 0));
         }
 
         [HttpPost("ResetPassword")]

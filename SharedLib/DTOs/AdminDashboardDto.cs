@@ -54,6 +54,7 @@ public class CenterSummaryDto
     public int SpecialNeedsCount   { get; set; }
     public int UnrwaCount          { get; set; }
     public int NewStudentsThisMonth{ get; set; }
+    public int NewStudentsThisWeek { get; set; }
 
     // النسب المئوية (محسوبة)
     public double MalePercent    => TotalStudents == 0 ? 0 : Math.Round((double)MaleStudents   / TotalStudents * 100, 1);

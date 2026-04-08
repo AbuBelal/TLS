@@ -1,0 +1,196 @@
+﻿@* @page "/profile" *@
+@attribute [Route(PagesUris.UsersPages.Profile)]
+
+<div class="container py-4" dir="rtl">
+    <h3 class="mb-4"><i class="bi bi-person-circle me-2"></i>ملف المستخدم</h3>
+    
+    @* ── رسائل النجاح والخطأ للمستخدم ── *@
+    @if (!string.IsNullOrEmpty(SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @SuccessMessage
+            <button type="button" class="btn-close" @onclick="() => SuccessMessage = null"></button>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @ErrorMessage
+            <button type="button" class="btn-close" @onclick="() => ErrorMessage = null"></button>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+    }
+    else
+    {
+        @* ── معلومات الملف الشخصي ── *@
+        <div class="card mb-4">
+            <div class="card-header fw-bold bg-dark text-white">
+                <i class="bi bi-person-badge me-2"></i>معلومات الحساب
+            </div>
+            <div class="card-body">
+                <EditForm Model="@ProfileModel" OnValidSubmit="SaveProfile">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">اسم المستخدم</label>
+                            <InputText class="form-control" @bind-Value="ProfileModel.UserName" />
+                            <ValidationMessage For="@(() => ProfileModel.UserName)" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            @* استخدام input عادي لأنه للقراءة فقط *@
+                            <input class="form-control" value="@ProfileModel.Email" readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">رقم الهاتف</label>
+                            <InputText class="form-control" @bind-Value="ProfileModel.PhoneNumber" />
+                            <ValidationMessage For="@(() => ProfileModel.PhoneNumber)" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الدور</label>
+                            <input class="form-control" value="@CurrentRole" readonly />
+                        </div>
+                        @if (!string.IsNullOrEmpty(ProfileModel.EmpName))
+                        {
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">الموظف المرتبط</label>
+                                <input class="form-control" value="@ProfileModel.EmpName" readonly />
+                            </div>
+                        }
+                    </div>
+                    @* <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>حفظ التغييرات
+                    </button> *@
+                </EditForm>
+            </div>
+        </div>
+
+        @* ── تغيير كلمة المرور ── *@
+        <div class="card">
+            <div class="card-header bg-dark text-white fw-bold">
+                <i class="bi bi-key me-2"></i>تغيير كلمة المرور
+            </div>
+            <div class="card-body">
+                <EditForm Model="@PasswordModel" OnValidSubmit="ChangePassword">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">كلمة المرور الحالية</label>
+                            <InputText @bind-Value="PasswordModel.OldPassword" type="password" class="form-control" />
+                            <ValidationMessage For="@(() => PasswordModel.OldPassword)" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">كلمة المرور الجديدة</label>
+                            <InputText @bind-Value="PasswordModel.NewPassword" type="password" class="form-control" />
+                            <ValidationMessage For="@(() => PasswordModel.NewPassword)" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">تأكيد كلمة المرور</label>
+                            <InputText @bind-Value="PasswordModel.ConfirmPassword" type="password" class="form-control" />
+                            <ValidationMessage For="@(() => PasswordModel.ConfirmPassword)" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-lock me-1"></i>تغيير كلمة المرور
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool IsLoading = true;
+    private ProfileInputModel ProfileModel = new();
+    private PasswordInputModel PasswordModel { get; set; } = new() { };
+    private string? CurrentRole;
+    
+    // إضافة متغيرات لرسائل المستخدم
+    private string? SuccessMessage;
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var profile = await UserApi.GetUserProfileAsync();
+            ProfileModel = new ProfileInputModel
+            {
+                Id = profile.UserId,
+                Email = profile.Email,
+                UserName = profile.UserName,
+                // PhoneNumber = profile.PhoneNumber, // <-- تم إصلاح الخطأ هنا
+                EmployeeId = profile.EmployeeId,
+                EmpName = profile.EmployeeName,
+                Role = profile.Role
+            };
+            PasswordModel.UserId = profile.UserId;
+            
+            // جلب الدور
+            var roles = await UserApi.GetCurUserRole();
+            CurrentRole = roles?.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"حدث خطأ أثناء تحميل البيانات: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task SaveProfile()
+    {
+        // مسح الرسائل السابقة عند بدء عملية جديدة
+        SuccessMessage = null;
+        ErrorMessage = null;
+
+        try
+        {
+            var result = await UserApi.Update(ProfileModel);
+            if (result.Success)
+                SuccessMessage = "تم حفظ التغييرات بنجاح.";
+            else
+                ErrorMessage = $"خطأ: {result.Message}";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"خطأ في الحفظ: {ex.Message}";
+        }
+    }
+
+    private async Task ChangePassword()
+    {
+        SuccessMessage = null;
+        ErrorMessage = null;
+
+        try
+        {
+            var result = await UserApi.ChangePassword(PasswordModel);
+            if (result.Success)
+            {
+                SuccessMessage = "تم تغيير كلمة المرور بنجاح.";
+                PasswordModel = new PasswordInputModel { UserId = ProfileModel.Id };
+            }
+            else
+            {
+                ErrorMessage = $"خطأ: {result.Message}";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"خطأ في تغيير كلمة المرور: {ex.Message}";
+        }
+    }
+}

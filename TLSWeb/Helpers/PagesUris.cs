@@ -15,6 +15,7 @@
             public const string Manage = PriorUrl+ "/Manage";
             public const string Add = PriorUrl+ "/Add";
             public const string Edit = PriorUrl+ "/Edit";
+            public const string Profile = PriorUrl+ "/profile";
         }
 
         public static class EmployeesPages

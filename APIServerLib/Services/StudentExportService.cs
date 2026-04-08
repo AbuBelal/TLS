@@ -65,6 +65,7 @@ public static class StudentExportService
             ("المستوى",       10),
             ("الأنروا",       8),
             ("احتياجات خاصة", 12),
+            ("تاريخ الميلاد", 12),
         };
 
         for (int c = 0; c < headers.Length; c++)
@@ -107,6 +108,7 @@ public static class StudentExportService
             ws.Cell(row, 8).Value = student.Level?.Name ?? "";
             ws.Cell(row, 9).Value = student.IsUnrwa ? "نعم" : "";
             ws.Cell(row, 10).Value = student.IsSpecialNeeds ? "نعم" : "";
+            ws.Cell(row, 11).Value = student.BirthDate.ToString();
 
             // تنسيق الصف كاملاً
             var rowRange = ws.Range(row, 1, row, totalCols);

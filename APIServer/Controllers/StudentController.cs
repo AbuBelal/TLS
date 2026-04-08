@@ -80,7 +80,7 @@ namespace APIServer.Controllers
 
               return Ok(response);
             }
-            return BadRequest();
+            return new GeneralResponse(false, "لا يمكن إضافة طالب ، تأكد من البيانات أو صلاحيات المستخدم", 0);
         }
 
         //[HttpPost("AddWithCenter")]
