@@ -1,12 +1,12 @@
 @* ╔══════════════════════════════════════════════════════════════╗ *@
 @* ║  TLSWeb/Pages/Dashboard/AdminDashboard.razor  (v2)           ║ *@
-@* ║  متوافق مع تصميم النظام — Bootstrap + text-primary          ║ *@
+@* ║  متوافق مع تصميم النظام — Bootstrap + text-primary           ║ *@
 @* ╚══════════════════════════════════════════════════════════════╝ *@
 
 @* @page "/admin-dashboard" *@
 @attribute [Route(PagesUris.Admin.DashBoard)]
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
 @* [Authorize(Roles = "Admin")] *@
-
 <div class="container-fluid px-4" dir="rtl">
 
     @if (IsLoading)
@@ -351,7 +351,8 @@
                                     {
                                         <div class="mb-2">
                                             <div class="d-flex justify-content-between mb-1">
-                                                <small class="fw-semibold">@level.Label</small>
+                                                <small class="fw-semibold">@level.Label  </small>
+                                                @* <small class="text-muted">(@level.GendersCount.First().Value @level.GendersCount.First().Key , @level.GendersCount.Last().Value @level.GendersCount.Last().Key)</small> *@
                                                 <small class="text-muted">@level.Count (@level.Percent%)</small>
                                             </div>
                                             <div class="progress" style="height:8px;border-radius:4px">

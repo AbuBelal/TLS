@@ -70,3 +70,33 @@ public class CenterSummaryDto
     // توزيع الطلاب حسب المستوى
     public List<DistributionItem> LevelDistribution { get; set; } = new();
 }
+
+// ── تقرير مفصل للمراكز ─────────────────────────────────────────────
+public class DetailedCentersReportDto
+{
+    public List<DetailedCenterReport> Centers { get; set; } = new();
+    public Dictionary<string, int> LevelMaleTotals { get; set; } = new();
+    public Dictionary<string, int> LevelFemaleTotals { get; set; } = new();
+    public int GrandTotalMales { get; set; }
+    public int GrandTotalFemales { get; set; }
+    public int GrandTotalUnrwa { get; set; }
+    public int GrandTotalSpecialNeeds { get; set; }
+    public int GrandTotalStudents { get; set; }
+}
+
+public class DetailedCenterReport
+{
+    public long CenterId { get; set; }
+    public string CenterName { get; set; } = string.Empty;
+    public string? CenterCode { get; set; }
+
+    // أعداد حسب المستوى والجنس
+    public Dictionary<string, int> LevelMales { get; set; } = new(); // key: level name, value: count
+    public Dictionary<string, int> LevelFemales { get; set; } = new();
+
+    public int UnrwaCount { get; set; }
+    public int SpecialNeedsCount { get; set; }
+    public int TotalMales { get; set; }
+    public int TotalFemales { get; set; }
+    public int TotalStudents => TotalMales + TotalFemales;
+}

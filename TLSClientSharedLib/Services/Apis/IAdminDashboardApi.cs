@@ -12,4 +12,9 @@ public interface IAdminDashboardApi
 {
     [Get(ApiUrls.AdminDashBoard.Get)]
     Task<AdminDashboardDto> Get();
+    [Get(ApiUrls.AdminDashBoard.DetailedReport)]
+    Task<DetailedCentersReportDto> GetDetailedReport();
+
+    [Get(ApiUrls.AdminDashBoard.ExportDetailedReport)]
+    Task<HttpResponseMessage> ExportDetailedReport();
 }

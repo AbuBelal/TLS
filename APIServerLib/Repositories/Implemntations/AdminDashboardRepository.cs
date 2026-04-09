@@ -6,6 +6,7 @@ using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
+using SharedLib.Fixed;
 
 namespace APIServerLib.Repositories.Implemntations;
 
@@ -104,7 +105,8 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             var totalEmp    = centerEmps.Count;
             var maleEmp     = centerEmps.Count(e => e.Gender?.Name == "ذكر");
             var femaleEmp   = centerEmps.Count(e => e.Gender?.Name == "أنثى");
-
+            var Genders     = await  _context.LookupValues.Where(x => x.ValueType == LookupTypes.Gender).ToListAsync();
+            Genders ??= new ();
             // توزيع المستويات لهذا المركز
             var levelDist = centerStudents
                 .Where(s => s.Level != null)
@@ -113,7 +115,10 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                 {
                     Label      = g.Key ?? "-",
                     Count      = g.Count(),
-                    Percent    = totalStd == 0 ? 0
+                    //GendersCount = new Dictionary<string, int> { { "", 0 }, { "", 0 } },
+                    //new Dictionary<string, int> { { Genders.First().Name, g.Count(x=>x.Gender.Id== Genders.First().Id) },
+                    //{ Genders.Last().Name, g.Count(x=>x.Gender.Id== Genders.Last().Id) }},
+                    Percent = totalStd == 0 ? 0
                                  : (int)Math.Round((double)g.Count() / totalStd * 100),
                     ColorClass = i < levelColors.Length ? levelColors[i] : "bg-secondary"
                 })
@@ -185,5 +190,87 @@ public class AdminDashboardRepository : IAdminDashboardRepository
             LevelDistribution   = globalLevelDist,
             Centers             = centerSummaries
         };
+    }
+
+
+    public async Task<DetailedCentersReportDto> GetDetailedCentersReportAsync()
+    {
+        // جلب جميع المراكز
+        var centers = await _context.Centers.AsNoTracking().ToListAsync();
+
+        // جلب جميع الطلاب النشطين مع البيانات المطلوبة
+        var allStdCenters = await _context.StdCenters
+            .AsNoTracking()
+            .Where(sc => sc.ToDate == null)
+            .Include(sc => sc.Student)
+                .ThenInclude(s => s!.Gender)
+            .Include(sc => sc.Student)
+                .ThenInclude(s => s!.Level)
+            .ToListAsync();
+
+        // جلب المستويات مرتبة
+        var levels = await _context.LookupValues
+            .Where(lv => lv.ValueType == "Level")
+            .OrderBy(lv => lv.SortOrder)
+            .ToListAsync();
+
+        var levelNames = levels.Select(l => l.Name).ToList();
+
+        var report = new DetailedCentersReportDto();
+        var levelMaleTotals = new Dictionary<string, int>();
+        var levelFemaleTotals = new Dictionary<string, int>();
+
+        foreach (var levelName in levelNames)
+        {
+            levelMaleTotals[levelName] = 0;
+            levelFemaleTotals[levelName] = 0;
+        }
+
+        foreach (var center in centers)
+        {
+            var students = allStdCenters
+                .Where(sc => sc.CenterId == center.Id)
+                .Select(sc => sc.Student!)
+                .ToList();
+
+            var levelMales = new Dictionary<string, int>();
+            var levelFemales = new Dictionary<string, int>();
+
+            foreach (var levelName in levelNames)
+            {
+                levelMales[levelName] = students
+                    .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "ذكر");
+                levelFemales[levelName] = students
+                    .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "أنثى");
+
+                levelMaleTotals[levelName] += levelMales[levelName];
+                levelFemaleTotals[levelName] += levelFemales[levelName];
+            }
+
+            var centerReport = new DetailedCenterReport
+            {
+                CenterId = center.Id,
+                CenterName = center.Name,
+                CenterCode = center.CenterCode,
+                LevelMales = levelMales,
+                LevelFemales = levelFemales,
+                UnrwaCount = students.Count(s => s.IsUnrwa),
+                SpecialNeedsCount = students.Count(s => s.IsSpecialNeeds),
+                TotalMales = levelMales.Values.Sum(),
+                TotalFemales = levelFemales.Values.Sum()
+            };
+
+            report.Centers.Add(centerReport);
+        }
+
+        report.LevelMaleTotals = levelMaleTotals;
+        report.LevelFemaleTotals = levelFemaleTotals;
+        report.GrandTotalMales = levelMaleTotals.Values.Sum();
+        report.GrandTotalFemales = levelFemaleTotals.Values.Sum();
+        report.GrandTotalUnrwa = report.Centers.Sum(c => c.UnrwaCount);
+        report.GrandTotalSpecialNeeds = report.Centers.Sum(c => c.SpecialNeedsCount);
+        report.GrandTotalStudents = report.GrandTotalMales + report.GrandTotalFemales;
+
+        return report;
     }
 }

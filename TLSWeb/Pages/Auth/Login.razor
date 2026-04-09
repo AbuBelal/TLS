@@ -2,6 +2,8 @@
 
 @inject IAccountManagement AccountManagement
 @inject NavigationManager Navigation
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+
 @* @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap'); *@
 <style>
     /* استيراد خط عربي عصري من جوجل */
@@ -60,8 +62,8 @@
         }
 </style>
 
-<div class="col-12 col-md-6 col-lg-4 mx-auto arabic-login-container">
-    <div class="card card-custom mt-4">
+<div class="col-12 col-md-6 col-lg-4 mx-auto arabic-login-container ">
+    <div class="card card-custom mt-4 mx-auto">
         <div class="card-body p-5">
             <div class="text-center mb-5">
                 <h3 class="fw-bold fs-4 mb-2 text-primary">مرحباً بعودتك</h3>
@@ -76,7 +78,7 @@
                                type="email"
                                class="form-control custom-input"
                                id="email"
-                               placeholder="البريد الإلكتروني"
+                               placeholder1="البريد الإلكتروني"
                                dir="ltr" />
                     <label for="email">البريد الإلكتروني</label>
                     <ValidationMessage For="() => Model.Email" class="text-danger small mt-1" />
@@ -87,7 +89,7 @@
                                type="password"
                                class="form-control custom-input"
                                id="password"
-                               placeholder="كلمة المرور"
+                               placeholder1="كلمة المرور"
                                dir="ltr" />
                     <label for="password">كلمة المرور</label>
                     <ValidationMessage For="() => Model.Password" class="text-danger small mt-1" />

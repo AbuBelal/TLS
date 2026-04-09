@@ -42,6 +42,7 @@ namespace SharedLib.DTOs
     {
         public string Label { get; set; } = string.Empty;
         public int Count { get; set; }
+        public Dictionary<string,int> GendersCount { get; set; } = new();
         public int Order { get; set; } = 0;
         public int Percent { get; set; }
         public string ColorClass { get; set; } = string.Empty;

@@ -1,0 +1,116 @@
+﻿@* @page "/admin/detailed-centers-report" *@
+@attribute [Route(PagesUris.Admin.DetailedCentersReport)]
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@* @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")] *@
+
+@inject IAdminDashboardApi AdminApi
+@inject ExcelDownloadService ExcelService
+<div class="container-fluid px-4" dir="rtl">
+    <AuthorizeView>
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+            <h3>
+                <i class="bi bi-table me-2 text-primary"></i>
+                تقرير مفصل لبيانات المراكز
+            </h3>
+            <button class="btn btn-success" @onclick="ExportToExcel">
+                <i class="bi bi-download me-1"></i>
+                تصدير إلى Excel
+            </button>
+        </div>
+    </AuthorizeView>
+    @if (IsLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">جاري تحميل البيانات...</p>
+        </div>
+    }
+    else if (Report != null)
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th rowspan="2" class="align-middle text-center">م</th>
+                        <th rowspan="2" class="align-middle">كود المركز</th>
+                        <th rowspan="2" class="align-middle">اسم المركز</th>
+                        @foreach (var level in LevelNames)
+                        {
+                            <th colspan="2" class="text-center">@level</th>
+                        }
+                        <th rowspan="2" class="align-middle text-center">UNRWA</th>
+                        <th rowspan="2" class="align-middle text-center">احتياجات خاصة</th>
+                        <th rowspan="2" class="align-middle text-center">مجموع الذكور</th>
+                        <th rowspan="2" class="align-middle text-center">مجموع الإناث</th>
+                        <th rowspan="2" class="align-middle text-center">المجموع الكلي</th>
+                    </tr>
+                    <tr>
+                        @foreach (var _ in LevelNames)
+                        {
+                            <th class="text-center">ذكور</th>
+                            <th class="text-center">إناث</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Report.Centers.Count; i++)
+                    {
+                        var center = Report.Centers[i];
+                        <tr>
+                            <td class="text-center">@(i + 1)</td>
+                            <td class="text-center">@center.CenterCode</td>
+                            <td class="fw-bold">@center.CenterName</td>
+                            @foreach (var level in LevelNames)
+                            {
+                                <td class="text-center">@center.LevelMales[level]</td>
+                                <td class="text-center">@center.LevelFemales[level]</td>
+                            }
+                            <td class="text-center">@center.UnrwaCount</td>
+                            <td class="text-center">@center.SpecialNeedsCount</td>
+                            <td class="text-center fw-bold">@center.TotalMales</td>
+                            <td class="text-center fw-bold">@center.TotalFemales</td>
+                            <td class="text-center fw-bold">@center.TotalStudents</td>
+                        </tr>
+                    }
+                    <tr class="table-success fw-bold">
+                        <td colspan="3" class="text-center">المجموع الكلي</td>
+                        @foreach (var level in LevelNames)
+                        {
+                            <td class="text-center">@Report.LevelMaleTotals[level]</td>
+                            <td class="text-center">@Report.LevelFemaleTotals[level]</td>
+                        }
+                        <td class="text-center">@Report.GrandTotalUnrwa</td>
+                        <td class="text-center">@Report.GrandTotalSpecialNeeds</td>
+                        <td class="text-center">@Report.GrandTotalMales</td>
+                        <td class="text-center">@Report.GrandTotalFemales</td>
+                        <td class="text-center">@Report.GrandTotalStudents</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    private DetailedCentersReportDto? Report;
+    private bool IsLoading = true;
+    private List<string> LevelNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Report = await AdminApi.GetDetailedReport();
+        if (Report?.LevelMaleTotals.Any() == true)
+        {
+            LevelNames = Report.LevelMaleTotals.Keys.ToList();
+        }
+        IsLoading = false;
+    }
+
+    private async Task ExportToExcel()
+    {
+        if (Report == null) return;
+        
+        var response = await AdminApi.ExportDetailedReport();
+        await ExcelService.DownloadFromResponse(response, "تقرير_المراكز_المفصل.xlsx");
+    }
+}

@@ -1,5 +1,5 @@
 ﻿
-<CascadingAuthenticationState>
+@*  <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeView Context="AppAuthState">
@@ -12,9 +12,9 @@
                     <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(AuthLayout)">
                         @*  <NotAuthorized>
                             <RedirectToLogin />
-                        </NotAuthorized> *@
+                        </NotAuthorized> *
                     </AuthorizeRouteView>
-                    <RedirectToLogin />
+                         <RedirectToLogin /> 
                 </NotAuthorized>
 
             </AuthorizeView>
@@ -27,4 +27,28 @@
             </LayoutView>
         </NotFound>
     </Router>
-</CascadingAuthenticationState>
+</CascadingAuthenticationState> 
+ *@
+
+ 
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                @* سيتم توجيه المستخدم غير المسجل إلى صفحة تسجيل الدخول *@
+                <RedirectToLogin />
+            </NotAuthorized>
+            <Authorizing>
+                <p>جاري التحقق من الصلاحيات...</p>
+            </Authorizing>
+        </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p>عفواً، الصفحة غير موجودة.</p>
+        </LayoutView>
+    </NotFound>
+</Router> 
+</CascadingAuthenticationState> 

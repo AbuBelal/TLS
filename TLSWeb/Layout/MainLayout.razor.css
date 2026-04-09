@@ -51,7 +51,8 @@ main {
     }
 
     .top-row {
-        justify-content: space-between;
+        /*justify-content: flex-start;*/
+        /*space-between;*/
         padding-right: 56px;
     }
 

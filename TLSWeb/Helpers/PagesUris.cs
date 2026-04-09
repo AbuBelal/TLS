@@ -45,6 +45,7 @@
             public const string DashBoard = PriorUrl + "/dashboard";
             public const string EditCenters = PriorUrl + "/EditCenters";
             public const string ResetPassword = PriorUrl + "/ResetPassword";
+            public const string DetailedCentersReport = PriorUrl + "/detailed-centers-report";
 
         }
 

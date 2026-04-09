@@ -148,6 +148,8 @@ namespace TLSClientSharedLib.Helpers
         {
             public const string PriorUrl = "/api/AdminDashboard";
             public const string Get = PriorUrl;
+            public const string DetailedReport = PriorUrl + "/detailed-report";
+            public const string ExportDetailedReport = PriorUrl + "/export/detailed-report";
         }
     }
 }
