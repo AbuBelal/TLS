@@ -20,4 +20,7 @@ public class StudentDto
     public string? CenterName { get; set; }
     public bool IsUnrwa { get; set; }
     public bool IsSpecialNeeds { get; set; }
+
+    /// <summary>تاريخ إضافة الطالب للمركز (من StdCenter.FromDate)</summary>
+    public DateOnly? AddedDate { get; set; }
 }

@@ -320,11 +320,11 @@
                             <div class="progress mb-3" style="height:10px;border-radius:5px">
                                 @if (center.MalePercent > 0)
                                 {
-                                    <div class="progress-bar bg-primary" style="width:@center.MalePercent%"></div>
+                                    <div class="progress-bar bg-primary" style="width:@((int)Math.Round(center.MalePercent))%"></div>
                                 }
                                 @if (center.FemalePercent > 0)
                                 {
-                                    <div class="progress-bar bg-danger" style="width:@center.FemalePercent%"></div>
+                                    <div class="progress-bar bg-danger" style="width:@((int)Math.Round(center.FemalePercent))%"></div>
                                 }
                             </div>
 

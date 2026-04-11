@@ -82,6 +82,9 @@ public class DetailedCentersReportDto
     public int GrandTotalUnrwa { get; set; }
     public int GrandTotalSpecialNeeds { get; set; }
     public int GrandTotalStudents { get; set; }
+    public int GrandTotalRooms { get; set; }
+    public int GrandTotalTarpaulins { get; set; }
+    public int GrandTotalOtherSpaces { get; set; }
 }
 
 public class DetailedCenterReport
@@ -99,4 +102,7 @@ public class DetailedCenterReport
     public int TotalMales { get; set; }
     public int TotalFemales { get; set; }
     public int TotalStudents => TotalMales + TotalFemales;
+    public int TotalRooms { get; set; }
+    public int TotalTarpaulins { get; set; }
+    public int TotalOtherSpaces { get; set; }
 }

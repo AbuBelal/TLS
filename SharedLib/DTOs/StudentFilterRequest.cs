@@ -25,4 +25,6 @@ public class StudentFilterRequest
     /// <summary>فلتر المستوى</summary>
     public string? Level { get; set; }
     public string? Center { get; set; }
+    /// <summary>فلتر تاريخ الإضافة — من هذا التاريخ فصاعلاً</summary>
+    public DateOnly? FromDate { get; set; } 
 }

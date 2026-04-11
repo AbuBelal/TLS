@@ -257,7 +257,10 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                 UnrwaCount = students.Count(s => s.IsUnrwa),
                 SpecialNeedsCount = students.Count(s => s.IsSpecialNeeds),
                 TotalMales = levelMales.Values.Sum(),
-                TotalFemales = levelFemales.Values.Sum()
+                TotalFemales = levelFemales.Values.Sum(),
+                TotalRooms = center.Rooms??0,
+                TotalTarpaulins = center.Tarpaulins??0,
+                TotalOtherSpaces = center.OtherSpaces??0
             };
 
             report.Centers.Add(centerReport);
@@ -270,6 +273,10 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         report.GrandTotalUnrwa = report.Centers.Sum(c => c.UnrwaCount);
         report.GrandTotalSpecialNeeds = report.Centers.Sum(c => c.SpecialNeedsCount);
         report.GrandTotalStudents = report.GrandTotalMales + report.GrandTotalFemales;
+
+        report.GrandTotalRooms = report.Centers.Sum(c=>c.TotalRooms);
+        report.GrandTotalTarpaulins = report.Centers.Sum(c => c.TotalTarpaulins);
+        report.GrandTotalOtherSpaces = report.Centers.Sum(c => c.TotalOtherSpaces);
 
         return report;
     }

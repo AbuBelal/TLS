@@ -12,6 +12,7 @@ namespace SharedLib.DTOs
         public string Center { get; set; } = string.Empty;
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+        public DateOnly? FromDate { get; set; }  // ← جديد
     }
 
     public sealed class EmployeeListItemDto
@@ -25,6 +26,7 @@ namespace SharedLib.DTOs
         public string? JobName { get; set; }
         public string? CenterName { get; set; }
         public string? SpecializationName { get; set; }
+        public DateOnly? AddedDate { get; set; }  // ← جديد
     }
 
     public sealed class EmployeePaginatedResponse

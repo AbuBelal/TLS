@@ -1,0 +1,248 @@
+﻿@attribute [Route(PagesUris.StudentsPages.NewStudentsReport)]
+
+<div class="container-fluid px-4" dir="rtl">
+    @* ===== العنوان ===== *@
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi bi-person-plus-fill me-2 text-primary"></i>تقرير الطلاب المضافين
+        </h3>
+        <div class="d-flex gap-2">
+            @* زر التصدير *@
+            <button class="btn btn-success shadow-sm"
+                    @onclick="ExportReport"
+                    disabled="@(isLoading || isExporting)">
+                @if (isExporting)
+                {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    <span>جاري التصدير...</span>
+                }
+                else
+                {
+                    <i class="bi bi-file-earmark-excel-fill me-1"></i>
+                    <span>تصدير Excel</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    @* ===== اختيار التاريخ ===== *@
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold text-muted small">
+                        <i class="bi bi-calendar-event me-1"></i> من تاريخ
+                    </label>
+                    <input type="date"
+                           class="form-control"
+                           @bind="fromDate"
+                           @bind:after="OnDateChanged" />
+                </div>
+                @* <div class="col-md-4">
+                    <label class="form-label fw-semibold text-muted small">
+                        <i class="bi bi-calendar-check me-1"></i> حتى تاريخ
+                    </label>
+                    <input type="date"
+                           class="form-control"
+                           @bind="toDate"
+                           @bind:after="OnDateChanged" />
+                </div> *@
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100"
+                            @onclick="LoadData"
+                            disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        <i class="bi bi-search me-1"></i>عرض
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100"
+                            @onclick="ResetDate">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> إعادة تعيين
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ===== ملخص سريع ===== *@
+    @if (!isLoading && students.Any())
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+                    <div class="card-body text-center py-3">
+                        <div class="text-primary fw-bold fs-4">@totalCount</div>
+                        <div class="text-muted small">إجمالي الطلاب</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-info bg-opacity-10">
+                    <div class="card-body text-center py-3">
+                        <div class="text-info fw-bold fs-4">@students.Count(s => s.GenderName == "ذكر")</div>
+                        <div class="text-muted small">ذكور</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-danger bg-opacity-10">
+                    <div class="card-body text-center py-3">
+                        <div class="text-danger fw-bold fs-4">@students.Count(s => s.GenderName == "أنثى")</div>
+                        <div class="text-muted small">إناث</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+                    <div class="card-body text-center py-3">
+                        <div class="text-success fw-bold fs-4">@students.Count(s => s.IsUnrwa)</div>
+                        <div class="text-muted small">أونروا</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* ===== Loading / Empty / Table ===== *@
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
+        </div>
+    }
+    else if (!students.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+            <p class="fs-6">لا توجد بيانات للعرض</p>
+            <p class="small">اختر تاريخ البداية ثم اضغط "عرض"</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width:50px">#</th>
+                            <th><i class="bi bi-person me-1"></i>الاسم</th>
+                            <th><i class="bi bi-card-text me-1"></i>رقم الهوية</th>
+                            <th><i class="bi bi-phone me-1"></i>الجوال</th>
+                            <th>الجنس</th>
+                            <th><i class="bi bi-mortarboard me-1"></i>المستوى</th>
+                            <th><i class="bi bi-building me-1"></i>المركز</th>
+                            <th><i class="bi bi-calendar-plus me-1"></i>تاريخ الإضافة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int rowIndex = 0;
+                        }
+                        @foreach (var student in students)
+                        {
+                            rowIndex++;
+                            <tr>
+                                <td class="text-muted small">
+                                    @((currentPage - 1) * pageSize + rowIndex)
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@student.Name</div>
+                                    <small class="text-muted">@student.EnName</small>
+                                </td>
+                                <td>
+                                    <code class="bg-light px-2 py-1 rounded">
+                                        @student.CivilId
+                                    </code>
+                                </td>
+                                <td class="text-muted small font-monospace">
+                                    @student.Mobile
+                                </td>
+                                <td>
+                                    @if (student.GenderName == "ذكر")
+                                    {
+                                        <span class="badge bg-primary bg-opacity-10
+                                            text-primary border border-primary
+                                            border-opacity-25">
+                                            <i class="bi bi-gender-male me-1"></i>ذكر
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger bg-opacity-10
+                                            text-danger border border-danger
+                                            border-opacity-25">
+                                            <i class="bi bi-gender-female me-1"></i>أنثى
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10
+                                        text-success border border-success
+                                        border-opacity-25">
+                                        @student.LevelName
+                                    </span>
+                                </td>
+                                <td>@student.CenterName</td>
+                                <td>
+                                    <span class="text-muted small">
+                                        @student.AddedDate?.ToString("yyyy/MM/dd")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @* ===== Pagination ===== *@
+        @if (totalPages > 1)
+        {
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="text-muted small">
+                    عرض @(Math.Min((currentPage - 1) * pageSize + 1, totalCount))
+                    - @(Math.Min(currentPage * pageSize, totalCount))
+                    من أصل <strong class="text-primary">@totalCount</strong>
+                </span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <button class="page-link" @onclick="@(() => GoToPage(1))">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </button>
+                        </li>
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <button class="page-link" @onclick="@(() => GoToPage(currentPage - 1))">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </li>
+                        @foreach (var p in GetPageNumbers())
+                        {
+                            <li class="page-item @(p == currentPage ? "active" : "")">
+                                <button class="page-link" @onclick="@(() => GoToPage(p))">@p</button>
+                            </li>
+                        }
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <button class="page-link" @onclick="@(() => GoToPage(currentPage + 1))">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                        </li>
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <button class="page-link" @onclick="@(() => GoToPage(totalPages))">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+</div>

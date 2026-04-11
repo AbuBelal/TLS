@@ -145,7 +145,14 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(s =>
                     s.Level != null && s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
             }
-          
+
+            // فلتر تاريخ الإضافة
+            if (request.FromDate.HasValue)
+            {
+                query = query.Where(s =>
+                    s.StdCenters.Any(sc => sc.FromDate >= request.FromDate.Value));
+            }
+
             // 3. حساب العدد الإجمالي (بعد الفلترة)
             var totalCount =await query.CountAsync();
 
@@ -171,7 +178,8 @@ namespace APIServerLib.Repositories.Implemntations
                 GenderName=s.Gender.Name,
                 LevelName=s.Level.Name,
                 CenterName=s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
-            }).ToList();
+                AddedDate = s.StdCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,
+            }).OrderByDescending(s=>s.AddedDate).ToList();
 
             // 5. بناء الاستجابة
             var response = new PaginatedResponse<StudentDto>
@@ -233,6 +241,10 @@ namespace APIServerLib.Repositories.Implemntations
 
             if (!string.IsNullOrWhiteSpace(request.Level))
                 query = query.Where(s => s.Level != null && s.Level.Name == request.Level);
+
+            if (request.FromDate.HasValue)
+                query = query.Where(s =>
+                    s.StdCenters.Any(sc => sc.FromDate >= request.FromDate.Value));
 
             return await query.OrderBy(s => s.Name).ToListAsync();
         }

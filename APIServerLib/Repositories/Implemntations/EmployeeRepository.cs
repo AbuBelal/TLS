@@ -108,6 +108,13 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
             }
 
+            // فلتر تاريخ الإضافة
+            if (request.FromDate.HasValue)
+            {
+                query = query.Where(e =>
+                    e.EmpCenters.Any(ec => ec.FromDate >= request.FromDate.Value));
+            }
+
             var totalCount = await query.CountAsync();
             var totalPages = Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
             if (pageNumber > totalPages)
@@ -129,8 +136,8 @@ namespace APIServerLib.Repositories.Implemntations
                     GenderName = e.Gender != null ? e.Gender.Name : null,
                     JobName = e.Job != null ? e.Job.Name : null,
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
-                    CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name
-
+                    CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name,
+                    AddedDate = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,  // ← جديد
                 })
                 .ToListAsync();
 
@@ -243,6 +250,10 @@ namespace APIServerLib.Repositories.Implemntations
             if (!string.IsNullOrWhiteSpace(request.Center))
                 query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
 
+            if (request.FromDate.HasValue)
+                query = query.Where(e =>
+                    e.EmpCenters.Any(ec => ec.FromDate >= request.FromDate.Value));
+
             return await query
                 .OrderBy(e => e.Name)
                 .Select(e => new EmployeeListItemDto
@@ -255,7 +266,8 @@ namespace APIServerLib.Repositories.Implemntations
                     GenderName = e.Gender != null ? e.Gender.Name : null,
                     JobName = e.Job != null ? e.Job.Name : null,
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
-                    CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name
+                    CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name,
+                    AddedDate = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,  // ← جديد
                 })
                 .ToListAsync();
         }
@@ -308,7 +320,8 @@ namespace APIServerLib.Repositories.Implemntations
                     GenderName = e.Gender != null ? e.Gender.Name : null,
                     JobName = e.Job != null ? e.Job.Name : null,
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
-                    CenterName=e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name
+                    CenterName=e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
+                    AddedDate = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,  // ← جديد
                 })
                 .ToListAsync();
         }
