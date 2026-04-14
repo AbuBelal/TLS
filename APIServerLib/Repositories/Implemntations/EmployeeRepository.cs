@@ -33,6 +33,36 @@ namespace APIServerLib.Repositories.Implemntations
             return new GeneralResponse (  true,  "Employee added successfully." ,item.Id);
         }
 
+        public async Task<GeneralResponse> AddEmployeeWithCenter(Employee employee, long centerid)
+        {
+            var emp = await _context.Employees.Where(s => s.EmpId == employee.EmpId)
+               .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
+               .Include(x => x.Specialization).FirstOrDefaultAsync();
+
+            if (emp is null)
+            {
+
+                if (centerid == 0) return await Insert(employee);
+
+                await _context.Database.BeginTransactionAsync();
+                _context.Employees.Add(employee);
+                await _context.SaveChangesAsync(); // للحصول على Id employee بعد الحفظ
+
+                var empCenter = new EmpCenter
+                {
+                    EmployeeId = employee.Id,
+                    CenterId = centerid,
+                    FromDate = DateOnly.FromDateTime(DateTime.Now)
+                };
+                _context.EmpCenters.Add(empCenter);
+                await _context.SaveChangesAsync();
+                await _context.Database.CommitTransactionAsync();
+
+                return new GeneralResponse(true, "تم إضافة الموظف للمركز بنجاح.");
+            }
+            return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {emp.EmpCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لموظف اسمه {emp.Name} في التخصص {emp.Specialization.Name} ", 0);
+        }
+
         public async Task<GeneralResponse> Update(Employee item)
         {
             _context.Employees.Update(item);
@@ -131,6 +161,7 @@ namespace APIServerLib.Repositories.Implemntations
                     Id = e.Id,
                     Name = e.Name,
                     EnName = e.EnName,
+                    EmpId= e.EmpId,
                     CivilId = e.CivilId,
                     Mobile = e.Mobile,
                     GenderName = e.Gender != null ? e.Gender.Name : null,
@@ -261,6 +292,7 @@ namespace APIServerLib.Repositories.Implemntations
                     Id = e.Id,
                     Name = e.Name,
                     EnName = e.EnName,
+                    EmpId = e.EmpId,
                     CivilId = e.CivilId,
                     Mobile = e.Mobile,
                     GenderName = e.Gender != null ? e.Gender.Name : null,
@@ -289,6 +321,7 @@ namespace APIServerLib.Repositories.Implemntations
                    Id = e.Id,
                    Name = e.Name,
                    EnName = e.EnName,
+                   EmpId = e.EmpId,
                    CivilId = e.CivilId,
                    Mobile = e.Mobile,
                    GenderName = e.Gender != null ? e.Gender.Name : null,
@@ -315,6 +348,7 @@ namespace APIServerLib.Repositories.Implemntations
                     Id = e.Id,
                     Name = e.Name,
                     EnName = e.EnName,
+                    EmpId = e.EmpId,
                     CivilId = e.CivilId,
                     Mobile = e.Mobile,
                     GenderName = e.Gender != null ? e.Gender.Name : null,

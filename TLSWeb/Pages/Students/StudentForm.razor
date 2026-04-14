@@ -35,7 +35,7 @@
                     </div>
 
                     @* المنسدلات (Lookups) *@
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">الجنس</label>
                         <InputSelect @bind-Value="student.GenderId" class="form-select">
                             <option value="">-- اختر الجنس --</option>
@@ -47,7 +47,7 @@
                         <ValidationMessage For="@(() => student.GenderId)" />
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">المستوى الدراسي</label>
                         <InputSelect @bind-Value="student.LevelId" class="form-select">
                             <option value="">-- اختر المستوى --</option>
@@ -58,10 +58,26 @@
                         </InputSelect>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">تاريخ الميلاد</label>
                         <InputDate TValue="DateOnly?" @bind-Value="student.BirthDate" class="form-control" />
                     </div>
+
+                    <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin" Context="student">
+                        <div class="col-md-3">
+                            <label class="form-label">المركز</label>
+                            <InputSelect @bind-Value="selectedCenterId" class="form-select">
+                                <option value="">-- اختر المركز --</option>
+                                @foreach (var c in centers)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => selectedCenterId)" />
+
+                        </div>
+                    </AuthorizeView>
+
 
                     @* خيارات إضافية *@
                     <div class="col-md-12 mt-3">
@@ -100,12 +116,16 @@
     private List<LookupValue> genders = new();
     private List<LookupValue> levels = new();
 
+    private List<Center> centers = new();          // ← جديد
+    private long? selectedCenterId;                  // ← جديد
+
     protected override async Task OnInitializedAsync()
     {
         if (Id != 0) student = await StudentApi.GetById(Id);
         // جلب البيانات للمنسدلات من الـ API
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
+        centers = await CenterApi.GetAll();          // ← جديد
     }
     private async Task TranslateName()
     {
@@ -130,11 +150,26 @@
         }
         else
         {
-            var response = await StudentApi.Insert(student);
+            // var response = await StudentApi.Insert(student);
+            // if (response.Success)
+            // {
+            //     NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+            // }
+            // MudSnackbar.Add(response.Message, Severity.Error);
+
+            // ← تعديل: استخدام AddWithCenter بدلاً من Insert
+            var stdWithCenter = new StdWithCenterId
+            {
+                Student = student,
+                CenterId = selectedCenterId ?? 0
+            };
+            var response = await StudentApi.AddWithCenter(stdWithCenter);
             if (response.Success)
             {
                 NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+                MudSnackbar.Add(response.Message, Severity.Success);
             }
+            else
             MudSnackbar.Add(response.Message, Severity.Error);
         }
     }

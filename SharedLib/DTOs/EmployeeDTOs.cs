@@ -20,6 +20,7 @@ namespace SharedLib.DTOs
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? EnName { get; set; }
+        public string? EmpId { get; set; }
         public string? CivilId { get; set; }
         public string? Mobile { get; set; }
         public string? GenderName { get; set; }
@@ -59,4 +60,11 @@ namespace SharedLib.DTOs
         public string? Comments { get; set; }
         public string? CenterName { get; set; }
     }
+
+    public class EmployeeWithCenter
+    {
+        public Entities.Employee Employee { get; set; }
+        public long CenterId { get; set; }
+    }
+
 }

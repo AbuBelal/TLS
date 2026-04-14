@@ -4,137 +4,547 @@
 @inject NavigationManager Navigation
 @attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
 
-@* @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap'); *@
 <style>
-    /* استيراد خط عربي عصري من جوجل */
+    /* ═══════════════════════════════════════════════════════════
+       صفحة الهبوط — مساحات التعليم المؤقتة
+       ═══════════════════════════════════════════════════════════ */
 
-    .arabic-login-container {
-        font-family: 'Cairo', sans-serif;
-        direction: rtl; /* ضبط الاتجاه من اليمين لليسار */
-        text-align: right;
+    .landing-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 30%, #f5f0ff 70%, #fff8f0 100%);
+        font-family: 'Tajawal', sans-serif;
+        direction: rtl;
+        overflow-x: hidden;
     }
 
-    .card-custom {
-        border-radius: 1.25rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    /* ── الهيدر ── */
+    .landing-header {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0,158,219,0.1);
+        padding: 1rem 2rem;
+    }
+
+    .brand-text {
+        font-family: 'Tajawal', sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: #009EDB;
+    }
+
+    .brand-sub {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    /* ── القسم الرئيسي (Hero + Login) ── */
+    .hero-section {
+        min-height: calc(100vh - 70px);
+        display: flex;
+        align-items: center;
+    }
+
+    /* ── الجانب التعريفي ── */
+    .hero-content {
+        padding: 3rem 2rem 3rem 4rem;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0,158,219,0.08);
+        border: 1px solid rgba(0,158,219,0.2);
+        color: #009EDB;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+        font-family: 'Tajawal', sans-serif;
+        font-weight: 800;
+        font-size: 2.8rem;
+        line-height: 1.3;
+        color: #1a2332;
+        margin-bottom: 1rem;
+    }
+
+    .hero-title span {
+        background: linear-gradient(135deg, #009EDB, #00658e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: 1.15rem;
+        color: #4b5563;
+        line-height: 1.8;
+        margin-bottom: 2.5rem;
+        max-width: 500px;
+    }
+
+    /* ── بطاقات المميزات ── */
+    .feature-card {
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0,158,219,0.08);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,158,219,0.12);
+        border-color: rgba(0,158,219,0.2);
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #1a2332;
+        margin-bottom: 0.35rem;
+    }
+
+    .feature-desc {
+        font-size: 0.8rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    /* ── العبارة الختامية ── */
+    .hero-motto {
+        margin-top: 2rem;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, rgba(0,158,219,0.06), rgba(0,101,142,0.06));
+        border-radius: 12px;
+        border-right: 4px solid #009EDB;
+    }
+
+    .hero-motto p {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #00658e;
+        margin: 0;
+    }
+
+    /* ── جانب تسجيل الدخول ── */
+    .login-side {
+        /* background: linear-gradient(160deg, #009EDB 40%, #00658e 40%, #004c6c 20%); */
+        min-height: calc(100vh - 70px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-side::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.03) 0%, transparent 50%);
+        animation: float 20s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(2%, -2%) rotate(1deg); }
+        66% { transform: translate(-1%, 1%) rotate(-0.5deg); }
+    }
+
+    .login-card {
+        background: rgba(255,255,255,0.97);
+        backdrop-filter: blur(20px);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+        position: relative;
+        z-index: 1;
+    }
+
+    .login-icon {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #009EDB, #00658e);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+    }
+
+    .login-icon i {
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .login-title {
+        font-family: 'Tajawal', sans-serif;
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: #1a2332;
+        text-align: center;
+        margin-bottom: 0.35rem;
+    }
+
+    .login-subtitle {
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    /* ── حقول الإدخال ── */
+    .form-floating-custom {
+        position: relative;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-floating-custom input {
+        width: 100%;
+        padding: 1rem 1rem 0.5rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        background: #f9fafb;
+        transition: all 0.2s ease;
+        direction: ltr;
+        text-align: left;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+    }
+
+    .form-floating-custom input:focus {
+        outline: none;
+        border-color: #009EDB;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(0,158,219,0.1);
+    }
+
+    .form-floating-custom label {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        pointer-events: none;
+        background: transparent;
+        padding: 0 0.25rem;
+    }
+
+    .form-floating-custom input:focus + label,
+    .form-floating-custom input:not(:placeholder-shown) + label {
+        top: 0;
+        font-size: 0.75rem;
+        color: #009EDB;
+        background: white;
+    }
+
+    /* ── زر الدخول ── */
+    .btn-login {
+        width: 100%;
+        padding: 0.85rem;
         border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #009EDB, #00658e);
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: 'Tajawal', sans-serif;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
 
-    /* تحسين شكل الحقول */
-    .custom-input {
-        border-radius: 0.75rem;
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        padding-right: 1.5rem; /* مسافة للنص العربي */
+    .btn-login:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,158,219,0.35);
     }
-    
-        .custom-input:focus {
-            background-color: #ffffff;
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+
+    .btn-login:disabled {
+        background: linear-gradient(135deg, #7dc8e8, #5ba8c8);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* ── الفوتر ── */
+    .landing-footer {
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(0,158,219,0.08);
+        padding: 1rem 2rem;
+        text-align: center;
+    }
+
+    .landing-footer p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    /* ── استجابة الجوال ── */
+    @@media (max-width: 991.98px) {
+        .hero-content {
+            padding: 2rem 1.5rem;
+            text-align: center;
         }
 
-    /* ضبط الحقول العائمة (Floating Labels) لتناسب اللغة العربية */
-    .form-floating > label {
-        right: 0;
-        left: auto;
-        padding-right: 1.25rem;
-        transform-origin: top right;
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-motto {
+            text-align: center;
+            border-right: none;
+            border-bottom: 4px solid #009EDB;
+        }
+
+        .login-side {
+            min-height: auto;
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        .login-card {
+            max-width: 100%;
+        }
     }
 
-    /* تحسين شكل الزر */
-    .btn-custom {
-        border-radius: 0.75rem;
-        background: linear-gradient(45deg, #0d6efd, #0099ff);
-        border: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+    @@media (max-width: 575.98px) {
+        .hero-title {
+            font-size: 1.6rem;
+        }
 
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+        .feature-card {
+            padding: 1rem;
         }
-    
-        .btn-custom:disabled {
-            background: #a5c8fd;
-            transform: none;
-            box-shadow: none;
-        }
+    }
 </style>
 
-<div class="col-12 col-md-6 col-lg-4 mx-auto arabic-login-container ">
-    <div class="card card-custom mt-4 mx-auto">
-        <div class="card-body p-5">
-            <div class="text-center mb-5">
-                <h3 class="fw-bold fs-4 mb-2 text-primary">مرحباً بعودتك</h3>
-                <p class="text-muted">قم بتسجيل الدخول للوصول إلى حسابك</p>
+<div class="landing-page">
+    @* ═══════════════════ الهيدر ═══════════════════ *@
+    <header class="landing-header">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center"
+                     style="width:42px;height:42px;background:linear-gradient(135deg,#009EDB,#00658e);border-radius:12px">
+                    <span class="material-symbols-outlined text-white" style="font-size:22px">school</span>
+                </div>
+                <div>
+                    <div class="brand-text">مساحات التعليم المؤقتة</div>
+                    <div class="brand-sub">شمال غزة — متابعة وإدارة</div>
+                    @* <div class="brand-sub">غرب الوسطى — متابعة وإدارة</div> *@
+                </div>
             </div>
+            <div class="d-none d-md-flex align-items-center gap-2 text-muted small">
+                <span class="material-symbols-outlined" style="font-size:18px">shield</span>
+                <span>نظام آمن ومحمي</span>
+            </div>
+        </div>
+    </header>
 
-            <EditForm Model="Model" OnValidSubmit="Submit">
-                <DataAnnotationsValidator />
+    @* ═══════════════════ القسم الرئيسي ═══════════════════ *@
+    <div class="hero-section">
+        <div class="container-fluid">
+            <div class="row g-0 align-items-center">
+                @* ── الجانب التعريفي ── *@
+                <div class="col-lg-7">
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <span class="material-symbols-outlined" style="font-size:16px">emergency</span>
+                            نظام متابعة في أوقات الطوارئ
+                        </div>
 
-                <div class="form-floating mb-4">
-                    <InputText @bind-Value="Model!.Email"
-                               type="email"
-                               class="form-control custom-input"
-                               id="email"
-                               placeholder1="البريد الإلكتروني"
-                               dir="ltr" />
-                    <label for="email">البريد الإلكتروني</label>
-                    <ValidationMessage For="() => Model.Email" class="text-danger small mt-1" />
-                </div>
+                        <h1 class="hero-title">
+                            ضمان <span>حق التعليم</span><br/>
+                            في أوقات الأزمات
+                        </h1>
 
-                <div class="form-floating mb-4">
-                    <InputText @bind-Value="Model!.Password"
-                               type="password"
-                               class="form-control custom-input"
-                               id="password"
-                               placeholder1="كلمة المرور"
-                               dir="ltr" />
-                    <label for="password">كلمة المرور</label>
-                    <ValidationMessage For="() => Model.Password" class="text-danger small mt-1" />
-                </div>
+                        <p class="hero-subtitle">
+                            منصة متكاملة لمتابعة وإدارة مساحات التعليم المؤقتة في منطقة الشمال،
+                            نوثّق البيانات ونُحسن الأداء لضمان استمرارية التعليم في أصعب الظروف.
+                        </p>
 
-                @if (IsNew)
-                {
-                    <div class="col-12 mb-4">
-                        <div class="alert alert-success rounded-3 d-flex align-items-center">
-                            <span>تم إنشاء الحساب بنجاح! يمكنك الدخول الآن.</span>
+                        @* ── بطاقات المميزات ── *@
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <div class="feature-card">
+                                    <div class="feature-icon" style="background:rgba(0,158,219,0.1);color:#009EDB">
+                                        <span class="material-symbols-outlined">school</span>
+                                    </div>
+                                    <div class="feature-title">متابعة الطلاب</div>
+                                    <div class="feature-desc">تسجيل ومتابعة بيانات الطلاب وتوزيعهم على المراكز والمستويات</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="feature-card">
+                                    <div class="feature-icon" style="background:rgba(16,185,129,0.1);color:#10b981">
+                                        <span class="material-symbols-outlined">badge</span>
+                                    </div>
+                                    <div class="feature-title">إدارة الموظفين</div>
+                                    <div class="feature-desc">تنظيم بيانات الموظفين وتوزيعهم على المراكز والوظائف</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="feature-card">
+                                    <div class="feature-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6">
+                                        <span class="material-symbols-outlined">analytics</span>
+                                    </div>
+                                    <div class="feature-title">تقارير ذكية</div>
+                                    <div class="feature-desc">تقارير وإحصائيات شاملة مع إمكانية التصدير والتحليل</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="feature-card">
+                                    <div class="feature-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b">
+                                        <span class="material-symbols-outlined">domain</span>
+                                    </div>
+                                    <div class="feature-title">إدارة المراكز</div>
+                                    <div class="feature-desc">متابعة تفاصيل المراكز والغيام والمساحات التعليمية</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* ── العبارة الختامية ── *@
+                        <div class="hero-motto">
+                            <p>
+                                <span class="material-symbols-outlined align-middle me-1" style="font-size:20px">verified</span>
+                                نتابع، نوثّق، نُحسن — لأن التعليم لا يتوقف
+                            </p>
                         </div>
                     </div>
-                }
-
-                <div class="col-12 mb-4 @(errorList.Any() ? string.Empty : "d-none")">
-                    <div class="alert alert-danger rounded-3">
-                        <ul class="mb-0 pe-3">
-                            @foreach (var error in errorList)
-                            {
-                                <li>@error</li>
-                            }
-                        </ul>
-                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-custom btn-lg w-100 fs-6 fw-bold py-3 mt-2" disabled="@loading">
-                    @if (loading)
-                    {
-                        <span>جاري تسجيل الدخول...</span>
-                    }
-                    else
-                    {
-                        <span>تسجيل الدخول</span>
-                    }
-                </button>
-            </EditForm>
+                @* ── جانب تسجيل الدخول ── *@
+                <div class="col-lg-5">
+                    <div class="login-side">
+                        <div class="login-card">
+                            <div class="login-icon">
+                                <i class="bi bi-person-fill-lock"></i>
+                            </div>
+                            <h2 class="login-title">مرحباً بعودتك</h2>
+                            <p class="login-subtitle">قم بتسجيل الدخول للوصول إلى لوحة التحكم</p>
+
+                            <EditForm Model="Model" OnValidSubmit="Submit">
+                                <DataAnnotationsValidator />
+
+                                <div class="form-floating-custom">
+                                    <InputText @bind-Value="Model!.Email"
+                                               type="email"
+                                               class="form-control"
+                                               id="email"
+                                               placeholder="البريد الإلكتروني"
+                                               dir="ltr" />
+                                    <label for="email">البريد الإلكتروني</label>
+                                    <ValidationMessage For="() => Model.Email" class="text-danger small mt-1 d-block" />
+                                </div>
+
+                                <div class="form-floating-custom">
+                                    <InputText @bind-Value="Model!.Password"
+                                               type="password"
+                                               class="form-control"
+                                               id="password"
+                                               placeholder="كلمة المرور"
+                                               dir="ltr" />
+                                    <label for="password">كلمة المرور</label>
+                                    <ValidationMessage For="() => Model.Password" class="text-danger small mt-1 d-block" />
+                                </div>
+
+                                @if (IsNew)
+                                {
+                                    <div class="mb-3">
+                                        <div class="alert alert-success rounded-3 d-flex align-items-center py-2">
+                                            <span class="material-symbols-outlined me-2" style="font-size:20px;color:#10b981">check_circle</span>
+                                            <span>تم إنشاء الحساب بنجاح! يمكنك الدخول الآن.</span>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="@(errorList.Any() ? string.Empty : "d-none")">
+                                    <div class="alert alert-danger rounded-3 py-2 mb-3">
+                                        <ul class="mb-0 pe-3 small">
+                                            @foreach (var error in errorList)
+                                            {
+                                                <li>@error</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-login" disabled="@loading">
+                                    @if (loading)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        <span>جاري تسجيل الدخول...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>تسجيل الدخول</span>
+                                    }
+                                </button>
+                            </EditForm>
+
+                            <div class="text-center mt-4">
+                                <small class="text-muted">
+                                    <span class="material-symbols-outlined align-middle me-1" style="font-size:16px">lock</span>
+                                    اتصال مشفر وآمن
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-   @*  <div class="text-center mt-4 mb-4">
-        <p class="text-muted">
-            ليس لديك حساب بعد؟
-            <NavLink href="/register" class="text-primary fw-bold text-decoration-none">سجل الآن</NavLink>
+
+    @* ═══════════════════ الفوتر ═══════════════════ *@
+    <footer class="landing-footer">
+        <p>
+            © @DateTime.Now.Year مساحات التعليم المؤقتة — شمال غزة
+            &nbsp;|&nbsp;
+            <span class="material-symbols-outlined align-middle" style="font-size:14px">favorite</span>
+            لأن التعليم حق لا يتوقف
         </p>
-    </div> *@
+        @* <p>
+            © @DateTime.Now.Year مساحات التعليم المؤقتة — غرب الوسطى
+            &nbsp;|&nbsp;
+            <span class="material-symbols-outlined align-middle" style="font-size:14px">favorite</span>
+            لأن التعليم حق لا يتوقف
+        </p> *@
+    </footer>
 </div>
 
 @code {
@@ -152,13 +562,7 @@
     private async Task Submit()
     {
         loading = true;
-        LoginModel loginModel = new()
-        {
-             Email= Model!.Email,
-            Password = Model.Password
-        };
         var result = await AccountManagement.LoginAsync(Model!);
-        // var result = await UserApi.LogIn(loginModel);
 
         if (result.Succeeded)
         {

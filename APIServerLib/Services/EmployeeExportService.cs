@@ -56,6 +56,7 @@ public static class EmployeeExportService
             ("الوظيفة",       14),
             ("التخصص",        16),
             ("المركز",        22),
+            ("رقم الموظف",        12),
         };
 
         for (int c = 0; c < headers.Length; c++)
@@ -94,6 +95,7 @@ public static class EmployeeExportService
             ws.Cell(row, 7).Value = emp.JobName        ?? "";
             ws.Cell(row, 8).Value = emp.SpecializationName ?? "";
             ws.Cell(row, 9).Value = emp.CenterName ?? "";
+            ws.Cell(row, 10).Value = emp.EmpId ?? "";
 
             var rowRange = ws.Range(row, 1, row, totalCols);
             rowRange.Style.Fill.BackgroundColor = rowBg;

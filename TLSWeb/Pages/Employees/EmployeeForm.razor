@@ -86,7 +86,7 @@
                     </div>
 
                     @* المنسدلات (Lookups) *@
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">الجنس</label>
                         <InputSelect @bind-Value="employee.GenderId" class="form-select">
                             <option value="">-- اختر الجنس --</option>
@@ -98,7 +98,7 @@
                         <ValidationMessage For="@(() => employee.GenderId)" class="text-danger" />
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">الوظيفة</label>
                         <InputSelect @bind-Value="employee.JobId" class="form-select">
                             <option value="">-- اختر الوظيفة --</option>
@@ -110,7 +110,7 @@
                         <ValidationMessage For="@(() => employee.JobId)" class="text-danger" />
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">التخصص</label>
                         <InputSelect @bind-Value="employee.SpecializationId" class="form-select">
                             <option value="">-- اختر التخصص --</option>
@@ -120,6 +120,21 @@
                             }
                         </InputSelect>
                     </div>
+
+                    <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin" Context="student">
+                        <div class="col-md-3">
+                            <label class="form-label">المركز</label>
+                            <InputSelect @bind-Value="selectedCenterId" class="form-select">
+                                <option value="">-- اختر المركز --</option>
+                                @foreach (var c in centers)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => selectedCenterId)" />
+
+                        </div>
+                    </AuthorizeView>
 
                     @* ملاحظات *@
                     <div class="col-12">

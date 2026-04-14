@@ -11,9 +11,10 @@ namespace TLSClientSharedLib.Helpers
 
         #if DEBUG
                 public const string BaseUrl = "https://localhost:7075";
-        #else
+#else
                 public const string BaseUrl = "https://manapi.runasp.net/";
-        #endif
+                //public const string BaseUrl = "https://midapi.tryasp.net/";
+#endif
         public static class Auth
         {
                 //post ///register
@@ -48,6 +49,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetByCivilId = PriorUrl+ "/GetByCivilId/{CivilId}";
             public const string GetByEmpId = PriorUrl+ "/GetByEmpId/{EmpId}";
             public const string Insert = PriorUrl;
+            public const string AddWithCenter = PriorUrl + "/AddWithCenter";
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             //    /api/Employee/EmployeeCenterCount/{CenterId}
@@ -62,7 +64,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetAll = PriorUrl;
             public const string GetById = PriorUrl + "/{id}";
             public const string Insert = PriorUrl;
-            public const string AddWithCenter = PriorUrl+ "AddWithCenter";
+            public const string AddWithCenter = PriorUrl+ "/AddWithCenter";
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             //   /api/Student/StudentCenterCount/{CenterId})

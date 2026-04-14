@@ -26,6 +26,9 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.Employee.Insert)]
         Task<GeneralResponse> Insert([Body] EmployeeUpsertDto employee);
 
+        [Post(ApiUrls.Employee.AddWithCenter)]
+        Task<GeneralResponse> AddWithCenter([Body] EmployeeWithCenter employee);
+
         [Put(ApiUrls.Employee.Update)]
         Task<GeneralResponse> Update([Body] EmployeeUpsertDto employee);
 

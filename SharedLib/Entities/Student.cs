@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -7,6 +8,7 @@ namespace SharedLib.Entities
 {
     public  class Student:BaseEntity
     {
+        [Length(9,9, ErrorMessage = "رقم الهوية يجب أن يكون 9 أرقام")]
         public string CivilId { get; set; } = string.Empty;
         public string? EnName { get; set; } = string.Empty;
         public string? Mobile { get; set; } 

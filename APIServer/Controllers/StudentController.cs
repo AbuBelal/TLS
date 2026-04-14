@@ -83,12 +83,19 @@ namespace APIServer.Controllers
             return new GeneralResponse(false, "لا يمكن إضافة طالب ، تأكد من البيانات أو صلاحيات المستخدم", 0);
         }
 
-        //[HttpPost("AddWithCenter")]
-        //public async Task<ActionResult<GeneralResponse>> AddWithCenter(StdWithCenterId student)
-        //{
-        //    var response = await _studentRepository.AddStudentWithCenter(student);
-        //    return Ok(response);
-        //}
+        [HttpPost("AddWithCenter")]
+        public async Task<ActionResult<GeneralResponse>> AddWithCenter(StdWithCenterId student)
+        {
+            if (student.CenterId <= 0)
+            {
+                return await Insert(student.Student);
+            }
+            else
+            {
+                var response = await _studentRepository.AddStudentWithCenter(student.Student, student.CenterId);
+                return Ok(response);
+            }
+        }
 
         [HttpPut]
         public async Task<ActionResult<GeneralResponse>> Update(Student student)

@@ -28,7 +28,8 @@ public partial class EmployeeForm : ComponentBase
     protected bool IsCheckingDuplicate = false;
     protected bool IsDuplicate = false;
     protected string DuplicateMessage = string.Empty;
-
+    private List<Center> centers = new();          // ← جديد
+    private long? selectedCenterId;
     // ────────────────────────────────────────────────
     //  Computed
     // ────────────────────────────────────────────────
@@ -51,6 +52,7 @@ public partial class EmployeeForm : ComponentBase
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         jobs = await LookupValueApi.GetByValueType(LookupTypes.Job) ?? new();
         specializations = await LookupValueApi.GetByValueType(LookupTypes.Specialization) ?? new();
+        centers = await CenterApi.GetAll() ?? new();
     }
 
     // ────────────────────────────────────────────────
@@ -151,7 +153,13 @@ public partial class EmployeeForm : ComponentBase
             }
             else
             {
-                var response = await EmployeeApi.Insert(employeeToSend);
+                var employee = mapper.ToEntity(employeeToSend);
+                var employeeWithCenter = new EmployeeWithCenter
+                {
+                    Employee = employee,
+                    CenterId = selectedCenterId ?? 0 // تأكد من تعيين مركز افتراضي إذا لم يتم الاختيار
+                };
+                var response = await EmployeeApi.AddWithCenter(employeeWithCenter);
 
                 if (response.Success)
                 {

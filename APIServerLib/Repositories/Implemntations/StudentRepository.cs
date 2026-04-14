@@ -80,11 +80,13 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<GeneralResponse> AddStudentWithCenter(Student student , long centerid)
         {
-            var Std = await _context.Students.Where(s => s.CivilId == student.CivilId)
+            var Std = await _context.Students.Where(s => s.CivilId == student.CivilId /*|| s.Name.Trim() == student.Name.Trim()*/)
                .Include(x => x.StdCenters).ThenInclude(x => x.Center)
                .Include(x => x.Level).FirstOrDefaultAsync();
             if (Std is null)
             {
+                if(centerid == 0) return await Insert(student);
+
                 await _context.Database.BeginTransactionAsync();
                 _context.Students.Add(student);
                 await _context.SaveChangesAsync(); // للحصول على Id الطالب
@@ -99,9 +101,9 @@ namespace APIServerLib.Repositories.Implemntations
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
 
-                return new GeneralResponse(true, "Student and center association added successfully.");
+                return new GeneralResponse(true, "تم إضافة الطالب للمركز بنجاح.");
             }
-            return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {Std.StdCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
+            return new GeneralResponse(false, $"رقم الهوية أو الاسم موجود مسبقاً في مركز {Std.StdCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
         }
 
         public async Task<PaginatedResponse<StudentDto>> GetPaginatedStudentsAsync(StudentFilterRequest request,long CenterId=0)
@@ -175,8 +177,8 @@ namespace APIServerLib.Repositories.Implemntations
                 Name = s.Name,
                 CivilId = s.CivilId,
                 Mobile = s.Mobile,
-                GenderName=s.Gender.Name,
-                LevelName=s.Level.Name,
+                GenderName=s.Gender?.Name,
+                LevelName=s.Level?.Name,
                 CenterName=s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
                 AddedDate = s.StdCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,
             }).OrderByDescending(s=>s.AddedDate).ToList();

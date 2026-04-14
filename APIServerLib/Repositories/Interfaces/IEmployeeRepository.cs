@@ -1,6 +1,7 @@
 // المسار: APIServerLib\Repositories\Interfaces\IEmployeeRepository.cs
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Responses;
 
 namespace APIServerLib.Repositories.Interfaces
 {
@@ -11,6 +12,7 @@ namespace APIServerLib.Repositories.Interfaces
         Task<EmployeePaginatedResponse> GetPaginatedEmployesAsync(EmployeeFilterRequest request, long CenterId = 0);
         Task<EmployeeUpsertDto?> GetByCivilId(string CivilId);
         Task<EmployeeUpsertDto?> GetByEmpId(string EmpId);
+        Task<GeneralResponse> AddEmployeeWithCenter(Employee employee, long centerid);
         // ── جديد: للتصدير ──────────────────────────────────────────
 
         /// <summary>تصدير الموظفين المفلترين بدون pagination</summary>
