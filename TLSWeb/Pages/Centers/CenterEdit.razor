@@ -78,7 +78,7 @@
                                 </div>
 
                                 @* العنوان *@
-                                <div class="col-12">
+                                <div class="col-8">
                                     <label class="form-label fw-semibold text-muted small">
                                         العنوان
                                     </label>
@@ -86,6 +86,24 @@
                                                class="form-control"
                                                placeholder="الحي، الشارع، المنطقة" />
                                     <ValidationMessage For="@(() => Model.Address)" class="text-danger small" />
+                                </div>
+
+                                @* فترة الدوام *@
+                                <div class="col-4">
+                                    <label class="form-label fw-semibold text-muted small">
+                                        فترة الدوام
+                                    </label>
+                                    @* <InputText @bind-Value="Model.Address"
+                                               class="form-control"
+                                               placeholder="صباحي / مسائي" /> *@
+                                    <InputSelect @bind-Value="Model.WHours" class="form-select">
+                                        <option value="">-- اختر فترة الدوام --</option>
+                                        @foreach (var g in WHoures)
+                                        {
+                                            <option value="@g.Id">@g.Name</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => Model.WHours)" class="text-danger small" />
                                 </div>
 
                                 @* ملاحظات *@

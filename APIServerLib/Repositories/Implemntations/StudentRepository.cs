@@ -82,10 +82,15 @@ namespace APIServerLib.Repositories.Implemntations
         {
             var Std = await _context.Students.Where(s => s.CivilId == student.CivilId /*|| s.Name.Trim() == student.Name.Trim()*/)
                .Include(x => x.StdCenters).ThenInclude(x => x.Center)
-               .Include(x => x.Level).FirstOrDefaultAsync();
+               .Include(x => x.Level)
+               .FirstOrDefaultAsync();
+
+            if(centerid<=0)
+                return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
+            else
             if (Std is null)
             {
-                if(centerid == 0) return await Insert(student);
+                //if(centerid == 0) return await Insert(student);
 
                 await _context.Database.BeginTransactionAsync();
                 _context.Students.Add(student);
@@ -103,7 +108,8 @@ namespace APIServerLib.Repositories.Implemntations
 
                 return new GeneralResponse(true, "تم إضافة الطالب للمركز بنجاح.");
             }
-            return new GeneralResponse(false, $"رقم الهوية أو الاسم موجود مسبقاً في مركز {Std.StdCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
+
+            return new GeneralResponse(false, $"رقم الهوية أو الاسم موجود مسبقاً في مركز {Std.StdCenters?.OrderByDescending(x => x.FromDate).First().Center?.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
         }
 
         public async Task<PaginatedResponse<StudentDto>> GetPaginatedStudentsAsync(StudentFilterRequest request,long CenterId=0)

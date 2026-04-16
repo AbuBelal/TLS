@@ -4,6 +4,7 @@ using APIServerLib.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APIServerLib.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415062922_15.4.2026")]
+    partial class _1542026
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -261,12 +264,7 @@ namespace APIServerLib.Data.Migrations
                     b.Property<int?>("Tarpaulins")
                         .HasColumnType("int");
 
-                    b.Property<long?>("WhoursId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WhoursId");
 
                     b.ToTable("Centers");
 
@@ -347,8 +345,7 @@ namespace APIServerLib.Data.Migrations
 
                     b.Property<string>("CivilId")
                         .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("nvarchar(9)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
@@ -639,15 +636,6 @@ namespace APIServerLib.Data.Migrations
                         .HasForeignKey("SharedLib.Entities.ApplicationUser", "EmployeeId");
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("SharedLib.Entities.Center", b =>
-                {
-                    b.HasOne("SharedLib.Entities.LookupValue", "Whours")
-                        .WithMany()
-                        .HasForeignKey("WhoursId");
-
-                    b.Navigation("Whours");
                 });
 
             modelBuilder.Entity("SharedLib.Entities.EmpCenter", b =>

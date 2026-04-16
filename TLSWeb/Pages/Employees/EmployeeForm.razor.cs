@@ -126,8 +126,9 @@ public partial class EmployeeForm : ComponentBase
     // ────────────────────────────────────────────────
     protected async Task HandleSubmit()
     {
+        IsSaving = true;
         //حماية مزدوجة: تحقق من التكرار قبل الحفظ
-       await CheckDuplicateAsync();
+        await CheckDuplicateAsync();
         if (IsDuplicate) return;
 
         IsSaving = true;
@@ -180,6 +181,7 @@ public partial class EmployeeForm : ComponentBase
         {
             IsSaving = false;
         }
+        IsSaving = false;
     }
 
     // ────────────────────────────────────────────────

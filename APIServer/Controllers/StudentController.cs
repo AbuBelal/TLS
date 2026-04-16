@@ -88,13 +88,13 @@ namespace APIServer.Controllers
         {
             if (student.CenterId <= 0)
             {
-                return await Insert(student.Student);
+                student.CenterId = await CurrentCenterId();
+                //return await Insert(student.Student);
             }
-            else
-            {
-                var response = await _studentRepository.AddStudentWithCenter(student.Student, student.CenterId);
-                return Ok(response);
-            }
+           
+            var response = await _studentRepository.AddStudentWithCenter(student.Student, student.CenterId);
+            return Ok(response);
+            
         }
 
         [HttpPut]

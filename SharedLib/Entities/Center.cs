@@ -12,6 +12,10 @@ namespace SharedLib.Entities
         public int? Rooms { get; set; } = 0;
         public int? Tarpaulins { get; set; } = 0;
         public int? OtherSpaces { get; set; } = 0;
+        public long? WhoursId { get; set; }
+        [ForeignKey(nameof(WhoursId))]
+        public LookupValue? Whours { get; set; }
+
 
         [Required]
         public string? DaysOfWeek { get; set; } = string.Empty;

@@ -101,17 +101,18 @@ namespace APIServer.Controllers
         [HttpPost("AddWithCenter")]
         public async Task<ActionResult<GeneralResponse>> AddWithCenter(EmployeeWithCenter employee)
         {
-            if (employee.CenterId == 0)
+            if (employee.CenterId <= 0)
             {
-                employee.Employee.EmpCenters.Add(new EmpCenter() { EmployeeId = employee.Employee.Id, CenterId = await CurrentCenterId() });
-                var response = await _employeeRepository.Insert(employee.Employee);
-                return Ok(response);
+                employee.CenterId= await CurrentCenterId();
+                //employee.Employee.EmpCenters.Add(new EmpCenter() { EmployeeId = employee.Employee.Id, CenterId = await CurrentCenterId() });
+                //var response = await _employeeRepository.Insert(employee.Employee);
+                //return Ok(response);
             }
-            else
-            {
-                var response = await _employeeRepository.AddEmployeeWithCenter(employee.Employee, employee.CenterId);
-                return Ok(response);
-            }
+            
+            
+            var response = await _employeeRepository.AddEmployeeWithCenter(employee.Employee, employee.CenterId);
+            return Ok(response);
+            
         }
 
         [HttpPut]

@@ -363,8 +363,8 @@
                 </div>
                 <div>
                     <div class="brand-text">مساحات التعليم المؤقتة</div>
-                    <div class="brand-sub">شمال غزة — متابعة وإدارة</div>
-                    @* <div class="brand-sub">غرب الوسطى — متابعة وإدارة</div> *@
+                    @* <div class="brand-sub">شمال غزة — متابعة وإدارة</div> *@
+                    <div class="brand-sub">@SharedLib.Fixed.SystemSettings.SelectedAreaAr — متابعة وإدارة</div>
                 </div>
             </div>
             <div class="d-none d-md-flex align-items-center gap-2 text-muted small">
@@ -533,17 +533,30 @@
     @* ═══════════════════ الفوتر ═══════════════════ *@
     <footer class="landing-footer">
         <p>
-            © @DateTime.Now.Year مساحات التعليم المؤقتة — شمال غزة
+            © @DateTime.Now.Year مساحات التعليم المؤقتة — @SharedLib.Fixed.SystemSettings.SelectedAreaAr
             &nbsp;|&nbsp;
             <span class="material-symbols-outlined align-middle" style="font-size:14px">favorite</span>
             لأن التعليم حق لا يتوقف
         </p>
-        @* <p>
-            © @DateTime.Now.Year مساحات التعليم المؤقتة — غرب الوسطى
-            &nbsp;|&nbsp;
-            <span class="material-symbols-outlined align-middle" style="font-size:14px">favorite</span>
-            لأن التعليم حق لا يتوقف
-        </p> *@
+       @*  @if (SharedLib.Fixed.SystemSettings.SelectedArea == SharedLib.Fixed.SystemSettings.JabaliaArea)
+        {
+            <p>
+                © @DateTime.Now.Year مساحات التعليم المؤقتة — شمال غزة
+                &nbsp;|&nbsp;
+                <span class="material-symbols-outlined align-middle" style="font-size:14px">favorite</span>
+                لأن التعليم حق لا يتوقف
+            </p>
+        }
+        else
+            if (SharedLib.Fixed.SystemSettings.SelectedArea == SharedLib.Fixed.SystemSettings.EMidArea)
+            {
+                <p>
+                    © @DateTime.Now.Year مساحات التعليم المؤقتة — غرب الوسطى
+                    &nbsp;|&nbsp;
+                    <span class="material-symbols-outlined align-middle" style="font-size:14px">favorite</span>
+                    لأن التعليم حق لا يتوقف
+                </p>
+            } *@
     </footer>
 </div>
 

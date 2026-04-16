@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -8,7 +9,7 @@ namespace SharedLib.Entities
 {
     public class Employee : BaseEntity
     {
-
+        [StringLength(9)]
         public string CivilId { get; set; } = string.Empty;
         public string EmpId { get; set; } = string.Empty;
         //public string ArName { get; set; } = string.Empty;

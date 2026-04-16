@@ -22,6 +22,7 @@ public class CenterUpsertDto
 
     [MaxLength(500, ErrorMessage = "العنوان لا يتجاوز 500 حرف")]
     public string? Address { get; set; }
+    public long? WHours { get; set; }
 
     [Required(ErrorMessage = "أيام الدوام مطلوبة")]
     [MaxLength(100, ErrorMessage = "أيام الدوام لا تتجاوز 100 حرف")]

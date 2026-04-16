@@ -16,6 +16,7 @@ public partial class CenterEdit : ComponentBase
 {
     [Parameter] public Center? center { get; set; }
     [Parameter] public string BackgroundColor { get; set; } = "#fff";
+    List<LookupValue> WHoures=new List<LookupValue>();
     bool IsAdmin=false;
     // ── State ──────────────────────────────────────────────────
     protected CenterUpsertDto Model    { get; set; } = new();
@@ -41,7 +42,8 @@ public partial class CenterEdit : ComponentBase
 
         try
         {
-            if(center == null) 
+            WHoures =await LookupValueApi.GetByValueType(SharedLib.Fixed.LookupTypes.WHoures);
+            if (center == null) 
              center = await CenterApi.GetMyCenter();
             MapToModel(center);
         }
@@ -71,6 +73,7 @@ public partial class CenterEdit : ComponentBase
         Model.Tarpaulins  = c.Tarpaulins  ?? 0;
         Model.OtherSpaces = c.OtherSpaces ?? 0;
         Model.Comments    = c.Comments;
+        Model.WHours    = c.WhoursId;
 
         // تحليل DaysOfWeek إلى Checkboxes
         SelectedDays.Clear();

@@ -36,13 +36,17 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<GeneralResponse> AddEmployeeWithCenter(Employee employee, long centerid)
         {
             var emp = await _context.Employees.Where(s => s.EmpId == employee.EmpId)
-               .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
-               .Include(x => x.Specialization).FirstOrDefaultAsync();
+               //.Include(x => x.EmpCenters).ThenInclude(x => x.Center)
+               //.Include(x => x.Specialization)
+               .FirstOrDefaultAsync();
 
+            if (centerid <= 0)
+                return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
+            else
             if (emp is null)
             {
 
-                if (centerid == 0) return await Insert(employee);
+                //if (centerid == 0) return await Insert(employee);
 
                 await _context.Database.BeginTransactionAsync();
                 _context.Employees.Add(employee);

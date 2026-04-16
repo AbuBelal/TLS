@@ -102,7 +102,20 @@
 
                     <div class="col-12 mt-4 text-end">
                         <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">إلغاء</button>
-                        <button type="submit" class="btn btn-primary px-5">حفظ الطالب</button>
+                        
+                        <button type="submit" class="btn btn-primary px-5" disabled="@(isLoading)">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>جاري الحفظ...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi bi-floppy me-1"></i>
+                                <span>حفظ الطالب</span>
+                            }
+
+                        </button>
                     </div>
                 </div>
             </EditForm>
@@ -115,17 +128,19 @@
     private Student student = new();
     private List<LookupValue> genders = new();
     private List<LookupValue> levels = new();
-
+    private bool isLoading = false;
     private List<Center> centers = new();          // ← جديد
     private long? selectedCenterId;                  // ← جديد
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = false;
         if (Id != 0) student = await StudentApi.GetById(Id);
         // جلب البيانات للمنسدلات من الـ API
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
         centers = await CenterApi.GetAll();          // ← جديد
+        isLoading = false;
     }
     private async Task TranslateName()
     {
@@ -139,6 +154,7 @@
     }
     private async Task HandleSubmit()
     {
+        isLoading = true;
         if (Id != 0)
         {
             var response = await StudentApi.Update(student);
@@ -172,6 +188,7 @@
             else
             MudSnackbar.Add(response.Message, Severity.Error);
         }
+        isLoading = false;
     }
 
     private void Cancel() => NavManager.NavigateTo(PagesUris.StudentsPages.Manage);

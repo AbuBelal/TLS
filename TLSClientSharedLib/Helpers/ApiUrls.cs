@@ -9,11 +9,13 @@ namespace TLSClientSharedLib.Helpers
     {
         //public const string BaseUrl = "https://manapi.runasp.net/";    // "https://localhost:7075";
 
-        #if DEBUG
-                public const string BaseUrl = "https://localhost:7075";
+#if DEBUG
+     public const string BaseUrl = "https://localhost:7075";
 #else
-                public const string BaseUrl = "https://manapi.runasp.net/";
-                //public const string BaseUrl = "https://midapi.tryasp.net/";
+
+     //public const string BaseUrl = "https://manapi.runasp.net/";
+     //public const string BaseUrl = "https://tlsapi.runasp.net/";
+     public const string BaseUrl =  "https://midapi.tryasp.net/";
 #endif
         public static class Auth
         {

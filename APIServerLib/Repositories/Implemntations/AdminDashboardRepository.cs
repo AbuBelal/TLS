@@ -20,7 +20,10 @@ public class AdminDashboardRepository : IAdminDashboardRepository
     public async Task<AdminDashboardDto> GetAdminDashboardAsync()
     {
         // ── 1. جلب جميع المراكز ──────────────────────────────────────
-        var centers = await _context.Centers.AsNoTracking().ToListAsync();
+        var centers = await _context.Centers
+            .Include(x=>x.Whours)
+            .Include(s=>s.EmpCenters.Where(ec => ec.Employee.Job.Name== "مدير مركز")).ThenInclude(ec => ec.Employee)
+            .AsNoTracking().ToListAsync();
 
         // ── 2. جلب جميع StdCenters النشطة (ToDate == null)
         //       مع بيانات الطالب كاملة دفعةً واحدة ───────────────────
@@ -135,6 +138,8 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                 Rooms               = center.Rooms,
                 Tarpaulins          = center.Tarpaulins,
                 OtherSpaces         = center.OtherSpaces,
+                WHours              = center.Whours?.Name,
+                CenterManager       = center.EmpCenters.FirstOrDefault()?.Employee?.Name ?? "غير محدد",
 
                 TotalStudents       = totalStd,
                 MaleStudents        = maleStd,
@@ -161,6 +166,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         // توزيع المستويات الكلي
         var globalLevelDist = allStudents
             .Where(s => s.Level != null)
+            .OrderBy(s => s.Level!.SortOrder) // ترتيب المستويات حسب SortOrder
             .GroupBy(s => s.Level!.Name)
             .Select((g, i) => new DistributionItem
             {

@@ -44,6 +44,7 @@ namespace APIServerLib.Repositories.Implemntations
             userCenter.Tarpaulins = dto.Tarpaulins;
             userCenter.OtherSpaces = dto.OtherSpaces;
             userCenter.Comments = dto.Comments;
+            userCenter.WhoursId = dto.WHours;
 
             _context.Centers.Update(userCenter);
             await _context.SaveChangesAsync();

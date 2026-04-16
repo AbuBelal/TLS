@@ -7,7 +7,6 @@ using SharedLib.Entities;
 using System.Text.Json.Serialization;
 using SharedLib.Fixed;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -22,7 +21,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 }); ;
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+
+var conn = builder.Configuration.GetConnectionString(SharedLib.Fixed.SystemSettings.SelectedAreaEn);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(conn ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
 
@@ -65,8 +65,15 @@ AddAppServices.AddAppServicesToContainer(builder);
 
 var app = builder.Build();
 
+
+using var scope = app.Services.CreateScope();
+var dbcontext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+dbcontext.Database.Migrate();
+
+
+
 // Configure the HTTP request pipeline.
-    app.MapOpenApi();
+app.MapOpenApi();
     app.MapScalarApiReference();
 if (app.Environment.IsDevelopment())
 {

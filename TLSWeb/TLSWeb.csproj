@@ -16,6 +16,7 @@
     <PackageReference Include="MudBlazor" Version="9.1.0" />
     <PackageReference Include="Refit" Version="10.0.1" />
     <PackageReference Include="Refit.HttpClientFactory" Version="10.0.1" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.6" />
   </ItemGroup>
 
   <ItemGroup>

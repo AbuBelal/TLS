@@ -40,7 +40,9 @@ public class CenterSummaryDto
     // معلومات المركز
     public long   CenterId   { get; set; }
     public string CenterName { get; set; } = string.Empty;
+    public string CenterManager { get; set; } = string.Empty;
     public string? CenterCode { get; set; }
+    public string? WHours { get; set; }
     public string? Address    { get; set; }
     public string? DaysOfWeek { get; set; }
     public int?   Rooms       { get; set; }

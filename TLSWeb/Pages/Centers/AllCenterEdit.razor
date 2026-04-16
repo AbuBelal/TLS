@@ -3,7 +3,11 @@
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
 
 <h3>تعديل بيانات المراكز</h3>
-
+@if (centers is null || centers.Count() == 0)
+{
+    <p>Loading .....</p>
+}
+else
 @foreach (var center in centers)
 {
     string BackgroundColor = center.Id>0 ? "white" : "lightblue";
