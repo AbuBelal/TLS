@@ -1,0 +1,18 @@
+CREATE TABLE AuditLogs (
+    Id            BIGINT         IDENTITY(1,1) PRIMARY KEY,
+    UserId        NVARCHAR(450)  NULL,
+    UserName      NVARCHAR(256)  NULL,
+    Action        NVARCHAR(100)  NOT NULL,
+    EntityType    NVARCHAR(100)  NOT NULL,
+    EntityId      NVARCHAR(100)  NULL,
+    Details       NVARCHAR(MAX)  NULL,
+    IpAddress     NVARCHAR(50)   NULL,
+    Timestamp     DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+    
+    CONSTRAINT FK_AuditLogs_UserId FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE NO ACTION
+);
+
+CREATE NONCLUSTERED INDEX IX_AuditLogs_UserId     ON AuditLogs(UserId);
+CREATE NONCLUSTERED INDEX IX_AuditLogs_Action     ON AuditLogs(Action);
+CREATE NONCLUSTERED INDEX IX_AuditLogs_EntityType ON AuditLogs(EntityType);
+CREATE NONCLUSTERED INDEX IX_AuditLogs_Timestamp   ON AuditLogs(Timestamp DESC);

@@ -9,13 +9,17 @@ namespace TLSClientSharedLib.Helpers
     {
         //public const string BaseUrl = "https://manapi.runasp.net/";    // "https://localhost:7075";
 
+
+        
 #if DEBUG
-     public const string BaseUrl = "https://localhost:7075";
+        //public const string BaseUrl = "https://localhost:7075";
+        public const string BaseUrl = SharedLib.Fixed.SystemSettings.DebugBaseUrl;
 #else
 
      //public const string BaseUrl = "https://manapi.runasp.net/";
      //public const string BaseUrl = "https://tlsapi.runasp.net/";
-     public const string BaseUrl =  "https://midapi.tryasp.net/";
+     //public const string BaseUrl =  "https://midapi.tryasp.net/";
+     public const string BaseUrl =SharedLib.Fixed.SystemSettings.SelectedBaseUrl;
 #endif
         public static class Auth
         {
@@ -154,6 +158,8 @@ namespace TLSClientSharedLib.Helpers
             public const string Get = PriorUrl;
             public const string DetailedReport = PriorUrl + "/detailed-report";
             public const string ExportDetailedReport = PriorUrl + "/export/detailed-report";
+            public const string DailyReport = PriorUrl + "/daily-report";
+            public const string LockDailyReport = PriorUrl + "/lock-daily-report";
         }
     }
 }

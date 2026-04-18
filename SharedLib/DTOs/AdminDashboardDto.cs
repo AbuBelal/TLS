@@ -93,7 +93,9 @@ public class DetailedCenterReport
 {
     public long CenterId { get; set; }
     public string CenterName { get; set; } = string.Empty;
+    public string? CenterManager { get; set; } = string.Empty;
     public string? CenterCode { get; set; }
+    public string? WHoures { get; set; }
 
     // أعداد حسب المستوى والجنس
     public Dictionary<string, int> LevelMales { get; set; } = new(); // key: level name, value: count
@@ -107,4 +109,54 @@ public class DetailedCenterReport
     public int TotalRooms { get; set; }
     public int TotalTarpaulins { get; set; }
     public int TotalOtherSpaces { get; set; }
+}
+
+// ── تقرير يومي للمراكز ─────────────────────────────────────────────
+public class DailyReportDto
+{
+    public DateOnly ReportDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+    public List<DailyCenterReport> Centers { get; set; } = new();
+    public Dictionary<string, int> LevelRegisteredMaleTotals { get; set; } = new();
+    public Dictionary<string, int> LevelRegisteredFemaleTotals { get; set; } = new();
+    public Dictionary<string, int> LevelAttendanceMaleTotals { get; set; } = new();
+    public Dictionary<string, int> LevelAttendanceFemaleTotals { get; set; } = new();
+
+    public int GrandTotalRegisteredMales { get; set; }
+    public int GrandTotalRegisteredFemales { get; set; }
+    public int GrandTotalAttendanceMales { get; set; }
+    public int GrandTotalAttendanceFemales { get; set; }
+    public int GrandTotalRegisteredStudents { get; set; }
+    public int GrandTotalAttendanceStudents { get; set; }
+}
+
+public class DailyCenterReport
+{
+    public long CenterId { get; set; }
+    public string CenterName { get; set; } = string.Empty;
+    public string? CenterManager { get; set; } = string.Empty;
+    public string? CenterCode { get; set; }
+    public string? WHoures { get; set; }
+    public bool IsLocked { get; set; } = false;
+
+    // Registered students by level and gender
+    public Dictionary<string, int> RegisteredLevelMales { get; set; } = new();
+    public Dictionary<string, int> RegisteredLevelFemales { get; set; } = new();
+
+    // Today's attendance by level and gender
+    public Dictionary<string, int> AttendanceLevelMales { get; set; } = new();
+    public Dictionary<string, int> AttendanceLevelFemales { get; set; } = new();
+
+    public int TotalRegisteredMales { get; set; }
+    public int TotalRegisteredFemales { get; set; }
+    public int TotalAttendanceMales { get; set; }
+    public int TotalAttendanceFemales { get; set; }
+    public int TotalRegisteredStudents => TotalRegisteredMales + TotalRegisteredFemales;
+    public int TotalAttendanceStudents => TotalAttendanceMales + TotalAttendanceFemales;
+}
+
+public class DailyReportLockRequest
+{
+    public DateOnly ReportDate { get; set; }
+    public long CenterId { get; set; }
+    public bool IsLocked { get; set; }
 }

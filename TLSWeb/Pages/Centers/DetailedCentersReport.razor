@@ -1,4 +1,5 @@
-﻿@* @page "/admin/detailed-centers-report" *@
+﻿@using TLSWeb.Components
+@* @page "/admin/detailed-centers-report" *@
 @attribute [Route(PagesUris.Admin.DetailedCentersReport)]
 @attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
 
@@ -33,20 +34,28 @@
     </AuthorizeView>
     @if (IsLoading)
     {
-        <div class="text-center py-5">
+       @*  <div class="text-center py-5">
             <div class="spinner-border text-primary"></div>
             <p class="mt-2">جاري تحميل البيانات...</p>
-        </div>
+        </div> *@
+        <LoadingComponent/>
     }
     else if (Report != null)
     {
-        <div class="table-responsive" style="zoom: 0.8;">
+        <div class="m-2">
+            <button type="button" class="btn btn-secondary" @onclick="ZoomIn"><i class="bi bi-zoom-in"></i></button>
+            <button type="button" class="btn btn-secondary" @onclick="ZoomOut"><i class="bi bi-zoom-out"></i></button>
+
+        </div>
+        <div class="table-responsive" style="zoom: @Zoom;">
             <table class="table table-bordered table-striped table-hover">
                 <thead class="table-dark">
                     <tr>
                         <th rowspan="2" class="align-middle text-center">م</th>
                         <th rowspan="2" class="align-middle">كود المركز</th>
                         <th rowspan="2" class="align-middle">اسم المركز</th>
+                        <th rowspan="2" class="align-middle">اسم المدير</th>
+                        <th rowspan="2" class="align-middle">الفترة</th>
                         @foreach (var level in LevelNames)
                         {
                             <th colspan="2" class="text-center">@level</th>
@@ -77,6 +86,8 @@
                             <td class="text-center align-middle">@(i + 1)</td>
                             <td class="text-center align-middle">@center.CenterCode</td>
                             <td class="fw-bold align-middle">@center.CenterName</td>
+                            <td class="fw-bold align-middle">@center.CenterManager</td>
+                            <td class="fw-bold align-middle">@center.WHoures</td>
                             @foreach (var level in LevelNames)
                             {
                                 <td class="text-center align-middle">@center.LevelMales[level]</td>
@@ -94,7 +105,7 @@
                         </tr>
                     }
                     <tr class="table-success fw-bold">
-                        <td colspan="3" class="text-center">المجموع الكلي</td>
+                        <td colspan="5" class="text-center">المجموع الكلي</td>
                         @foreach (var level in LevelNames)
                         {
                             <td class="text-center">@Report.LevelMaleTotals[level]</td>
@@ -120,7 +131,7 @@
     private DetailedCentersReportDto? Report;
     private bool IsLoading = true;
     private List<string> LevelNames = new();
-
+    private float Zoom = 0.7f;
     protected override async Task OnInitializedAsync()
     {
         Report = await AdminApi.GetDetailedReport();
@@ -138,4 +149,8 @@
         var response = await AdminApi.ExportDetailedReport();
         await ExcelService.DownloadFromResponse(response, "تقرير_المراكز_المفصل.xlsx");
     }
+
+    private void ZoomIn() => Zoom += 0.1f;
+    private void ZoomOut() => Zoom -= 0.1f;
+
 }

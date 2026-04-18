@@ -64,7 +64,10 @@ namespace APIServerLib.Repositories.Implemntations
 
                 return new GeneralResponse(true, "تم إضافة الموظف للمركز بنجاح.");
             }
-            return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {emp.EmpCenters.OrderByDescending(x => x.FromDate).First().Center.Name} لموظف اسمه {emp.Name} في التخصص {emp.Specialization.Name} ", 0);
+            if(emp.EmpCenters is null|| emp.EmpCenters.Count() == 0)
+            return new GeneralResponse(false, $"رقم الهوية أو رقم الموظف موجود مسبقاً في مركز ", 0);
+                else
+            return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً   {emp.EmpCenters?.OrderByDescending(x => x.FromDate)?.First()?.Center?.Name} لموظف اسمه {emp.Name} في التخصص {emp.Specialization?.Name} ", 0);
         }
 
         public async Task<GeneralResponse> Update(Employee item)
@@ -124,7 +127,9 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(e =>
                     e.Name.Contains(term) ||
                     (e.EnName != null && e.EnName.Contains(term)) ||
-                    (e.CivilId != null && e.CivilId.Contains(term)));
+                    (e.CivilId != null && e.CivilId.Contains(term)) ||
+                    (e.EmpId != null && e.EmpId.Contains(term))
+                    );
             }
 
             if (!string.IsNullOrWhiteSpace(request.Gender))

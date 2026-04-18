@@ -18,12 +18,14 @@ namespace APIServer.Controllers
         private readonly IStudentRepository _studentRepository;
         private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly AuditLogService _auditLogService;
 
-        public StudentController(IStudentRepository studentRepository, IUserRepository UserRepository , IEmployeeRepository EmployeeRepository)
+        public StudentController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService)
         {
             _studentRepository = studentRepository;
             _userRepository = UserRepository;
             _employeeRepository = EmployeeRepository;
+            _auditLogService = auditLogService;
         }
         #region CurUser CurEmp Details
         private async Task<ApplicationUser> CurrentUser ()
@@ -53,6 +55,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<List<Student>>> GetAll()
         {
             var result = await _studentRepository.GetAll();
+            await _auditLogService.LogAsync("Read", "Student", "", $"قراءة جميع الطلاب");
             return Ok(result);
         }
 
@@ -62,6 +65,7 @@ namespace APIServer.Controllers
             var result = await _studentRepository.GetById(id);
             if (result == null)
                 return NotFound();
+            await _auditLogService.LogAsync("Read", "Student", id.ToString(), $"قراءة طالب: {result.Name}");
             return Ok(result);
         }
 
@@ -78,7 +82,9 @@ namespace APIServer.Controllers
                 //var centerid= Employee.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId;
                 var response = await _studentRepository.AddStudentWithCenter(student , CurCenter);
 
-              return Ok(response);
+                await _auditLogService.LogAsync("Create", "Student", student.Id.ToString(), $"تم إضافة طالب: {student.Name}");
+
+                return Ok(response);
             }
             return new GeneralResponse(false, "لا يمكن إضافة طالب ، تأكد من البيانات أو صلاحيات المستخدم", 0);
         }
@@ -93,6 +99,7 @@ namespace APIServer.Controllers
             }
            
             var response = await _studentRepository.AddStudentWithCenter(student.Student, student.CenterId);
+            await _auditLogService.LogAsync("Create", "Student", student.Student.Id.ToString(), $"تم إضافة طالب: {student.Student.Name}");
             return Ok(response);
             
         }
@@ -101,6 +108,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Update(Student student)
         {
             var response = await _studentRepository.Update(student);
+            await _auditLogService.LogAsync("Update", "Student", student.Id.ToString(), $"تم تعديل طالب: {student.Name}");
             return Ok(response);
         }
 
@@ -108,6 +116,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Delete(long id)
         {
             var response = await _studentRepository.DeleteById(id);
+            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $"تم حذف طالب");
             return Ok(response);
         }
 
@@ -115,6 +124,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<int>> GetStudentCountByCenterId(long id)
         {
             var result = await _studentRepository.GetCenterStudentsCountAsync(id);
+            await _auditLogService.LogAsync("Read", "Student", id.ToString(), $"قراءة عدد الطلاب في المركز: {result}");
             return Ok(result);
         }
 
@@ -130,6 +140,7 @@ namespace APIServer.Controllers
         {
             var CurCenter = await CurrentCenterId() ;
             var response = await _studentRepository.GetPaginatedStudentsAsync(request, CurCenter);
+            await _auditLogService.LogAsync("Read", "Student", "", $"قراءة الطلاب بشكل مُنقَّط");
             return Ok(response);
         }
 
@@ -155,7 +166,7 @@ namespace APIServer.Controllers
 
             var bytes = StudentExportService.GenerateExcel(students, sheetTitle, centerName);
             var fileName = $"طلاب_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
-
+            await _auditLogService.LogAsync("Read", "Student", "", $"تصدير الطلاب حسب التصفية: {fileName}");
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);
@@ -178,7 +189,7 @@ namespace APIServer.Controllers
                 students, "جميع الطلاب", centerName);
 
             var fileName = $"جميع_طلاب_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
-
+            await _auditLogService.LogAsync("Read", "Student", "", $"تصدير جميع الطلاب: {fileName}");
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);

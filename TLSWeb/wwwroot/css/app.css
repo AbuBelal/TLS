@@ -113,3 +113,19 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.form-control {
+    border-radius: 0.5rem !important;
+}
+
+.form-control:focus {
+    border-radius: 0.5rem !important; 
+
+}
+.form-select {
+    border-radius: 0.5rem !important;
+}
+
+    .form-select:focus {
+        border-radius: 0.5rem !important;
+    }

@@ -48,7 +48,7 @@
             public const string EditCenters = PriorUrl + "/EditCenters";
             public const string ResetPassword = PriorUrl + "/ResetPassword";
             public const string DetailedCentersReport = PriorUrl + "/detailed-centers-report";
-
+            public const string DailyReport = PriorUrl + "/daily-report";
         }
 
         public static class CenterPages

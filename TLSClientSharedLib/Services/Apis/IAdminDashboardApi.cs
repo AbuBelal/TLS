@@ -17,4 +17,10 @@ public interface IAdminDashboardApi
 
     [Get(ApiUrls.AdminDashBoard.ExportDetailedReport)]
     Task<HttpResponseMessage> ExportDetailedReport();
+
+    [Get(ApiUrls.AdminDashBoard.DailyReport)]
+    Task<DailyReportDto> GetDailyReport(DateOnly? date = null);
+
+    [Post(ApiUrls.AdminDashBoard.LockDailyReport)]
+    Task<HttpResponseMessage> LockDailyReport([Body] DailyReportLockRequest request);
 }

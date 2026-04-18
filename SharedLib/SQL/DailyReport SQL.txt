@@ -1,0 +1,55 @@
+CREATE TABLE DailyReports (
+    Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    ReportDate DATE NOT NULL DEFAULT CAST(GETDATE() AS DATE),
+    CenterId BIGINT NOT NULL,
+    IsLocked BIT NOT NULL DEFAULT 1,
+    LockedAt DATETIME2 NULL,
+    LockedBy NVARCHAR(256) NULL, -- افترضنا طول 256 لمعرف المستخدم، يمكنك تغييره لـ MAX إذا لزم الأمر
+
+    -- Registered students (Male)
+    RegMale01 INT NULL DEFAULT 0,
+    RegMale02 INT NULL DEFAULT 0,
+    RegMale03 INT NULL DEFAULT 0,
+    RegMale04 INT NULL DEFAULT 0,
+    RegMale05 INT NULL DEFAULT 0,
+    RegMale06 INT NULL DEFAULT 0,
+    RegMale07 INT NULL DEFAULT 0,
+    RegMale08 INT NULL DEFAULT 0,
+    RegMale09 INT NULL DEFAULT 0,
+
+    -- Registered students (Female)
+    RegFemale01 INT NULL DEFAULT 0,
+    RegFemale02 INT NULL DEFAULT 0,
+    RegFemale03 INT NULL DEFAULT 0,
+    RegFemale04 INT NULL DEFAULT 0,
+    RegFemale05 INT NULL DEFAULT 0,
+    RegFemale06 INT NULL DEFAULT 0,
+    RegFemale07 INT NULL DEFAULT 0,
+    RegFemale08 INT NULL DEFAULT 0,
+    RegFemale09 INT NULL DEFAULT 0,
+
+    -- Attendant students (Male)
+    AttMale01 INT NULL DEFAULT 0,
+    AttMale02 INT NULL DEFAULT 0,
+    AttMale03 INT NULL DEFAULT 0,
+    AttMale04 INT NULL DEFAULT 0,
+    AttMale05 INT NULL DEFAULT 0,
+    AttMale06 INT NULL DEFAULT 0,
+    AttMale07 INT NULL DEFAULT 0,
+    AttMale08 INT NULL DEFAULT 0,
+    AttMale09 INT NULL DEFAULT 0,
+
+    -- Attendant students (Female)
+    AttFemale01 INT NULL DEFAULT 0,
+    AttFemale02 INT NULL DEFAULT 0,
+    AttFemale03 INT NULL DEFAULT 0,
+    AttFemale04 INT NULL DEFAULT 0,
+    AttFemale05 INT NULL DEFAULT 0,
+    AttFemale06 INT NULL DEFAULT 0,
+    AttFemale07 INT NULL DEFAULT 0,
+    AttFemale08 INT NULL DEFAULT 0,
+    AttFemale09 INT NULL DEFAULT 0,
+
+    -- Foreign Key Constraint
+    CONSTRAINT FK_DailyReports_Centers FOREIGN KEY (CenterId) REFERENCES Centers(Id)
+);

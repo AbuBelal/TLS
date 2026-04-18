@@ -20,6 +20,9 @@ namespace APIServerLib.Data
         // جداول الربط (Many-to-Many)
         public DbSet<EmpCenter> EmpCenters { get; set; }
         public DbSet<StdCenter> StdCenters { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<DailyReport> DailyReports { get; set; }
+
 
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -113,6 +116,22 @@ namespace APIServerLib.Data
                 new LookupValue { Id = 1, Name = "ذكر" },
                 new LookupValue { Id = 2, Name = "أنثى" }
             );
+
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(a => a.UserId)
+                      .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<DailyReport>(entity =>
+            {
+                entity.HasOne<Center>()
+                      .WithMany()
+                      .HasForeignKey(a => a.CenterId)
+                      .OnDelete(DeleteBehavior.NoAction);
+            });
         }
 
     }

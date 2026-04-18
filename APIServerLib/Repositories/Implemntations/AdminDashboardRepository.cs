@@ -202,7 +202,13 @@ public class AdminDashboardRepository : IAdminDashboardRepository
     public async Task<DetailedCentersReportDto> GetDetailedCentersReportAsync()
     {
         // جلب جميع المراكز
-        var centers = await _context.Centers.AsNoTracking().ToListAsync();
+        var centers = await _context.Centers
+            .AsNoTracking()
+            .Include(x=>x.EmpCenters)
+            .ThenInclude(ec => ec.Employee)
+            .ThenInclude(x=>x.Job)
+            .Include(x=>x.Whours)
+            .ToListAsync();
 
         // جلب جميع الطلاب النشطين مع البيانات المطلوبة
         var allStdCenters = await _context.StdCenters
@@ -266,7 +272,9 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                 TotalFemales = levelFemales.Values.Sum(),
                 TotalRooms = center.Rooms??0,
                 TotalTarpaulins = center.Tarpaulins??0,
-                TotalOtherSpaces = center.OtherSpaces??0
+                TotalOtherSpaces = center.OtherSpaces??0,
+                CenterManager = center.EmpCenters.FirstOrDefault(x=>x.Employee?.Job?.Name == "مدير مركز")?.Employee?.Name ?? "غير محدد",
+                WHoures = center.Whours?.Name
             };
 
             report.Centers.Add(centerReport);

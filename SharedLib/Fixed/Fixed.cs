@@ -6,17 +6,26 @@ namespace SharedLib.Fixed
 {
     public static class SystemSettings
     {
-       
-        ///
-        public const string NorthAreaAr = "الشمال";
-        public const string NorthAreaEn = "North";
+        public const string DebugBaseUrl = "https://localhost:7075";
 
-        public const string WestMiddleAreaAr = "غرب الوسطى";
-        public const string WestMiddleAreaEn = "WestMiddle";
+        #region North
+            public const string NorthBaseUrl = "https://manapi.runasp.net/";
+          //public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
+            public const string NorthAreaAr = "الشمال";
+            public const string NorthAreaEn = "North";
+        #endregion
 
-        ///
-        public const string SelectedAreaAr = NorthAreaAr;
-        public const string SelectedAreaEn = NorthAreaEn;
+        #region WestMiddle
+            public const string WestMiddleBaseUrl = "https://midapi.tryasp.net/";
+            public const string WestMiddleAreaAr  = "غرب الوسطى";
+            public const string WestMiddleAreaEn  = "WestMiddle";
+        #endregion
+
+        #region Selected
+        public const string SelectedBaseUrl     =  NorthBaseUrl  ;
+        public const string SelectedAreaAr      =  NorthAreaAr    ;
+        public const string SelectedAreaEn      = NorthAreaEn;
+        #endregion
     }
     public static class Roles
     {

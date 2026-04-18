@@ -18,12 +18,14 @@ namespace APIServer.Controllers
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IStudentRepository _studentRepository;
         private readonly IUserRepository _userRepository;
+        private readonly AuditLogService _auditLogService;
 
-        public EmployeeController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository)
+        public EmployeeController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService)
         {
             _employeeRepository = EmployeeRepository;
             _userRepository = UserRepository;
             _employeeRepository = EmployeeRepository;
+            _auditLogService = auditLogService;
         }
 
         #region CurUser CurEmp Details
@@ -57,6 +59,8 @@ namespace APIServer.Controllers
         public async Task<ActionResult<List<Employee>>> GetAll()
         {
             var result = await _employeeRepository.GetAll();
+            await _auditLogService.LogAsync("Read", "Employee","", $"قراءة جميع الموظفين");
+
             return Ok(result);
         }
 
@@ -66,6 +70,7 @@ namespace APIServer.Controllers
             var result = await _employeeRepository.GetById(id);
             if (result == null)
                 return NotFound();
+            await _auditLogService.LogAsync("Read", "Employee", id.ToString(), $"قراءة موظف: {result.Name}");
             return Ok(result);
         }
 
@@ -76,6 +81,7 @@ namespace APIServer.Controllers
             var result = await _employeeRepository.GetByCivilId(CivilId);
             if (result == null)
                 return NotFound(null);
+            await _auditLogService.LogAsync("Read", "Employee", result.Id.ToString(), $"قراءة موظف: {result.Name}");
             return Ok(result);
         }
 
@@ -85,6 +91,7 @@ namespace APIServer.Controllers
             var result = await _employeeRepository.GetByEmpId(EmpId);
             if (result == null)
                 return NotFound(null);
+            await _auditLogService.LogAsync("Read", "Employee", result.Id.ToString(), $"قراءة موظف: {result.Name}");
             return Ok(result);
         }
 
@@ -95,6 +102,7 @@ namespace APIServer.Controllers
             
             employeeToSave.EmpCenters.Add(new EmpCenter() { EmployeeId = employeeToSave.Id, CenterId = await CurrentCenterId() });
             var response = await _employeeRepository.Insert(employeeToSave);
+            await _auditLogService.LogAsync("Create", "Insert Employee", employeeToSave.Id.ToString(), $"تم إضافة موظف: {employeeToSave.Name}");
             return Ok(response);
         }
 
@@ -111,6 +119,7 @@ namespace APIServer.Controllers
             
             
             var response = await _employeeRepository.AddEmployeeWithCenter(employee.Employee, employee.CenterId);
+            await _auditLogService.LogAsync("Create", "Add With Center Employee", employee.Employee.Id.ToString(), $"تم إضافة موظف: {employee.Employee.Name}");
             return Ok(response);
             
         }
@@ -121,6 +130,7 @@ namespace APIServer.Controllers
             var employeeToSave = (new EmployeeMapper()).ToEntity(employee);
             
             var response = await _employeeRepository.Update(employeeToSave);
+            await _auditLogService.LogAsync("Update", "Employee", employeeToSave.Id.ToString(), $"تم تعديل موظف: {employeeToSave.Name}");
             return Ok(response);
         }
 
@@ -128,6 +138,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Delete(long id)
         {
             var response = await _employeeRepository.DeleteById(id);
+            await _auditLogService.LogAsync("Delete", "Employee", id.ToString(), $"تم حذف موظف");
             return Ok(response);
         }
 
@@ -135,6 +146,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<int>> GetEmployeeCountByCenterId(long id)
         {
             var result = await _employeeRepository.GetCenterEmployeesCountAsync(id);
+            await _auditLogService.LogAsync("Read", "Employee", id.ToString(), $"قراءة عدد الموظفين في المركز: {result}");
             return Ok(result);
         }
 
@@ -143,6 +155,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<EmployeePaginatedResponse>> GetPaginated([FromBody] EmployeeFilterRequest request)
         {
             var employeespaginated =await _employeeRepository.GetPaginatedEmployesAsync(request , await CurrentCenterId());
+            await _auditLogService.LogAsync("Read", "Employee", "", $"قراءة الموظفين بشكل مُنقَّط");
             return Ok(employeespaginated);
         }
 
@@ -165,6 +178,8 @@ namespace APIServer.Controllers
 
             var bytes = EmployeeExportService.GenerateExcel(employees, sheetTitle, centerName);
             var fileName = $"موظفون_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+            
+            await _auditLogService.LogAsync("Read", "Employee", "", $"تصدير الموظفين حسب التصفية: {fileName}");
 
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -186,6 +201,8 @@ namespace APIServer.Controllers
 
             var bytes = EmployeeExportService.GenerateExcel(employees, "جميع الموظفين", centerName);
             var fileName = $"جميع_موظفي_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+
+            await _auditLogService.LogAsync("Read", "Employee", "", $"تصدير جميع الموظفين: {fileName}");
 
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

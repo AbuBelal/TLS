@@ -83,6 +83,29 @@ public partial class EmployeeForm : ComponentBase
 
         try
         {
+            
+
+            if (string.IsNullOrWhiteSpace(employee.EmpId))
+            {
+                IsDuplicate = true;
+                DuplicateMessage = $"يرجى كتابة رقم الموظف ";
+            }
+            else
+            {
+
+
+                var result = await EmployeeApi.GetByEmpId(employee.EmpId);
+
+                if (result is not null)
+                {
+                    IsDuplicate = true;
+                    DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الوظيفة مسبقاً باسم: {result.Name}";
+                    return;
+                }
+                else
+                    ResetDuplicateState();
+            }
+
             if (!string.IsNullOrWhiteSpace(employee.CivilId))
             {
                 var result = await EmployeeApi.GetByCivilId(employee.CivilId);
@@ -93,19 +116,6 @@ public partial class EmployeeForm : ComponentBase
                     DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الهوية مسبقاً باسم: {result.Name}";
                 }
             }
-            else
-                if (!string.IsNullOrWhiteSpace(employee.EmpId))
-                {
-                    var result = await EmployeeApi.GetByEmpId(employee.EmpId);
-
-                    if (result is not null)
-                    {
-                        IsDuplicate = true;
-                        DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الوظيفة مسبقاً باسم: {result.Name}";
-                    }
-                    else
-                        ResetDuplicateState();
-                }
         }
         catch
         {

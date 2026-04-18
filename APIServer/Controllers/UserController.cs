@@ -22,14 +22,17 @@ namespace APIServer.Controllers
         private readonly IUserRepository _userRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AuditLogService _auditLogService;
 
         public UserController(IUserRepository userRepository, 
             UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager, 
+            AuditLogService auditLogService)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _signInManager = signInManager;
+            _auditLogService = auditLogService;
         }
 
 
@@ -54,6 +57,7 @@ namespace APIServer.Controllers
                 profile.CenterId = Center?.CenterId;
                 profile.CenterName = Center?.Center.Name;
             }
+            await _auditLogService.LogAsync("Read", "User", userId, $"قراءة ملف المستخدم: {user.UserName}");
             return Ok(profile);
         }
 
@@ -71,12 +75,14 @@ namespace APIServer.Controllers
         public async Task<ActionResult<List<ApplicationUser>>> GetAll()
         {
             var users = await _userRepository.GetAll();
+            await _auditLogService.LogAsync("Read", "User", "", $"قراءة جميع المستخدمين");
             return Ok(users);
         }
         [HttpGet("GetAllWithRoles")]
         public async Task<ActionResult<List<UserWithRoles>>> GetAllWithRols()
         {
             var users = await _userRepository.GetAllWithRols();
+            await _auditLogService.LogAsync("Read", "User", "", $"قراءة جميع المستخدمين مع الأدوار");
             return Ok(users);
         }
 
@@ -86,6 +92,7 @@ namespace APIServer.Controllers
             var result = await _userRepository.GetById(id);
             if (result == null)
                 return NotFound();
+            await _auditLogService.LogAsync("Read", "User", id, $"قراءة مستخدم: {result.UserName}");
             return Ok(result);
         }
 
@@ -95,6 +102,7 @@ namespace APIServer.Controllers
             var result = await _userRepository.GetUserByEmail(Email);
             if (result == null)
                 return NotFound();
+            await _auditLogService.LogAsync("Read", "User", "", $"قراءة مستخدم بالبريد الإلكتروني: {result.UserName}");
             return Ok(result);
         }
 
@@ -136,10 +144,10 @@ namespace APIServer.Controllers
 
                     // Optional: Update security stamp
                     await _userManager.UpdateSecurityStampAsync(user);
-
+                    await _auditLogService.LogAsync("Update", "User", "", $"تم تعديل ملف المستخدم: {user.UserName}");
                     return Ok(new GeneralResponse(true, "All User Profile updated successfully"));
                 }
-
+                await _auditLogService.LogAsync("Update", "User", "", $"تم تعديل ملف المستخدم: {user.UserName}");
                 return Ok(new GeneralResponse(true, "User Data updated successfully"));
                 //var response = await _userRepository.Update(user);
                 //_userManager.UpdateAsync(user).Wait();
@@ -156,6 +164,8 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Delete(string id)
         {
             var response = await _userRepository.DeleteById(id);
+            var user = await _userManager.FindByIdAsync(id);
+            await _auditLogService.LogAsync("Delete", "User", id, $"تم حذف المستخدم: {user?.UserName}");
             return Ok(response);
         }
 
@@ -172,9 +182,10 @@ namespace APIServer.Controllers
             if (!result.Succeeded)
             {
                 var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                
                 return BadRequest(new GeneralResponse(false, $"فشل تغيير كلمة المرور: {errors}", 0));
             }
-
+            await _auditLogService.LogAsync("Update", "User", "", $"تم تعديل ملف المستخدم: {user.UserName}");
             return Ok(new GeneralResponse(true, "تم تغيير كلمة المرور بنجاح", 0));
         }
 
@@ -192,11 +203,13 @@ namespace APIServer.Controllers
             {
                 
                 await _userManager.UpdateSecurityStampAsync(user);
+                await _auditLogService.LogAsync("Update", "User", "", $"تم تعيين كلمة مرور جديدة للمستخدم: {user.UserName}");   
                 return Ok(new GeneralResponse(true, "تم تعيين كلمة مرور جديدة للمستخدم بنجاح.", 0));
             }
             else
             {
                 var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                await _auditLogService.LogAsync("Update", "User", "", $"فشل في تعيين كلمة المرور الجديدة: {errors}");
                 return BadRequest(new GeneralResponse(false, $"فشل في تعيين كلمة المرور الجديدة: {errors}", 0));
             }
         }
@@ -233,7 +246,7 @@ namespace APIServer.Controllers
                 // الحساب يتطلب مصادقة ثنائية
                 return Ok(new { RequiresTwoFactor = true, Message = "يرجى إدخال رمز التحقق." });
             }
-
+            await _auditLogService.LogAsync("Read", "User", "", $"فشل في تسجيل الدخول: {loginmodel.Email}");
             // إذا لم يكن أي مما سبق، فالمشكلة غالباً هي كلمة مرور خاطئة
             return BadRequest("اسم المستخدم أو كلمة المرور غير صحيحة.");
         }
@@ -253,6 +266,7 @@ namespace APIServer.Controllers
                 {
                     await _userManager.AddToRoleAsync(newUser, Input.Role);
                 }
+                await _auditLogService.LogAsync("Create", "User", "", $"تم إضافة مستخدم جديد: {newUser.UserName}");
                 return Ok(new GeneralResponse(true, "User added successfully", 0));
                 //NavManager.NavigateTo("/admin/users?success=UserAdded");
             }
@@ -260,6 +274,7 @@ namespace APIServer.Controllers
             {
                 //Errors.AddRange(result.Errors.Select(e => e.Description));
                 //isProcessing = false;
+                await _auditLogService.LogAsync("Create", "User", "", $"فشل في إضافة مستخدم جديد: {newUser.UserName}"); 
                 return BadRequest(new GeneralResponse(false, $"User creation failed: {string.Join("; ", result.Errors.Select(e => e.Description))}", 0));
             }
         }
@@ -270,6 +285,7 @@ namespace APIServer.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound("User not found");
             var roles = await _userManager.GetRolesAsync(user);
+            await _auditLogService.LogAsync("Read", "User", id, $"قراءة أدوار المستخدم: {user.UserName}");  
             return Ok(roles);
         }
 
@@ -280,6 +296,7 @@ namespace APIServer.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound("User not found");
             var roles = await _userManager.GetRolesAsync(user);
+            await _auditLogService.LogAsync("Read", "User", userId, $"قراءة أدوار المستخدم: {user.UserName}");
             return Ok(roles);
         }
     }

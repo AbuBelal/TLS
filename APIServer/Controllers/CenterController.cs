@@ -15,10 +15,11 @@ namespace APIServer.Controllers
     public class CenterController : ControllerBase
     {
         private readonly ICenterRepository _centerRepository;
-
-        public CenterController(ICenterRepository centerRepository)
+        private readonly AuditLogService _auditLogService;
+        public CenterController(ICenterRepository centerRepository, AuditLogService auditLogService)
         {
             _centerRepository = centerRepository;
+            _auditLogService = auditLogService;
         }
 
         [HttpGet]
@@ -26,6 +27,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<List<Center>>> GetAll()
         {
             var result = await _centerRepository.GetAll();
+            await _auditLogService.LogAsync("Read", "Center", "", $"قراءة جميع المراكز");
             return Ok(result);
         }
 
@@ -35,6 +37,7 @@ namespace APIServer.Controllers
             var result = await _centerRepository.GetById(id);
             if (result == null)
                 return NotFound();
+            await _auditLogService.LogAsync("Read", "Center", id.ToString(), $"قراءة مركز: {result.Name}");
             return Ok(result);
         }
 
@@ -42,6 +45,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Insert(Center center)
         {
             var response = await _centerRepository.Insert(center);
+            await _auditLogService.LogAsync("Create", "Center", center.Id.ToString(), $"تم إضافة مركز: {center.Name}");
             return Ok(response);
         }
 
@@ -49,6 +53,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Update(CenterUpsertDto center)
         {
             var response = await _centerRepository.Update(center);
+            await _auditLogService.LogAsync("Update", "Center", center.Id.ToString(), $"تم تعديل مركز: {center.Name}");
             return Ok(response);
         }
 
@@ -56,6 +61,7 @@ namespace APIServer.Controllers
         public async Task<ActionResult<GeneralResponse>> Delete(long id)
         {
             var response = await _centerRepository.DeleteById(id);
+            await _auditLogService.LogAsync("Delete", "Center", id.ToString(), $"تم حذف مركز");
             return Ok(response);
         }
 
@@ -68,6 +74,7 @@ namespace APIServer.Controllers
                 return Unauthorized();
 
             var center = await _centerRepository.GetByUserIdAsync(userId);
+            await _auditLogService.LogAsync("Read", "Center", "", $"قراءة مركز المستخدم: {center?.Name}");
             return center is null
                 ? NotFound(new GeneralResponse(false, "لا يوجد مركز مرتبط بحسابك.", 0))
                 : Ok(center);
@@ -89,6 +96,7 @@ namespace APIServer.Controllers
                 return Unauthorized();
 
             var result = await _centerRepository.UpdateByUserAsync(dto, userId);
+            await _auditLogService.LogAsync("Update", "Center", dto.Id.ToString(), $"تم تعديل مركز المستخدم: {dto.Name}");
             return Ok(result);
         }
     }

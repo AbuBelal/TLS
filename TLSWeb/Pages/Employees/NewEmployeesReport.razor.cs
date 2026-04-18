@@ -49,7 +49,7 @@ public partial class NewEmployeesReport : ComponentBase
 
             var response = await EmployeeApi.GetPaginated(request);
 
-            employees = response.Items;
+            employees = response.Items.OrderByDescending(e => e.AddedDate).ToList();
             totalCount = response.TotalCount;
             totalPages = response.TotalPages;
             currentPage = response.CurrentPage;

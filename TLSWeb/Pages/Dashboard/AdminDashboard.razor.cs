@@ -15,9 +15,11 @@ public partial class AdminDashboard : ComponentBase
     protected AdminDashboardDto?  Stats     { get; private set; }
     protected bool                IsLoading { get; private set; } = true;
     protected string?             ErrorMsg  { get; private set; }
+    private string searchText = string.Empty;
 
     // للتبديل بين عرض الملخص الكلي وتفاصيل مركز معين
     protected long? SelectedCenterId { get; private set; } = null;
+    protected List<CenterSummaryDto> AllCenters { get;  set; }
     protected CenterSummaryDto? SelectedCenter
         => Stats?.Centers.FirstOrDefault(c => c.CenterId == SelectedCenterId);
 
@@ -26,6 +28,7 @@ public partial class AdminDashboard : ComponentBase
         try
         {
             Stats = await AdminDashboardApi.Get();
+            AllCenters=Stats.Centers.ToList();
         }
         catch (Exception ex)
         {
@@ -42,4 +45,13 @@ public partial class AdminDashboard : ComponentBase
 
     protected void ClearSelection()
         => SelectedCenterId = null;
+    private async Task OnSearchChanged()
+    {
+        Stats.Centers=AllCenters.Where(x=>x.CenterName.ToLower().Contains(searchText.ToLower()) || 
+        x.CenterManager.ToLower().Contains(searchText.ToLower())||
+        x.CenterCode.Contains(searchText)).ToList();
+
+        //currentPage = 1;
+        //await LoadDataAsync();
+    }
 }

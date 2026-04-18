@@ -20,6 +20,10 @@ namespace APIServerLib.ProgramSettings
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
+            builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            builder.Services.AddScoped<AuditLogService>();
+            builder.Services.AddHttpContextAccessor();
+
             // أضف هذا السطر مع باقي تسجيلات الخدمات:
             //builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 

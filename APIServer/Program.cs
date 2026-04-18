@@ -68,7 +68,7 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
 var dbcontext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-dbcontext.Database.Migrate();
+//dbcontext.Database.Migrate();
 
 
 

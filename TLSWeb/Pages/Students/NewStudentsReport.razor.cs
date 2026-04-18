@@ -55,7 +55,7 @@ public partial class NewStudentsReport : ComponentBase
 
             var response = await StudentApi.GetPaginated(request);
 
-            students = response.Items;
+            students = response.Items.OrderByDescending(s => s.AddedDate).ToList();
             totalCount = response.TotalCount;
             totalPages = response.TotalPages;
             currentPage = response.CurrentPage;
