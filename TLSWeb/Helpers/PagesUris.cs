@@ -55,6 +55,7 @@
         {
             public const string PriorUrl = "Center";
             public const string Edit = PriorUrl + "/Edit";
+            public const string DailyReport = PriorUrl + "/DailyReport";
         }
     }
 }

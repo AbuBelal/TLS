@@ -16,7 +16,7 @@ namespace SharedLib.Entities
         public DateOnly ReportDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public long CenterId { get; set; }
         [ForeignKey(nameof(CenterId))]
-        [JsonIgnore]
+
         public Center? Center { get; set; }
         public bool IsLocked { get; set; } = true;
         public DateTime? LockedAt { get; set; }

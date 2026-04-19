@@ -88,6 +88,13 @@ namespace TLSClientSharedLib.Helpers
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             public const string MyCenter = PriorUrl + "/my-center";
+           
+
+        }
+        public static class Reports
+        {
+            public const string PriorUrl = "/api/DailyReport";
+            public const string DailyReport = PriorUrl + "";
         }
 
         public static class EmpCenter

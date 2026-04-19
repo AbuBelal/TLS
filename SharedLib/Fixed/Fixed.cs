@@ -9,9 +9,9 @@ namespace SharedLib.Fixed
         public const string DebugBaseUrl = "https://localhost:7075";
 
         #region North
-            public const string NorthBaseUrl = "https://manapi.runasp.net/";
-          //public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
-            public const string NorthAreaAr = "الشمال";
+        //public const string NorthBaseUrl = "https://manapi.runasp.net/";
+        public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
+        public const string NorthAreaAr = "الشمال";
             public const string NorthAreaEn = "North";
         #endregion
 

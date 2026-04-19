@@ -85,11 +85,17 @@ namespace TLSWeb.Helpers
                    c.BaseAddress = new Uri(ApiUrls.BaseUrl);
                }).AddHttpMessageHandler<CookieHandler>();
 
+            builder.Services.AddRefitClient<IDailyReportApi>()
+               .ConfigureHttpClient(c =>
+               {
+                   c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+               }).AddHttpMessageHandler<CookieHandler>();
+
             builder.Services.AddRefitClient<IAdminDashboardApi>()
-   .ConfigureHttpClient(c =>
-   {
-       c.BaseAddress = new Uri(ApiUrls.BaseUrl);
-   }).AddHttpMessageHandler<CookieHandler>();
+               .ConfigureHttpClient(c =>
+               {
+                   c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+               }).AddHttpMessageHandler<CookieHandler>();
 
 
             //services.AddTransient<CookieHandler>();

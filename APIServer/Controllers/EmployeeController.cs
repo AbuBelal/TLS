@@ -80,7 +80,7 @@ namespace APIServer.Controllers
         {
             var result = await _employeeRepository.GetByCivilId(CivilId);
             if (result == null)
-                return NotFound(null);
+                return NotFound(new EmployeeUpsertDto());
             await _auditLogService.LogAsync("Read", "Employee", result.Id.ToString(), $"قراءة موظف: {result.Name}");
             return Ok(result);
         }
@@ -90,7 +90,7 @@ namespace APIServer.Controllers
         {
             var result = await _employeeRepository.GetByEmpId(EmpId);
             if (result == null)
-                return NotFound(null);
+                return NotFound(new EmployeeUpsertDto());
             await _auditLogService.LogAsync("Read", "Employee", result.Id.ToString(), $"قراءة موظف: {result.Name}");
             return Ok(result);
         }

@@ -24,7 +24,7 @@ namespace APIServerLib.Data
         public DbSet<DailyReport> DailyReports { get; set; }
 
 
-       
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -125,13 +125,13 @@ namespace APIServerLib.Data
                       .OnDelete(DeleteBehavior.NoAction);
             });
 
-            modelBuilder.Entity<DailyReport>(entity =>
-            {
-                entity.HasOne<Center>()
-                      .WithMany()
-                      .HasForeignKey(a => a.CenterId)
-                      .OnDelete(DeleteBehavior.NoAction);
-            });
+            //modelBuilder.Entity<DailyReport>(entity =>
+            //{
+            //    entity.HasOne<Center>()
+            //          .WithMany()
+            //          .HasForeignKey(a => a.CenterId)
+            //          .OnDelete(DeleteBehavior.NoAction);
+            //});
         }
 
     }

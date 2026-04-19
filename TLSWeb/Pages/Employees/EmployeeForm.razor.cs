@@ -93,17 +93,21 @@ public partial class EmployeeForm : ComponentBase
             else
             {
 
-
-                var result = await EmployeeApi.GetByEmpId(employee.EmpId);
-
-                if (result is not null)
+                try
                 {
-                    IsDuplicate = true;
-                    DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الوظيفة مسبقاً باسم: {result.Name}";
-                    return;
+                    var result = await EmployeeApi.GetByEmpId(employee.EmpId);
+                    if (result is not null)
+                    {
+                        IsDuplicate = true;
+                        DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الوظيفة مسبقاً باسم: {result.Name}";
+                        return;
+                    }
+                    else
+                        ResetDuplicateState();
                 }
-                else
-                    ResetDuplicateState();
+                catch  { }
+
+                
             }
 
             if (!string.IsNullOrWhiteSpace(employee.CivilId))
