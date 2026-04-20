@@ -94,7 +94,8 @@ namespace TLSClientSharedLib.Helpers
         public static class Reports
         {
             public const string PriorUrl = "/api/DailyReport";
-            public const string DailyReport = PriorUrl + "";
+            public const string DailyReport = PriorUrl;
+            public const string UpdateDailyReport = PriorUrl ;
         }
 
         public static class EmpCenter

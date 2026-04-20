@@ -1,0 +1,167 @@
+﻿@using TLSWeb.Components
+@using TLSWeb.Pages.Centers.Components
+@attribute [Route(PagesUris.CenterPages.DailyReport)]
+
+<h3>
+    <i class="bi bi-table me-2 text-primary"></i>
+تقرير حضور الطلاب اليومي</h3>
+
+@if(DailyReports is null || DailyReports.Count<=0)
+{
+    <LoadingComponent></LoadingComponent>
+}
+else
+{
+    @* @model List<DailyReport> *@
+
+@* <div class="container mt-4">
+    @* <h2 class="mb-4">تقرير الحضور اليومي للمراكز</h2> 
+
+    <div class="row bg-dark text-white p-2 d-none d-md-flex fw-bold">
+        <div class="col-md-3">اسم المركز</div>
+        <div class="col-md-9 text-center">بيانات الطلاب (مسجلين / حضور)</div>
+    </div>
+
+    @foreach (var item in DailyReports)
+    {
+        <div class="row border-bottom align-items-center py-3">
+            <div class="col-md-2 fw-bold text-primary">
+                @item.Center?.Name 
+                <div class="text-muted small">@item.ReportDate.ToString("yyyy-MM-dd")</div>
+            </div>
+
+                <div class="col-md-1 fw-bold text-primary">
+                    <span class="badge bg-info text-dark max-width-100">ذكور</span><br />
+                    <span class="badge bg-info text-dark">إناث</span><br />
+                    <span class="badge bg-info text-dark max-width-100">ذكور</span><br />
+                    <span class="badge bg-info text-dark">إناث</span>
+                </div>
+            <div class="col-md-8">
+
+                <div class="row mb-2 bg-light p-2 rounded">
+                    <div class="col-12 small text-muted border-bottom mb-1">إجمالي المسجلين: <strong>@item.RegTotal</strong></div>
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                            var MaleregValue = item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null);
+                            var FemaleregValue = item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null);
+
+                        <div class="col align-content-md-center">
+                                <span class="d-block x-small text-secondary">الصف @i</span>
+                                <span class="badge bg-info text-dark max-width-100">@MaleregValue</span><br />
+                                <span class="badge bg-info text-dark">@FemaleregValue</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="row p-2">
+                    <div class="col-12 small text-muted border-bottom mb-1">تسجيل الحضور اليومي:</div>
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <div class="col">
+                            <label class="d-block x-small">الصف @i</label>
+                            <input type="number" 
+                                       name="Reports[@DailyReports.IndexOf(item)].AttMale0@i"
+                                       value="@item.GetType().GetProperty($"AttMale0{i}")?.GetValue(item, null)"
+                                   class="form-control form-control-sm shadow-sm" 
+                                       min="0" max="@item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null)" />
+                            <input type="number" 
+                                       name="Reports[@DailyReports.IndexOf(item)].AttFemale0@i"
+                                   value="@item.GetType().GetProperty($"AttFemale0{i}")?.GetValue(item, null)" 
+                                   class="form-control form-control-sm shadow-sm" 
+                                       min="0" max="@item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null)" />
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    }
+    
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success px-5">حفظ التقارير</button>
+    </div>
+</div> *@
+
+@* <style>
+    .x-small { font-size: 0.7rem; }
+    .form-control-sm { padding: 0.25rem; font-size: 0.8rem; }
+</style> *@
+
+
+
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h2 class="text-primary fw-bold">تقرير الحضور اليومي</h2>
+            <span class="badge bg-secondary p-2">التاريخ: @DateTime.Now.ToString("yyyy-MM-dd")</span>
+        </div>
+
+        @foreach (var item in DailyReports)
+        {
+            <CenterDailyReportComponent item="@item"  ></CenterDailyReportComponent>
+        }
+
+      @*   <div class="text-center mt-5 mb-5">
+            <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                <i class="bi bi-check-circle me-2"></i> حفظ جميع التقارير
+            </button>
+        </div> *@
+    </div>
+
+    <style>
+        /* لمسة جمالية إضافية */
+        .bg-soft-info {
+            background-color: #e0f7fa;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+            border-color: #198754;
+        }
+
+        .table th {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .card {
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+    </style>
+}
+
+@code {
+    List<SharedLib.Entities.DailyReport> DailyReports = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        DailyReports =await DailyReportApi.GetDailyReport();
+    }
+
+    private async Task SaveCenter(long CenterId)
+    {
+        var reportToSave = DailyReports.FirstOrDefault(r => r.CenterId == CenterId);
+
+        if (reportToSave != null)
+        {
+            reportToSave.Center = null;
+            var response = await DailyReportApi.UpdateDailyReport(reportToSave);
+            if (response.Success)
+                MudSnackbar.Add(response.Message, Severity.Success);
+            else
+                MudSnackbar.Add(response.Message, Severity.Error);
+        }
+    }
+
+}

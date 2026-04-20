@@ -169,8 +169,8 @@
                 </div>
             }
         </div>
-
-
+        </AuthorizeView>
+            <AuthorizeView Roles="@Roles.Admin">
         @* المستخدمون — للمدير فقط *@
             <div>
                 <button class="@GroupBtnClass("users")"
@@ -204,7 +204,7 @@
                 }
             </div>
   
-
+            </AuthorizeView>
         @* التقارير *@
         <div>
             <button class="@GroupBtnClass("reports")"
@@ -218,7 +218,7 @@
             @if (openGroup == "reports")
             {
                 <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
-
+                     <AuthorizeView Roles="@Roles.Admin">
                 <a href="@PagesUris.Admin.DetailedCentersReport" class="@SubLinkClass" @onclick="CloseSidebar">
                   <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                   <span>تقرير مفصل للمراكز</span>
@@ -233,7 +233,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                         <span>تقرير الموظفين الجدد</span>
                   </a>
-
+                  </AuthorizeView>
                   <a href="@PagesUris.CenterPages.DailyReport" class="@SubLinkClass" @onclick="CloseSidebar">
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                         <span>تقرير حضور الطلاب اليومي</span>
@@ -241,7 +241,7 @@
               </div>
             }
         </div>
-
+            <AuthorizeView Roles="@Roles.Admin">
         @* الإعدادات *@
         <div>
             <button class="@GroupBtnClass("settings")"

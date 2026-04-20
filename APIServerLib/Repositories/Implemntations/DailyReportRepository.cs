@@ -1,7 +1,10 @@
 ﻿using APIServerLib.Data;
+using APIServerLib.Data.Migrations;
 using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using SharedLib.Entities;
 using SharedLib.Responses;
 using System;
@@ -88,41 +91,123 @@ namespace APIServerLib.Repositories.Implemntations
         {
             string userrole = await CurUserRole();
             List<DailyReport> DailyReportList = new List<DailyReport>();
-            var Centers =  _context.Centers.ToList();
-            var TodayDate = DateOnly.FromDateTime(DateTime.Today);
+
+            var Centers = await  _context.Centers.AsNoTracking().ToListAsync();
+
+            // جلب جميع الطلاب النشطين مع البيانات المطلوبة
+            var allStdCenters = await _context.StdCenters
+                .AsNoTracking()
+                .Where(sc => sc.ToDate == null)
+                .Include(sc => sc.Student)
+                    .ThenInclude(s => s!.Gender)
+                .Include(sc => sc.Student)
+                    .ThenInclude(s => s!.Level)
+                .ToListAsync();
+
+            // جلب المستويات مرتبة
+            
 
             if (userrole == SharedLib.Fixed.Roles.Admin)
             {
-                var stdCount = _context.Students.GroupBy(x =>new { x.StdCenters.OrderByDescending(x => x.FromDate).First().CenterId , x.LevelId })
-                    .Select(   g => g.Count()).ToList();
-                foreach (var c in Centers)
+                foreach (var center in Centers)
                 {
-                    var dly = _context.DailyReports.FirstOrDefault(x=>x.CenterId == c.Id
-                    && x.ReportDate==TodayDate);
-
-                    if(dly is null)
-                    {
-                        dly = new DailyReport();
-                        dly.CenterId = c.Id;
-                        dly.Center = c;
-                        
-                        dly.RegMale01 = 0;
-                    }
-                    DailyReportList.Add(dly);
+                    DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, center));
                 }
             }
             else
             {
-                var dly=new DailyReport();
-                dly.CenterId =await CurrentCenterId();
+                ///User
+                
+                //var dly=new DailyReport();
+                var centerid = await CurrentCenterId();
+                var Center =await _context.Centers.FirstOrDefaultAsync(x => x.Id == centerid);
+                DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, Center));
             }
 
             return DailyReportList;
         }
-
-        public Task<GeneralResponse> UpdateDailyReportAsync(SharedLib.Entities.DailyReport dailyreport)
+        private async Task<DailyReport> GetDailyReportByCenterIdAsync(List<StdCenter> allStdCenters,  Center Center)
         {
-            throw new NotImplementedException();
+            var levels = await _context.LookupValues
+                .Where(lv => lv.ValueType == "Level")
+                .OrderBy(lv => lv.SortOrder)
+                .ToListAsync();
+
+            var levelNames = levels.Select(l => l.Name).ToList();
+            var levelMaleTotals = new Dictionary<string, int>();
+            var levelFemaleTotals = new Dictionary<string, int>();
+            foreach (var levelName in levelNames)
+            {
+                levelMaleTotals[levelName] = 0;
+                levelFemaleTotals[levelName] = 0;
+            }
+
+            var TodayDate = DateOnly.FromDateTime(DateTime.Today);
+            var dly = _context.DailyReports.Include(x => x.Center).FirstOrDefault(x => x.CenterId == Center.Id
+                     && x.ReportDate == TodayDate);
+
+            if (dly is null)
+            {
+                dly = new DailyReport();
+
+                var students = allStdCenters
+               .Where(sc => sc.CenterId == Center.Id)
+               .Select(sc => sc.Student!)
+               .ToList();
+
+                var levelMales = new Dictionary<string, int>();
+                var levelFemales = new Dictionary<string, int>();
+                var properties = typeof(DailyReport).GetProperties();
+                int L = 0;
+
+                foreach (var levelName in levelNames)
+                {
+
+                    levelMales[levelName] = students
+                        .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "ذكر");
+                    levelFemales[levelName] = students
+                        .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "أنثى");
+
+                    levelMaleTotals[levelName] += levelMales[levelName];
+                    levelFemaleTotals[levelName] += levelFemales[levelName];
+                    //////
+
+                    properties.First(p => p.Name == $"RegMale0{L + 1}")?.SetValue(dly, levelMales[levelName]);
+                    properties.First(p => p.Name == $"RegFemale0{L + 1}")?.SetValue(dly, levelFemales[levelName]);
+                    L++;
+                }
+
+                dly.CenterId = Center.Id;
+                dly.Center = Center;
+            }
+
+            return dly;
+        }
+
+        public async Task<GeneralResponse> UpdateDailyReportAsync(SharedLib.Entities.DailyReport dailyreport)
+        {
+            var existingReport = await _context.DailyReports.FindAsync(dailyreport.Id);
+
+            if (existingReport is null)
+            {
+                await _context.DailyReports.AddAsync(dailyreport);
+                await _context.SaveChangesAsync();
+                return new GeneralResponse(true, "تم إضافة التقرير بنجاح");
+            }
+            else
+            {
+                foreach (var prop in typeof(DailyReport).GetProperties())
+                {
+                    var newValue = prop.GetValue(dailyreport);
+                    if ((prop.Name.Contains("AttMale0")|| prop.Name.Contains("AttFemale0")) && newValue != null)
+                    {
+                        prop.SetValue(existingReport, newValue);
+                    }
+                }
+                //_context.DailyReports.Update(dailyreport);
+                await _context.SaveChangesAsync();
+                return new GeneralResponse(true, "تم تحديث التقرير بنجاح");
+            }
         }
     }
 }
