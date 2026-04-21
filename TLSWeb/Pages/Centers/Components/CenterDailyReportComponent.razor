@@ -1,7 +1,10 @@
 ﻿@* @{var index = DailyReports.IndexOf(item);} *@
-<div class="card shadow-sm mb-5 border-0">
+@* <div class="card shadow-sm mb-5 border-0">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name</h5>
+        <h5 class="mb-0 fw-bold">
+            <i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name
+            <span style="color:darkred"> @(item.Id == 0 ? "  -  جديد" : "")  </span>
+        </h5>
         <span class="small opacity-75">كود المركز: @item.Center?.CenterCode</span>
     </div>
 
@@ -13,7 +16,7 @@
                         <th style="width: 100px;">الصف</th>
                         @for (int i = 1; i <= 9; i++)
                         {
-                            <th>الصف @i</th>
+                            <th> @Levels[i-1]</th>
                         }
                         <th class="table-primary">الإجمالي</th>
                     </tr>
@@ -32,134 +35,36 @@
                                 </div>
                             </td>
                         }
-                        <td class="table-primary fw-bold">@item.RegTotal</td>
+                        <td class="table-primary fw-bold">
+                            <div class="d-flex flex-column gap-1">
+                                <span class="badge bg-info text-dark">@item.RegMaleTotal</span>
+                                <span class="badge bg-soft-info border text-dark">@item.RegFemaleTotal</span>
+                                <span class="badge bg-warning text-dark">@item.RegTotal</span>
+                            </div>
+                        </td>
                     </tr>
 
 
-                    @* Attendant *@
+                    @* Attendant *
                     <tr>
                         <td class="fw-bold text-success small">الحضور<br><small>(ذكر/أنثى)</small></td>
-
-                        <td>
+                        @for (int i = 1; i <= 9; i++)
+                        {
+                            <LevelComponent item="item" MalePropertyName=@($"AttMale0{i}") 
+                                            FemalePropertyName=@($"AttFemale0{i}") Readonly=@ReadOnly></LevelComponent>
+                        }
+                        <td class="table-success fw-bold text-success">
                             <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale01"
-                                       @bind-value="item.AttMale01"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale01" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale01"
-                                       @bind-value="item.AttFemale01"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale01" placeholder="♀">
+                                <span class="badge bg-info text-dark">@item.AttMaleTotal</span>
+                                <span class="badge bg-soft-info border text-dark">@item.AttFemaleTotal</span>
+                                <span class="badge bg-warning text-dark">@item.AttTotal</span>
                             </div>
                         </td>
-
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale02"
-                                       @bind-value="item.AttMale02"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale02" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale02"
-                                       @bind-value="item.AttFemale02"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale02" placeholder="♀">
-                            </div>
+                    </tr>
+                    <tr>
+                        <td class="table-success fw-bold text-success">
+                            <InputCheckbox @bind-Value="item.IsLocked"  class="form-check-input me-2" />
                         </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale03"
-                                       @bind-value="item.AttMale03"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale03" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale03"
-                                       @bind-value="item.AttFemale03"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale03" placeholder="♀">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale04"
-                                       @bind-value="item.AttMale04"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale04" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale04"
-                                       @bind-value="item.AttFemale04"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale04" placeholder="♀">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale05"
-                                       @bind-value="item.AttMale05"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale05" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale05"
-                                       @bind-value="item.AttFemale05"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale05" placeholder="♀">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale06"
-                                       @bind-value="item.AttMale06"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale06" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale06"
-                                       @bind-value="item.AttFemale06"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale06" placeholder="♀">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale07"
-                                       @bind-value="item.AttMale07"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale07" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale07"
-                                       @bind-value="item.AttFemale07"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale07" placeholder="♀">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale08"
-                                       @bind-value="item.AttMale08"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale08" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale08"
-                                       @bind-value="item.AttFemale08"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale08" placeholder="♀">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                <input type="number" name="item.AttMale09"
-                                       @bind-value="item.AttMale09"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegMale09" placeholder="♂">
-
-                                <input type="number" name="item.AttFemale09"
-                                       @bind-value="item.AttFemale09"
-                                       class="form-control form-control-sm text-center border-success"
-                                       min="0" max="@item.RegFemale09" placeholder="♀">
-                            </div>
-                        </td>
-
-                        <td class="table-success fw-bold text-success">@item.AttTotal</td>
                     </tr>
                 </tbody>
             </table>
@@ -168,19 +73,212 @@
 
     <div class="card-footer bg-white text-muted small d-flex justify-content-between">
         <span><i class="bi bi-clock me-1"></i> تاريخ التقرير: @item.ReportDate.ToString("yyyy/MM/dd")</span>
-        @if (item.IsLocked)
+        @if (!ReadOnly)
         {
-            @* <span class="text-danger"><i class="bi bi-lock-fill"></i> مغلق</span> *@
+            <button class="btn btn-success btn-lg px-5 shadow" @onclick="() => SaveCenter()">
+                <i class="bi bi-check-circle me-2"></i>                 
+                حفظ                  
+            </button>
         }
+        else
+        {
+            <span class="text-danger"><i class="bi bi-lock-fill"></i> مغلق</span>
+        }
+    </div >
+</div> *@
 
-        <button class="btn btn-success btn-lg px-5 shadow" @onclick="() => SaveCenter()">
-            <i class="bi bi-check-circle me-2"></i> حفظ
-        </button>
+ 
+<div class="card shadow-sm mb-5 border-0">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+            <i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name
+            <span style="color:darkred"> @(item.Id == 0 ? "  -  جديد" : "")  </span>
+        </h5>
+        <span class="small opacity-75">كود المركز: @item.Center?.CenterCode</span>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered mb-0 text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 100px;">الصف</th>
+                        @for (int i = 1; i <= 9; i++)
+                        {
+                            <th> @Levels[i - 1]</th>
+                        }
+                        <th class="table-primary">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-light">
+                        <td class="fw-bold text-muted small">المسجلين<br><small>(ذكر/أنثى)</small></td>
+                        @for (int i = 1; i <= 9; i++)
+                        {
+                            var male = item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null) ?? 0;
+                            var female = item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null) ?? 0;
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="badge bg-info text-dark">@male</span>
+                                    <span class="badge bg-soft-info border text-dark">@female</span>
+                                </div>
+                            </td>
+                        }
+                        <td class="table-primary fw-bold">
+                            <div class="d-flex flex-column gap-1">
+                                <span class="badge bg-info text-dark">@item.RegMaleTotal</span>
+                                <span class="badge bg-soft-info border text-dark">@item.RegFemaleTotal</span>
+                                <span class="badge bg-warning text-dark">@item.RegTotal</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    @* Attendant *@
+                    <tr>
+                        <td class="fw-bold text-success small">الحضور<br><small>(ذكر/أنثى)</small></td>
+                        @for (int i = 1; i <= 9; i++)
+                        {
+                            <LevelComponent item="item" MalePropertyName=@($"AttMale0{i}")
+                                            FemalePropertyName=@($"AttFemale0{i}") Readonly=@ReadOnly></LevelComponent>
+                        }
+                        <td class="table-success fw-bold text-success">
+                            <div class="d-flex flex-column gap-1">
+                                <span class="badge bg-info text-dark">@item.AttMaleTotal</span>
+                                <span class="badge bg-soft-info border text-dark">@item.AttFemaleTotal</span>
+                                <span class="badge bg-warning text-dark">@item.AttTotal</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        @* <div class="p-4 border-top bg-light">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">عدد اللاجئين (UNRWA)</label>
+                    <InputNumber @bind-Value="item.IsUNRWA" class="form-control" disabled="@ReadOnly" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">غير اللاجئين (تلقائي)</label>
+                    <input type="number" class="form-control bg-white" value="@item.IsNotUNRWA" readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">ذوي الإعاقة</label>
+                    <InputNumber @bind-Value="item.Disabilities" class="form-control" disabled="@ReadOnly" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-primary">بسكويت WFP (موزع)</label>
+                    <InputNumber @bind-Value="item.WFPBiscDist" class="form-control" disabled="@ReadOnly" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-danger">بسكويت WFP (تالف/مفقود)</label>
+                    <InputNumber @bind-Value="item.WFPBiscLost" class="form-control" disabled="@ReadOnly" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">إجمالي بسكويت WFP</label>
+                    <input type="number" class="form-control bg-warning bg-opacity-10 fw-bold" value="@item.WFPBiscTotal" readonly />
+                </div>
+                <AuthorizeView Roles="Admin">
+                <div class="col-12 mt-3">
+                    <div class="form-check">
+                        <InputCheckbox @bind-Value="item.IsLocked" id="lockCheck" class="form-check-input" disabled="@ReadOnly" />
+                        <label class="form-check-label fw-bold text-danger" for="lockCheck">
+                            إغلاق التقرير (نهائي)
+                        </label>
+                    </div>
+                </div>
+                </AuthorizeView>
+            </div>
+        </div> *@
+
+        <div class="p-3 border-top bg-light">
+            <div class="row g-2 align-items-center">
+
+                <div class="col compact-field">
+                    <label class="compact-label">لاجئ</label>
+                    <InputNumber @bind-Value="item.IsUNRWA" class="form-control form-control-xs shadow-sm" disabled="@ReadOnly" />
+                </div>
+
+                <div class="col compact-field">
+                    <label class="compact-label">غير لاجئ</label>
+                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.IsNotUNRWA" readonly />
+                </div>
+
+                <div class="col-md-1 compact-field">
+                    <label class="compact-label">إعاقة</label>
+                    <InputNumber @bind-Value="item.Disabilities" class="form-control form-control-xs shadow-sm" disabled="@ReadOnly" />
+                </div>
+
+                <div class="col compact-field">
+                    <label class="compact-label text-primary">البسكويت الموزع</label>
+                    <InputNumber @bind-Value="item.WFPBiscDist" class="form-control form-control-xs border-primary shadow-sm" disabled="@ReadOnly" />
+                </div>
+
+                <div class="col compact-field">
+                    <label class="compact-label text-danger">البسكويت التالف</label>
+                    <InputNumber @bind-Value="item.WFPBiscLost" class="form-control form-control-xs border-danger shadow-sm" disabled="@ReadOnly" />
+                </div>
+
+                <div class="col compact-field">
+                    <label class="compact-label text-dark">إجمالي البسكويت</label>
+                    <input type="number" class="form-control form-control-xs bg-warning bg-opacity-10 fw-bold shadow-sm" value="@item.WFPBiscTotal" readonly />
+                </div>
+
+                <div class="col-auto pt-2">
+                    <div class="form-check form-switch">
+                        <InputCheckbox @bind-Value="item.IsLocked" class="form-check-input" id="lockSwitch" disabled="@ReadOnly" />
+                        <label class="form-check-label small fw-bold" for="lockSwitch">قفل</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white text-muted small d-flex justify-content-between align-items-center p-3">
+        <span><i class="bi bi-clock me-1"></i> تاريخ التقرير: @item.ReportDate.ToString("yyyy/MM/dd")</span>
+        @if (!ReadOnly)
+        {
+            <button class="btn btn-success btn-lg px-5 shadow-sm" @onclick="() => SaveCenter()">
+                <i class="bi bi-check-circle me-2"></i>
+                حفظ البيانات
+            </button>
+        }
+        else
+        {
+            <span class="badge bg-danger p-2 px-3"><i class="bi bi-lock-fill me-1"></i> التقرير مغلق</span>
+        }
     </div>
 </div>
+ 
 
 @code {
     [Parameter] public DailyReport item { get; set; }
+    string[] Levels = new[] { "الصف الأول", "الصف الثاني", "الصف الثالث", "الصف الرابع", "الصف الخامس", "الصف السادس", "الصف السابع", "الصف الثامن", "الصف التاسع" };
+    bool ReadOnly = false;
+    string UserName = string.Empty;
+    string UserEmail = string.Empty;
+    string UserRole = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            UserName = user.Identity.Name!;
+            UserEmail = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
+            UserRole = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value!;
+        }
+
+        if (user.IsInRole("Admin") )
+            ReadOnly = false;
+        else
+        if (item.ReportDate != DateOnly.FromDateTime(DateTime.Now) && item.IsLocked)
+            ReadOnly = true;
+    }
 
     private async Task SaveCenter()
     {

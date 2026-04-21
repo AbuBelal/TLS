@@ -14,6 +14,8 @@ namespace TLSClientSharedLib.Services.Apis
         [Get(ApiUrls.Reports.DailyReport)]
         Task<List<DailyReport>> GetDailyReport();
 
+        [Get(ApiUrls.Reports.DailyReportForDate)]
+        Task<List<DailyReport>> GetDailyReportForDate([Query] DateOnly date);
 
         [Post(ApiUrls.Reports.UpdateDailyReport)]
         Task<GeneralResponse> UpdateDailyReport([Body] DailyReport dailyReport);

@@ -1,0 +1,79 @@
+﻿<td>
+    <div class="d-flex flex-column gap-1">
+        @if(Readonly)
+        {
+        <input type="number" name=@($"item.{MalePropertyName}") disabled="@((MaleReg <= 0) ? "disabled" : null)"
+               value="@GetValue()" @onchange="SetValue"
+               class="form-control form-control-sm text-center border-success )"
+               min="0" max="@item.RegMale01" placeholder="♂" readonly >
+
+        <input type="number" name=@($"item.{FemalePropertyName}") disabled="@((FemaleReg <= 0) ? "disabled" : null)"
+               value="@GetValue1()" @onchange="SetValue1"
+               class="form-control form-control-sm text-center border-success "
+               min="0" max="@item.RegFemale01" placeholder="♀" readonly>
+        }
+        else
+        {
+            <input type="number" name=@($"item.{MalePropertyName}") disabled="@((MaleReg <= 0) ? "disabled" : null)"
+                   value="@GetValue()" @onchange="SetValue"
+                   class="form-control form-control-sm text-center border-success )"
+                   min="0" max="@item.RegMale01" placeholder="♂">
+
+            <input type="number" name=@($"item.{FemalePropertyName}") disabled="@((FemaleReg <= 0) ? "disabled" : null)"
+                   value="@GetValue1()" @onchange="SetValue1"
+                   class="form-control form-control-sm text-center border-success "
+                   min="0" max="@item.RegFemale01" placeholder="♀">
+        }
+
+    </div>
+</td>
+
+@code {
+    [Parameter] public DailyReport item { get; set; }
+    [Parameter] public string MalePropertyName { get; set; }
+    [Parameter] public string FemalePropertyName { get; set; }
+    [Parameter] public bool Readonly { get; set; } = false;
+
+    int MaleReg=0;
+    int FemaleReg = 0;
+    protected async override Task OnInitializedAsync()
+    {
+        string MaleRegname = MalePropertyName.Replace("Att", "Reg");
+        string FemaleRegname = FemalePropertyName.Replace("Att", "Reg");
+        MaleReg = int.Parse(item.GetType().GetProperty(MaleRegname)?.GetValue(item)?.ToString() ?? "0");
+        FemaleReg = int.Parse(item.GetType().GetProperty(FemaleRegname)?.GetValue(item)?.ToString() ?? "0");
+    }
+
+    private object GetValue() =>
+        item.GetType().GetProperty(MalePropertyName)?.GetValue(item);
+
+    private void SetValue(ChangeEventArgs e) 
+    {
+        var newvalue = int.Parse(e.Value?.ToString()?? "0");
+        // string regname = MalePropertyName.Replace("Att", "Reg");
+        // var regcount =int.Parse(item.GetType().GetProperty(regname)?.GetValue(item)?.ToString() ?? "0");
+        if (newvalue > MaleReg)
+        {
+            MudSnackbar.Add($"لا يمكن إدخال قيمة أكبر من عدد المسجلين ({MaleReg})", Severity.Error);
+            e.Value = 0;
+        }
+
+        item.GetType().GetProperty(MalePropertyName)?.SetValue(item, Convert.ChangeType(e.Value, typeof(int)));
+    }
+    private object GetValue1() =>
+        item.GetType().GetProperty(FemalePropertyName)?.GetValue(item);
+
+    private void SetValue1(ChangeEventArgs e)
+    {
+        var newvalue = int.Parse(e.Value?.ToString() ?? "0");
+        // string regname = FemalePropertyName.Replace("Att", "Reg");
+        // var regcount = int.Parse(item.GetType().GetProperty(regname)?.GetValue(item)?.ToString() ?? "0");
+        if (newvalue > FemaleReg)
+        {
+            MudSnackbar.Add($"لا يمكن إدخال قيمة أكبر من عدد المسجلين ({FemaleReg})", Severity.Error);
+            e.Value = 0;
+        }
+
+       item.GetType().GetProperty(FemalePropertyName)?.SetValue(item, Convert.ChangeType(e.Value, typeof(int)));
+    }
+}

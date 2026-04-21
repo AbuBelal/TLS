@@ -77,22 +77,13 @@ namespace APIServerLib.Repositories.Implemntations
             return new GeneralResponse(false, "لم يتم العثور على التقرير اليومي", 0);
         }
 
-        public Task<List<SharedLib.Entities.DailyReport>> GetDailyReportForDateAsync(DateOnly date)
+        public async Task<List<SharedLib.Entities.DailyReport>> GetDailyReportForDateAsync(DateOnly date)
         {
-            throw new NotImplementedException();
-        }
 
-        public Task<List<SharedLib.Entities.DailyReport>> GetDailyReportFromDateAsync(DateOnly FromDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<List<SharedLib.Entities.DailyReport>> GetTodayDailyReportAsync()
-        {
             string userrole = await CurUserRole();
             List<DailyReport> DailyReportList = new List<DailyReport>();
 
-            var Centers = await  _context.Centers.AsNoTracking().ToListAsync();
+            var Centers = await _context.Centers.AsNoTracking().ToListAsync();
 
             // جلب جميع الطلاب النشطين مع البيانات المطلوبة
             var allStdCenters = await _context.StdCenters
@@ -105,28 +96,73 @@ namespace APIServerLib.Repositories.Implemntations
                 .ToListAsync();
 
             // جلب المستويات مرتبة
-            
+
 
             if (userrole == SharedLib.Fixed.Roles.Admin)
             {
                 foreach (var center in Centers)
                 {
-                    DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, center));
+                    DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, center,date));
                 }
             }
             else
             {
                 ///User
-                
+
                 //var dly=new DailyReport();
                 var centerid = await CurrentCenterId();
-                var Center =await _context.Centers.FirstOrDefaultAsync(x => x.Id == centerid);
-                DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, Center));
+                var Center = await _context.Centers.FirstOrDefaultAsync(x => x.Id == centerid);
+                DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, Center, date));
             }
 
             return DailyReportList;
         }
-        private async Task<DailyReport> GetDailyReportByCenterIdAsync(List<StdCenter> allStdCenters,  Center Center)
+
+        public Task<List<SharedLib.Entities.DailyReport>> GetDailyReportFromDateAsync(DateOnly FromDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<SharedLib.Entities.DailyReport>> GetTodayDailyReportAsync()
+        {
+            //string userrole = await CurUserRole();
+            //List<DailyReport> DailyReportList = new List<DailyReport>();
+
+            //var Centers = await  _context.Centers.AsNoTracking().ToListAsync();
+
+            //// جلب جميع الطلاب النشطين مع البيانات المطلوبة
+            //var allStdCenters = await _context.StdCenters
+            //    .AsNoTracking()
+            //    .Where(sc => sc.ToDate == null)
+            //    .Include(sc => sc.Student)
+            //        .ThenInclude(s => s!.Gender)
+            //    .Include(sc => sc.Student)
+            //        .ThenInclude(s => s!.Level)
+            //    .ToListAsync();
+
+            //// جلب المستويات مرتبة
+            
+
+            //if (userrole == SharedLib.Fixed.Roles.Admin)
+            //{
+            //    foreach (var center in Centers)
+            //    {
+            //        DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, center, DateOnly.FromDateTime(DateTime.Today)));
+            //    }
+            //}
+            //else
+            //{
+            //    ///User
+                
+            //    //var dly=new DailyReport();
+            //    var centerid = await CurrentCenterId();
+            //    var Center =await _context.Centers.FirstOrDefaultAsync(x => x.Id == centerid);
+            //    DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, Center));
+            //}
+
+            return await GetDailyReportForDateAsync(DateOnly.FromDateTime(DateTime.Today));
+        }
+        private async Task<DailyReport> GetDailyReportByCenterIdAsync(List<StdCenter> allStdCenters,  Center Center ,DateOnly ADate = default(DateOnly))
         {
             var levels = await _context.LookupValues
                 .Where(lv => lv.ValueType == "Level")
@@ -142,14 +178,15 @@ namespace APIServerLib.Repositories.Implemntations
                 levelFemaleTotals[levelName] = 0;
             }
 
-            var TodayDate = DateOnly.FromDateTime(DateTime.Today);
+            //TodayDate = DateOnly.FromDateTime(DateTime.Today);
+
             var dly = _context.DailyReports.Include(x => x.Center).FirstOrDefault(x => x.CenterId == Center.Id
-                     && x.ReportDate == TodayDate);
+                     && x.ReportDate == ADate);
 
             if (dly is null)
             {
                 dly = new DailyReport();
-
+                dly.ReportDate = ADate;
                 var students = allStdCenters
                .Where(sc => sc.CenterId == Center.Id)
                .Select(sc => sc.Student!)
@@ -204,6 +241,12 @@ namespace APIServerLib.Repositories.Implemntations
                         prop.SetValue(existingReport, newValue);
                     }
                 }
+                existingReport.IsLocked = dailyreport.IsLocked;
+                existingReport.IsUNRWA = dailyreport.IsUNRWA;
+                existingReport.Disabilities = dailyreport.Disabilities;
+                existingReport.WFPBiscDist = dailyreport.WFPBiscDist;
+                existingReport.WFPBiscLost = dailyreport.WFPBiscLost;
+
                 //_context.DailyReports.Update(dailyreport);
                 await _context.SaveChangesAsync();
                 return new GeneralResponse(true, "تم تحديث التقرير بنجاح");

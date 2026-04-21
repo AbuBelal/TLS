@@ -54,6 +54,7 @@ namespace SharedLib.Entities
         public int? AttMale07 { get; set; } = 0;
         public int? AttMale08 { get; set; } = 0;
         public int? AttMale09 { get; set; } = 0;
+
         public int? AttFemale01 { get; set; } = 0;
         public int? AttFemale02 { get; set; } = 0;
         public int? AttFemale03 { get; set; } = 0;
@@ -63,6 +64,17 @@ namespace SharedLib.Entities
         public int? AttFemale07 { get; set; } = 0;
         public int? AttFemale08 { get; set; } = 0;
         public int? AttFemale09 { get; set; } = 0;
+
+        //
+        public int? IsUNRWA { get; set; }
+        public int? Disabilities { get; set; }
+        public int? WFPBiscDist { get; set; }
+        public int? WFPBiscLost { get; set; }
+
+        [NotMapped]
+        public int? IsNotUNRWA => RegTotal - (IsUNRWA ?? 0);
+        [NotMapped]
+        public int? WFPBiscTotal  => (WFPBiscDist ?? 0) + (WFPBiscLost ?? 0);
 
         //Calculated fields
         [NotMapped]
@@ -104,8 +116,16 @@ namespace SharedLib.Entities
         public int AttStd09 => (AttMale09 ?? 0) + (AttFemale09 ?? 0);
         [NotMapped]
         public int RegTotal => RegStd01 + RegStd02 + RegStd03 + RegStd04 + RegStd05 + RegStd06 + RegStd07 + RegStd08 + RegStd09;
+       [NotMapped]
+        public int? RegMaleTotal => RegMale01 + RegMale02 + RegMale03 + RegMale04 + RegMale05 + RegMale06 + RegMale07 + RegMale08 + RegMale09;
+       [NotMapped]
+        public int? RegFemaleTotal => RegFemale01 + RegFemale02 + RegFemale03 + RegFemale04 + RegFemale05 + RegFemale06 + RegFemale07 + RegFemale08 + RegFemale09;
         [NotMapped]
         public int AttTotal => AttStd01 + AttStd02 + AttStd03 + AttStd04 + AttStd05 + AttStd06 + AttStd07 + AttStd08 + AttStd09;
+        [NotMapped]
+        public int? AttMaleTotal => AttMale01 + AttMale02 + AttMale03 + AttMale04 + AttMale05 + AttMale06 + AttMale07 + AttMale08 + AttMale09;
+        [NotMapped]
+        public int? AttFemaleTotal => AttFemale01 + AttFemale02 + AttFemale03 + AttFemale04 + AttFemale05 + AttFemale06 + AttFemale07 + AttFemale08 + AttFemale09;
 
     }
 }

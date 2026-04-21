@@ -27,5 +27,13 @@ namespace APIServer.Controllers
             var result = await _repo.UpdateDailyReportAsync(dailyReport);
             return Ok(result);
         }
+
+
+        [HttpGet("for-date")]
+        public async Task<IActionResult> GetDailyReportForDate([FromQuery] DateOnly date)
+        {
+            var report = await _repo.GetDailyReportForDateAsync(date);
+            return Ok(report);
+        }
     }
 }

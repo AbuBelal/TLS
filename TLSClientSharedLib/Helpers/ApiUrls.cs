@@ -95,6 +95,7 @@ namespace TLSClientSharedLib.Helpers
         {
             public const string PriorUrl = "/api/DailyReport";
             public const string DailyReport = PriorUrl;
+            public const string DailyReportForDate = PriorUrl + "/for-date";
             public const string UpdateDailyReport = PriorUrl ;
         }
 
