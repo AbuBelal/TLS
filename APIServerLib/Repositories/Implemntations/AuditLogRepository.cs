@@ -56,7 +56,10 @@ namespace APIServerLib.Repositories.Implemntations
                     a.Details!.Contains(request.SearchText));
 
             if (!string.IsNullOrWhiteSpace(request.Action))
-                query = query.Where(a => a.Action == request.Action);
+                query = query.Where(a => a.Action==request.Action);
+
+            if (!string.IsNullOrWhiteSpace(request.Details))
+                query = query.Where(a => a.Details.Contains(request.Details));
 
             if (!string.IsNullOrWhiteSpace(request.EntityType))
                 query = query.Where(a => a.EntityType == request.EntityType);
@@ -72,10 +75,13 @@ namespace APIServerLib.Repositories.Implemntations
 
             var total = await query.CountAsync();
 
-            var items = await query
-                .OrderByDescending(a => a.Timestamp)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
+            var orderedQuery = request.SortDescending
+               ? query.OrderByDescending(a => a.Timestamp)
+                : query.OrderBy(a => a.Timestamp);
+
+            var items = await orderedQuery
+              .Skip((request.PageNumber - 1) * request.PageSize)
+              .Take(request.PageSize)
                 .Select(a => new AuditLogDto
                 {
                     Id = a.Id,

@@ -18,7 +18,7 @@ namespace SharedLib.Entities
         [ForeignKey(nameof(CenterId))]
 
         public Center? Center { get; set; }
-        public bool IsLocked { get; set; } = true;
+        public bool IsLocked { get; set; } = false;
         public DateTime? LockedAt { get; set; }
         public string? LockedBy { get; set; } // User ID who locked it
 

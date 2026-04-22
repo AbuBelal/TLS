@@ -1,5 +1,4 @@
-﻿@* @{var index = DailyReports.IndexOf(item);} *@
-@* <div class="card shadow-sm mb-5 border-0">
+﻿<div class="card shadow-sm mb-5 border-0">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold">
             <i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name
@@ -9,206 +8,88 @@
     </div>
 
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered mb-0 text-center align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 100px;">الصف</th>
-                        @for (int i = 1; i <= 9; i++)
-                        {
-                            <th> @Levels[i-1]</th>
-                        }
-                        <th class="table-primary">الإجمالي</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="bg-light">
-                        <td class="fw-bold text-muted small">المسجلين<br><small>(ذكر/أنثى)</small></td>
-                        @for (int i = 1; i <= 9; i++)
-                        {
-                            var male = item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null) ?? 0;
-                            var female = item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null) ?? 0;
-                            <td>
-                                <div class="d-flex flex-column gap-1">
-                                    <span class="badge bg-info text-dark">@male</span>
-                                    <span class="badge bg-soft-info border text-dark">@female</span>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered mb-0 text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 120px;" class="bg-light">الصف</th>
+                            @for (int i = 1; i <= 9; i++)
+                            {
+                                <th class="fw-bold">@Levels[i - 1]</th>
+                            }
+                        <th class="bg-warning text-dark" style="width: 110px;">الإجمالي العام</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-light">
+                            <td class="fw-bold text-muted small border-end-0">
+                                <i class="bi bi-people-fill me-1"></i>المسجلين
+                                <div class="text-xs text-secondary mt-1">(ذكر / أنثى)</div>
+                            </td>
+                            @for (int i = 1; i <= 9; i++)
+                            {
+                                var male = item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null) ?? 0;
+                                var female = item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null) ?? 0;
+                                <td>
+                                    <div class="d-grid gap-1">
+                                        <span class="badge bg-info text-dark py-1">@male</span>
+                                        <span class="badge bg-light border text-dark py-1">@female</span>
+                                    </div>
+                                </td>
+                            }
+                            <td class="bg-primary bg-opacity-10 fw-bold border-start-0">
+                                <div class="d-grid gap-1">
+                                    <span class="badge bg-info text-dark py-1" title="إجمالي الذكور">@item.RegMaleTotal</span>
+                                    <span class="badge bg-light border text-dark py-1" title="إجمالي الإناث">@item.RegFemaleTotal</span>
+                                    <span class="badge bg-warning text-dark py-1 mt-1 border border-dark border-opacity-10">@item.RegTotal</span>
                                 </div>
                             </td>
-                        }
-                        <td class="table-primary fw-bold">
-                            <div class="d-flex flex-column gap-1">
-                                <span class="badge bg-info text-dark">@item.RegMaleTotal</span>
-                                <span class="badge bg-soft-info border text-dark">@item.RegFemaleTotal</span>
-                                <span class="badge bg-warning text-dark">@item.RegTotal</span>
-                            </div>
-                        </td>
-                    </tr>
+                        </tr>
 
-
-                    @* Attendant *
-                    <tr>
-                        <td class="fw-bold text-success small">الحضور<br><small>(ذكر/أنثى)</small></td>
-                        @for (int i = 1; i <= 9; i++)
-                        {
-                            <LevelComponent item="item" MalePropertyName=@($"AttMale0{i}") 
-                                            FemalePropertyName=@($"AttFemale0{i}") Readonly=@ReadOnly></LevelComponent>
-                        }
-                        <td class="table-success fw-bold text-success">
-                            <div class="d-flex flex-column gap-1">
-                                <span class="badge bg-info text-dark">@item.AttMaleTotal</span>
-                                <span class="badge bg-soft-info border text-dark">@item.AttFemaleTotal</span>
-                                <span class="badge bg-warning text-dark">@item.AttTotal</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="table-success fw-bold text-success">
-                            <InputCheckbox @bind-Value="item.IsLocked"  class="form-check-input me-2" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="card-footer bg-white text-muted small d-flex justify-content-between">
-        <span><i class="bi bi-clock me-1"></i> تاريخ التقرير: @item.ReportDate.ToString("yyyy/MM/dd")</span>
-        @if (!ReadOnly)
-        {
-            <button class="btn btn-success btn-lg px-5 shadow" @onclick="() => SaveCenter()">
-                <i class="bi bi-check-circle me-2"></i>                 
-                حفظ                  
-            </button>
-        }
-        else
-        {
-            <span class="text-danger"><i class="bi bi-lock-fill"></i> مغلق</span>
-        }
-    </div >
-</div> *@
-
- 
-<div class="card shadow-sm mb-5 border-0">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">
-            <i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name
-            <span style="color:darkred"> @(item.Id == 0 ? "  -  جديد" : "")  </span>
-        </h5>
-        <span class="small opacity-75">كود المركز: @item.Center?.CenterCode</span>
-    </div>
-
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered mb-0 text-center align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 100px;">الصف</th>
-                        @for (int i = 1; i <= 9; i++)
-                        {
-                            <th> @Levels[i - 1]</th>
-                        }
-                        <th class="table-primary">الإجمالي</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="bg-light">
-                        <td class="fw-bold text-muted small">المسجلين<br><small>(ذكر/أنثى)</small></td>
-                        @for (int i = 1; i <= 9; i++)
-                        {
-                            var male = item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null) ?? 0;
-                            var female = item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null) ?? 0;
-                            <td>
-                                <div class="d-flex flex-column gap-1">
-                                    <span class="badge bg-info text-dark">@male</span>
-                                    <span class="badge bg-soft-info border text-dark">@female</span>
+                        <tr>
+                            <td class="fw-bold text-success small border-end-0">
+                                <i class="bi bi-check-circle-fill me-1"></i>الحضور
+                                <div class="text-xs text-secondary mt-1">(ذكر / أنثى)</div>
+                            </td>
+                            @for (int i = 1; i <= 9; i++)
+                            {
+                                <td>
+                                    <LevelComponent item="item"
+                                                    MalePropertyName=@($"AttMale0{i}")
+                                                    FemalePropertyName=@($"AttFemale0{i}")
+                                                    Readonly=@ReadOnly />
+                                </td>
+                            }
+                            <td class="bg-success bg-opacity-10 fw-bold border-start-0">
+                                <div class="d-grid gap-1">
+                                    <span class="badge bg-info text-dark py-1">@item.AttMaleTotal</span>
+                                    <span class="badge bg-light border text-dark py-1">@item.AttFemaleTotal</span>
+                                    <span class="badge bg-warning text-dark py-1 mt-1 border border-dark border-opacity-10">@item.AttTotal</span>
                                 </div>
                             </td>
-                        }
-                        <td class="table-primary fw-bold">
-                            <div class="d-flex flex-column gap-1">
-                                <span class="badge bg-info text-dark">@item.RegMaleTotal</span>
-                                <span class="badge bg-soft-info border text-dark">@item.RegFemaleTotal</span>
-                                <span class="badge bg-warning text-dark">@item.RegTotal</span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    @* Attendant *@
-                    <tr>
-                        <td class="fw-bold text-success small">الحضور<br><small>(ذكر/أنثى)</small></td>
-                        @for (int i = 1; i <= 9; i++)
-                        {
-                            <LevelComponent item="item" MalePropertyName=@($"AttMale0{i}")
-                                            FemalePropertyName=@($"AttFemale0{i}") Readonly=@ReadOnly></LevelComponent>
-                        }
-                        <td class="table-success fw-bold text-success">
-                            <div class="d-flex flex-column gap-1">
-                                <span class="badge bg-info text-dark">@item.AttMaleTotal</span>
-                                <span class="badge bg-soft-info border text-dark">@item.AttFemaleTotal</span>
-                                <span class="badge bg-warning text-dark">@item.AttTotal</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        @* <div class="p-4 border-top bg-light">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">عدد اللاجئين (UNRWA)</label>
-                    <InputNumber @bind-Value="item.IsUNRWA" class="form-control" disabled="@ReadOnly" />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">غير اللاجئين (تلقائي)</label>
-                    <input type="number" class="form-control bg-white" value="@item.IsNotUNRWA" readonly />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">ذوي الإعاقة</label>
-                    <InputNumber @bind-Value="item.Disabilities" class="form-control" disabled="@ReadOnly" />
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-primary">بسكويت WFP (موزع)</label>
-                    <InputNumber @bind-Value="item.WFPBiscDist" class="form-control" disabled="@ReadOnly" />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-danger">بسكويت WFP (تالف/مفقود)</label>
-                    <InputNumber @bind-Value="item.WFPBiscLost" class="form-control" disabled="@ReadOnly" />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">إجمالي بسكويت WFP</label>
-                    <input type="number" class="form-control bg-warning bg-opacity-10 fw-bold" value="@item.WFPBiscTotal" readonly />
-                </div>
-                <AuthorizeView Roles="Admin">
-                <div class="col-12 mt-3">
-                    <div class="form-check">
-                        <InputCheckbox @bind-Value="item.IsLocked" id="lockCheck" class="form-check-input" disabled="@ReadOnly" />
-                        <label class="form-check-label fw-bold text-danger" for="lockCheck">
-                            إغلاق التقرير (نهائي)
-                        </label>
-                    </div>
-                </div>
-                </AuthorizeView>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div> *@
+        
 
+        
         <div class="p-3 border-top bg-light">
             <div class="row g-2 align-items-center">
 
                 <div class="col compact-field">
                     <label class="compact-label">لاجئ</label>
-                    <InputNumber @bind-Value="item.IsUNRWA" class="form-control form-control-xs shadow-sm" disabled="@ReadOnly" />
+                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.IsUNRWA" disabled />
                 </div>
 
                 <div class="col compact-field">
                     <label class="compact-label">غير لاجئ</label>
-                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.IsNotUNRWA" readonly />
+                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.IsNotUNRWA" disabled />
                 </div>
 
                 <div class="col-md-1 compact-field">
                     <label class="compact-label">إعاقة</label>
-                    <InputNumber @bind-Value="item.Disabilities" class="form-control form-control-xs shadow-sm" disabled="@ReadOnly" />
+                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.Disabilities" disabled />
                 </div>
 
                 <div class="col compact-field">
@@ -223,7 +104,7 @@
 
                 <div class="col compact-field">
                     <label class="compact-label text-dark">إجمالي البسكويت</label>
-                    <input type="number" class="form-control form-control-xs bg-warning bg-opacity-10 fw-bold shadow-sm" value="@item.WFPBiscTotal" readonly />
+                    <input type="number" class="form-control form-control-xs bg-warning bg-opacity-10 fw-bold shadow-sm" value="@item.WFPBiscTotal" disabled />
                 </div>
 
                 <div class="col-auto pt-2">
@@ -276,8 +157,8 @@
         if (user.IsInRole("Admin") )
             ReadOnly = false;
         else
-        if (item.ReportDate != DateOnly.FromDateTime(DateTime.Now) && item.IsLocked)
-            ReadOnly = true;
+            if (/* item.ReportDate != DateOnly.FromDateTime(DateTime.Now) && */ item.IsLocked)
+                ReadOnly = item.IsLocked;
     }
 
     private async Task SaveCenter()
@@ -288,13 +169,19 @@
         {
             Center center = reportToSave.Center;
             reportToSave.Center = null;
+
+            if (UserRole!="Admin")
+                reportToSave.IsLocked = true;
+
+            reportToSave.LockedAt = DateTime.Now;
+            reportToSave.LockedBy = UserName;
             var response = await DailyReportApi.UpdateDailyReport(reportToSave);
             if (response.Success)
                 MudSnackbar.Add(response.Message, Severity.Success);
             else
                 MudSnackbar.Add(response.Message, Severity.Error);
-
             item.Center = center;
+            StateHasChanged();
         }
     }
 }

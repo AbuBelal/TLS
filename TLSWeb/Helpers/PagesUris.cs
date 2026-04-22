@@ -57,5 +57,10 @@
             public const string Edit = PriorUrl + "/Edit";
             public const string DailyReport = PriorUrl + "/DailyReport";
         }
+
+        public static class AuditLogPages
+        {
+            public const string Manage = "/admin/audit-logs";
+        }
     }
 }

@@ -114,6 +114,7 @@ namespace APIServerLib.Repositories.Implemntations
                  query = _context.Employees
                     .Where(e => CenterId==0 ? true: e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().CenterId == CenterId)
                     .AsNoTracking()
+                    .OrderBy(e=> e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name)
                     .Include(e => e.Gender)
                     .Include(e => e.Job)
                     .Include(e => e.Specialization)

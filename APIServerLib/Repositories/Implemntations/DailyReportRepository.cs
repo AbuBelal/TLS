@@ -191,6 +191,9 @@ namespace APIServerLib.Repositories.Implemntations
                .Where(sc => sc.CenterId == Center.Id)
                .Select(sc => sc.Student!)
                .ToList();
+                //
+                dly.IsUNRWA = students.Count(s => s.IsUnrwa);
+                dly.Disabilities = students.Count(s => s.IsSpecialNeeds);
 
                 var levelMales = new Dictionary<string, int>();
                 var levelFemales = new Dictionary<string, int>();

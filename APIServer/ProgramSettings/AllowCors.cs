@@ -11,10 +11,10 @@
             {
                 options.AddPolicy(CorsPolicyName,
                     policy => policy.WithOrigins(WebAppUrl!) // تأكد من مطابقة بورت الـ Client
-                        .AllowCredentials()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        );
+                    .AllowCredentials()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    );
             });
 
             return builder;

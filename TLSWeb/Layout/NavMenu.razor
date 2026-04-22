@@ -218,25 +218,35 @@
             @if (openGroup == "reports")
             {
                 <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
-                     <AuthorizeView Roles="@Roles.Admin">
-                <a href="@PagesUris.Admin.DetailedCentersReport" class="@SubLinkClass" @onclick="CloseSidebar">
-                  <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                  <span>تقرير مفصل للمراكز</span>
-                </a>
 
-                  <a href="@PagesUris.StudentsPages.NewStudentsReport" class="@SubLinkClass" @onclick="CloseSidebar">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                        <span>تقرير الطلاب الجدد</span>
-                  </a>
+                    <AuthorizeView Roles="@Roles.Admin">
 
-                  <a href="@PagesUris.EmployeesPages.NewEmployeesReport" class="@SubLinkClass" @onclick="CloseSidebar">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                        <span>تقرير الموظفين الجدد</span>
-                  </a>
-                  </AuthorizeView>
+                        <a href="@PagesUris.Admin.DetailedCentersReport" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>تقرير مفصل للمراكز</span>
+                        </a>
+
+                        <a href="@PagesUris.StudentsPages.NewStudentsReport" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>تقرير الطلاب الجدد</span>
+                        </a>
+
+                        <a href="@PagesUris.EmployeesPages.NewEmployeesReport" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>تقرير الموظفين الجدد</span>
+                        </a>
+
+                        <a href="@PagesUris.AuditLogPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>سجل الأحداث</span>
+                        </a>
+
+
+                    </AuthorizeView>
+
                   <a href="@PagesUris.CenterPages.DailyReport" class="@SubLinkClass" @onclick="CloseSidebar">
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                        <span>تقرير حضور الطلاب اليومي</span>
+                        <span>التقرير اليومي</span>
                   </a>
               </div>
             }

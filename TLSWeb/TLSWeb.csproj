@@ -28,8 +28,4 @@
     <ProjectReference Include="..\TLSClientSharedLib\TLSClientSharedLib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Admin\" />
-  </ItemGroup>
-
 </Project>

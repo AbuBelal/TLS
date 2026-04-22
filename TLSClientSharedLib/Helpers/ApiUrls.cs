@@ -170,5 +170,14 @@ namespace TLSClientSharedLib.Helpers
             public const string DailyReport = PriorUrl + "/daily-report";
             public const string LockDailyReport = PriorUrl + "/lock-daily-report";
         }
+
+        public static class AuditLog
+        {
+            public const string PriorUrl = "/api/AuditLog";
+            public const string GetAll = PriorUrl;
+            public const string GetByUserId = PriorUrl + "/user/{userId}";
+            public const string GetByEntityType = PriorUrl + "/entity/{entityType}";
+            public const string Paginated = PriorUrl + "/paginated";
+        }
     }
 }

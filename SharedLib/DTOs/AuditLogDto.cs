@@ -20,9 +20,11 @@ namespace SharedLib.DTOs
         public string? SearchText { get; set; }
         public string? Action { get; set; }
         public string? EntityType { get; set; }
+        public string? Details { get; set; }
         public string? UserId { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public bool SortDescending { get; set; } = true;  // ← جديد: ترتيب تنازلي افتراضياً
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 20;
     }

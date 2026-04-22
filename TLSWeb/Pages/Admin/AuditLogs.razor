@@ -1,0 +1,216 @@
+﻿@attribute [Route(PagesUris.AuditLogPages.Manage)]
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi bi-clock-history me-2 text-primary"></i>سجل الأحداث
+        </h3>
+    </div>
+
+    @* ── بطاقة التصفية ── *@
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-funnel text-primary"></i>
+                <h6 class="mb-0 fw-bold text-secondary">تصفية وبحث</h6>
+            </div>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-muted small">بحث نصي</label>
+                    <input type="text" class="form-control" placeholder="اسم المستخدم أو التفاصيل..."
+                           @bind="searchText" @bind:event="oninput" @bind:after="OnSearchChanged" />
+                </div>
+
+               @*  <div class="col-md-2">
+                    <label class="form-label fw-semibold text-muted small">المستخدم</label>
+                    <input type="text" class="form-control" placeholder="معرف المستخدم..."
+                           @bind="selectedUserId" @bind:event="oninput" @bind:after="OnFilterChangedAsync" />
+                </div> *@
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-muted small">الإجراء </label>
+                    @* <input type="text" class="form-control" placeholder="اختر نوع الإجراء..."
+                           @bind ="ActionType" @bind:event="oninput" @bind:after="OnFilterChangedAsync" />*@
+                    <select class="form-select" @bind="ActionType" @bind:after="OnFilterChangedAsync">
+                        <option value="">كل الإجراءات</option>
+                        <option value="Create">إنشاء</option>
+                        <option value="Update">تحديث</option>
+                        <option value="Delete">حذف</option>
+                        @* <option value="Login">تسجيل دخول</option>
+                        <option value="Logout">تسجيل خروج</option> *@
+                        </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-muted small">تفاصيل الحركة</label>
+                    <input type="text" class="form-control" placeholder="تفاصيل الحركة..."
+                           @bind="Details" @bind:event="oninput" @bind:after="OnFilterChangedAsync" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-muted small">من تاريخ</label>
+                    <input type="date" class="form-control"
+                           @bind="fromDate" @bind:after="OnFilterChangedAsync" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-muted small">إلى تاريخ</label>
+                    <input type="date" class="form-control"
+                           @bind="toDate" @bind:after="OnFilterChangedAsync" />
+                </div>
+
+               @*  <div class="col-md-2">
+                    <label class="form-label fw-semibold text-muted small">الترتيب</label>
+                    <select class="form-select" @bind="sortDescending" @bind:after="OnFilterChangedAsync">
+                        <option value="true">تنازلي (الأحدث أولاً)</option>
+                        <option value="false">تصاعدي (الأقدم أولاً)</option>
+                    </select>
+                </div> *@
+
+                <div class="col-md-1">
+                    <button class="btn btn-outline-secondary w-100" @onclick="ResetFiltersAsync">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ── شريط المعلومات ── *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">
+            <i class="bi bi-clipboard-data me-1"></i> عدد النتائج: <strong>@totalCount</strong>
+        </span>
+        <div class="d-flex align-items-center gap-2 text-muted small">
+            <span>عرض:</span>
+            <select class="form-select form-select-sm" style="width: 80px;"
+                    @bind="pageSize" @bind:after="OnPageSizeChangedAsync">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span>لكل صفحة</span>
+        </div>
+    </div>
+
+    @* ── التحميل ── *@
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+            <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
+        </div>
+    }
+    else if (!auditLogs.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="fs-5 fw-semibold">لا توجد بيانات للعرض</p>
+            <p class="small">جرب تغيير الفلاتر</p>
+        </div>
+    }
+    else
+    {
+        @* ── الجدول ── *@
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>المستخدم</th>
+                            <th>الإجراء</th>
+                            <th>نوع الكيان</th>
+                            <th>معرف الكيان</th>
+                            <th>التفاصيل</th>
+                            <th>عنوان IP</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var row = 0;
+                        }
+                        @foreach (var log in auditLogs)
+                        {
+                            row++;
+                            <tr>
+                                <td class="text-muted small">@(((currentPage - 1) * pageSize) + row)</td>
+                                <td>
+                                    <div class="fw-semibold">@log.UserName</div>
+                                    <small class="text-muted">@log.UserId</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-dark">@log.Action</span>
+                                </td>
+                                <td>@log.EntityType</td>
+                                <td><code class="bg-light text-dark px-2 py-1 rounded">@(log.EntityId ?? "-")</code></td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(log.Details) && log.Details.Length > 80)
+                                    {
+                                        <span title="@log.Details">@log.Details.Substring(0, 80)...</span>
+                                    }
+                                    else
+                                    {
+                                        @log.Details
+                                    }
+                                </td>
+                                <td><code class="bg-light text-dark px-1 rounded small">@(log.IpAddress ?? "-")</code></td>
+                                <td class="small" dir="ltr">@log.Timestamp.ToLocalTime().ToString("yyyy/MM/dd-HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @* ── ترقيم الصفحات ── *@
+        @if (totalPages > 1)
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">
+                            عرض @(((currentPage - 1) * pageSize) + 1)
+                            إلى @(Math.Min(currentPage * pageSize, totalCount))
+                            من أصل @totalCount
+                        </span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(1))">
+                                        <i class="bi bi-chevron-double-right"></i>
+                                    </button>
+                                </li>
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(currentPage - 1))">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </li>
+                                @foreach (var pageNo in GetPageNumbers())
+                                {
+                                    <li class="page-item @(pageNo == currentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="@(() => GoToPageAsync(pageNo))">@pageNo</button>
+                                    </li>
+                                }
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(currentPage + 1))">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                </li>
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="@(() => GoToPageAsync(totalPages))">
+                                        <i class="bi bi-chevron-double-left"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

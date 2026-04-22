@@ -19,3 +19,26 @@
     font-size: 0.85rem;
     height: calc(1.5em + 0.5rem + 2px);
 }
+
+/* تحسينات إضافية للمظهر */
+.table th, .table td {
+    padding: 0.75rem 0.4rem !important;
+    vertical-align: middle;
+}
+
+.badge {
+    font-family: 'Courier New', Courier, monospace; /* اختيار اختياري للأرقام */
+    font-size: 0.85rem;
+    min-width: 35px;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+/* تمييز بصري بسيط لعمود الإجمالي */
+.bg-opacity-10 {
+    border-left: 2px solid rgba(0,0,0,0.1) !important;
+}
+
+
+

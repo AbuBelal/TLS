@@ -97,6 +97,12 @@ namespace TLSWeb.Helpers
                    c.BaseAddress = new Uri(ApiUrls.BaseUrl);
                }).AddHttpMessageHandler<CookieHandler>();
 
+            builder.Services.AddRefitClient<IAuditLogApi>()
+           .ConfigureHttpClient(c =>
+           {
+               c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+           }).AddHttpMessageHandler<CookieHandler>();
+
 
             //services.AddTransient<CookieHandler>();
             builder.Services.AddScoped<IUserService, UserService>();
