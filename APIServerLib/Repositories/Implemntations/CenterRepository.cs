@@ -45,6 +45,10 @@ namespace APIServerLib.Repositories.Implemntations
             userCenter.OtherSpaces = dto.OtherSpaces;
             userCenter.Comments = dto.Comments;
             userCenter.WhoursId = dto.WHours;
+            userCenter.EnName = dto.EnName;
+            userCenter.SortOrder = dto.SortOrder;
+            userCenter.BuildingCode = dto.BuildingCode;
+
 
             _context.Centers.Update(userCenter);
             await _context.SaveChangesAsync();

@@ -21,6 +21,7 @@ else
     override protected async Task OnInitializedAsync()
     {
         centers = await CenterApi.GetAll();
+        centers = centers.OrderBy(c => c.SortOrder).ToList();
 
         bool IsAdmin = false;
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();

@@ -20,5 +20,9 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.Reports.UpdateDailyReport)]
         Task<GeneralResponse> UpdateDailyReport([Body] DailyReport dailyReport);
 
+        /// <summary>تصدير التقارير اليومية (POST لأن الفلاتر في الـ body)</summary>
+        [Post(ApiUrls.Reports.ExportDailyReport)]
+        Task<HttpResponseMessage> Export( DateOnly date);
+
     }
 }

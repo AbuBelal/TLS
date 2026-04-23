@@ -97,6 +97,7 @@ namespace TLSClientSharedLib.Helpers
             public const string DailyReport = PriorUrl;
             public const string DailyReportForDate = PriorUrl + "/for-date";
             public const string UpdateDailyReport = PriorUrl ;
+            public const string ExportDailyReport = PriorUrl+"/export" ;
         }
 
         public static class EmpCenter

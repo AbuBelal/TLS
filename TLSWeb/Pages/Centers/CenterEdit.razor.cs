@@ -74,6 +74,9 @@ public partial class CenterEdit : ComponentBase
         Model.OtherSpaces = c.OtherSpaces ?? 0;
         Model.Comments    = c.Comments;
         Model.WHours    = c.WhoursId;
+        Model.EnName    = c.EnName;
+        Model.SortOrder    = c.SortOrder;
+        Model.BuildingCode    = c.BuildingCode;
 
         // تحليل DaysOfWeek إلى Checkboxes
         SelectedDays.Clear();
@@ -97,6 +100,9 @@ public partial class CenterEdit : ComponentBase
         c.OtherSpaces = Model.OtherSpaces;
         c.Comments = Model.Comments;
         c.DaysOfWeek = Model.DaysOfWeek;
+        c.EnName = Model.EnName;
+        c.SortOrder = Model.SortOrder;
+        c.BuildingCode = Model.BuildingCode;
         return c;
     }
 

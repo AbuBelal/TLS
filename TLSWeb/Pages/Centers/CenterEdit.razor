@@ -4,10 +4,8 @@
 @* ╚══════════════════════════════════════════════════════════════╝ *@
 
 @attribute [Route(PagesUris.CenterPages.Edit)]
-@* @page "/Center/Edit" *@
-@* @attribute [Authorize(Roles = SharedLib.Fixed.Roles.User)] *@
 
-<div class="container-fluid px-4 border" dir="rtl" style="background:@BackgroundColor">
+<div class="container-fluid px-4 border-2 " dir="rtl" style="background:@BackgroundColor">
 
     @* ══ رأس الصفحة ══ *@
     <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
@@ -75,6 +73,38 @@
                                                class="form-control"
                                                placeholder="مثال: JB-001" />
                                     <ValidationMessage For="@(() => Model.CenterCode)" class="text-danger small" />
+                                </div>
+                                @*  اسم المركز بالانجليزية*@
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold text-muted small">
+                                        اسم المركز بالإنجليزية <span class="text-danger">*</span>
+                                    </label>
+                                    <InputText @bind-Value="Model.EnName" disabled=@(!IsAdmin)
+                                               class="form-control"
+                                               placeholder=" أدخل اسم المركز بالإنجليزية" />
+                                    <ValidationMessage For="@(() => Model.EnName)" class="text-danger small" />
+                                </div>
+
+                                @* رقم المبنى *@
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-muted small">
+                                        رقم المبنى
+                                    </label>
+                                    <InputText @bind-Value="Model.BuildingCode" disabled=@(!IsAdmin)
+                                               class="form-control"
+                                               placeholder="2xxxxxx" />
+                                    <ValidationMessage For="@(() => Model.BuildingCode)" class="text-danger small" />
+                                </div>
+
+                                @* ترتيب العرض *@
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-muted small">
+                                        ترتيب العرض
+                                    </label>
+                                    <InputNumber @bind-Value="Model.SortOrder" disabled=@(!IsAdmin)
+                                               class="form-control"
+                                               placeholder="01" />
+                                    <ValidationMessage For="@(() => Model.SortOrder)" class="text-danger small" />
                                 </div>
 
                                 @* العنوان *@
