@@ -2,24 +2,24 @@
     <div class="d-flex flex-column gap-1">
         @if(Readonly)
         {
-        <input type="number" name=@($"item.{MalePropertyName}") disabled="@((MaleReg <= 0) ? "disabled" : null)"
+            <input type="text" inputmode="numeric" pattern="\d*" name=@($"item.{MalePropertyName}") disabled="@((MaleReg <= 0) ? "disabled" : null)"
                value="@GetValue()" @onchange="SetValue"
                class="form-control form-control-sm text-center border-success )"
                min="0" max="@item.RegMale01" placeholder="♂" readonly >
 
-        <input type="number" name=@($"item.{FemalePropertyName}") disabled="@((FemaleReg <= 0) ? "disabled" : null)"
+            <input type="text" inputmode="numeric" pattern="\d*" name=@($"item.{FemalePropertyName}") disabled="@((FemaleReg <= 0) ? "disabled" : null)"
                value="@GetValue1()" @onchange="SetValue1"
                class="form-control form-control-sm text-center border-success "
                min="0" max="@item.RegFemale01" placeholder="♀" readonly>
         }
         else
         {
-            <input type="number" name=@($"item.{MalePropertyName}") disabled="@((MaleReg <= 0) ? "disabled" : null)"
+            <input type="text" inputmode="numeric" pattern="\d*" name=@($"item.{MalePropertyName}") disabled="@((MaleReg <= 0) ? "disabled" : null)"
                    value="@GetValue()" @onchange="SetValue"
                    class="form-control form-control-sm text-center border-success )"
                    min="0" max="@item.RegMale01" placeholder="♂">
 
-            <input type="number" name=@($"item.{FemalePropertyName}") disabled="@((FemaleReg <= 0) ? "disabled" : null)"
+            <input type="text" inputmode="numeric" pattern="\d*" name=@($"item.{FemalePropertyName}") disabled="@((FemaleReg <= 0) ? "disabled" : null)"
                    value="@GetValue1()" @onchange="SetValue1"
                    class="form-control form-control-sm text-center border-success "
                    min="0" max="@item.RegFemale01" placeholder="♀">

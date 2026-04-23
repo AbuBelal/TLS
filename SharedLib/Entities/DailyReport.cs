@@ -72,11 +72,13 @@ namespace SharedLib.Entities
         public int? WFPBiscLost { get; set; }
 
         [NotMapped]
-        public int? IsNotUNRWA => RegTotal - (IsUNRWA ?? 0);
+        public int? IsNotUNRWA => AttTotal - (IsUNRWA ?? 0);
         [NotMapped]
         public int? WFPBiscTotal  => (WFPBiscDist ?? 0) + (WFPBiscLost ?? 0);
 
         //Calculated fields
+        [NotMapped]
+        public int? RegUNRWA { get; set; }
         [NotMapped]
         public int RegStd01=> (RegMale01 ?? 0) + (RegFemale01 ?? 0);
         [NotMapped]

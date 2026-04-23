@@ -126,6 +126,6 @@ code {
     border-radius: 0.5rem !important;
 }
 
-    .form-select:focus {
-        border-radius: 0.5rem !important;
-    }
+.form-select:focus {
+    border-radius: 0.5rem !important;
+}

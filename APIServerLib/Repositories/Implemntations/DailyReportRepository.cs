@@ -192,7 +192,7 @@ namespace APIServerLib.Repositories.Implemntations
                .Select(sc => sc.Student!)
                .ToList();
                 //
-                dly.IsUNRWA = students.Count(s => s.IsUnrwa);
+                dly.RegUNRWA = students.Count(s => s.IsUnrwa);
                 dly.Disabilities = students.Count(s => s.IsSpecialNeeds);
 
                 var levelMales = new Dictionary<string, int>();

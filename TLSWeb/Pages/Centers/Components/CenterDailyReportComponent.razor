@@ -30,10 +30,12 @@
                             {
                                 var male = item.GetType().GetProperty($"RegMale0{i}")?.GetValue(item, null) ?? 0;
                                 var female = item.GetType().GetProperty($"RegFemale0{i}")?.GetValue(item, null) ?? 0;
-                                <td>
+                                string regmalestr = $"RegMale0{i}";
+                                string regfemalestr = $"RegFemale0{i}";
+                            <td>
                                     <div class="d-grid gap-1">
-                                        <span class="badge bg-info text-dark py-1">@male</span>
-                                        <span class="badge bg-light border text-dark py-1">@female</span>
+                                    <span class="badge bg-info text-dark py-1" @onclick="@(() => OnRegValueClick(regmalestr))">@male</span>
+                                    <span class="badge bg-light border text-dark py-1" @onclick="@(() => OnRegValueClick(regfemalestr))">@female</span>
                                     </div>
                                 </td>
                             }
@@ -78,12 +80,12 @@
             <div class="row g-2 align-items-center">
 
                 <div class="col compact-field">
-                    <label class="compact-label">لاجئ</label>
-                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.IsUNRWA" disabled />
+                    <label class="compact-label"> لاجىء حاضر</label>
+                    <InputNumber @bind-Value="item.IsUNRWA" class="form-control form-control-xs border-danger shadow-sm" disabled="@ReadOnly" />
                 </div>
 
                 <div class="col compact-field">
-                    <label class="compact-label">غير لاجئ</label>
+                    <label class="compact-label">غير لاجئ حاضر</label>
                     <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.IsNotUNRWA" disabled />
                 </div>
 
@@ -167,6 +169,17 @@
 
         if (reportToSave != null)
         {
+            if (reportToSave.IsUNRWA > reportToSave.RegUNRWA)
+            {
+                MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور أكبر من المسجلين !", Severity.Error);
+                return;
+            }
+            else
+             if (reportToSave.IsUNRWA ==0 && reportToSave.RegUNRWA > 0)
+            {
+                MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور صفر !", Severity.Error);
+                return;
+            }
             Center center = reportToSave.Center;
             reportToSave.Center = null;
 
@@ -183,5 +196,15 @@
             item.Center = center;
             StateHasChanged();
         }
+    }
+
+    void OnRegValueClick(string propertyName)
+    {
+
+        if (ReadOnly) return;
+
+        var regValue = item.GetType().GetProperty(propertyName)?.GetValue(item, null) ?? 0;
+        string AttName = propertyName.Replace("Reg", "Att");
+        item.GetType().GetProperty(AttName)?.SetValue(item, regValue);
     }
 }

@@ -47,20 +47,20 @@ else
         DailyReports =await DailyReportApi.GetDailyReport();
     }
 
-    private async Task SaveCenter(long CenterId)
-    {
-        var reportToSave = DailyReports.FirstOrDefault(r => r.CenterId == CenterId);
+    // private async Task SaveCenter(long CenterId)
+    // {
+    //     var reportToSave = DailyReports.FirstOrDefault(r => r.CenterId == CenterId);
 
-        if (reportToSave != null)
-        {
-            reportToSave.Center = null;
-            var response = await DailyReportApi.UpdateDailyReport(reportToSave);
-            if (response.Success)
-                MudSnackbar.Add(response.Message, Severity.Success);
-            else
-                MudSnackbar.Add(response.Message, Severity.Error);
-        }
-    }
+    //     if (reportToSave != null)
+    //     {
+    //         reportToSave.Center = null;
+    //         var response = await DailyReportApi.UpdateDailyReport(reportToSave);
+    //         if (response.Success)
+    //             MudSnackbar.Add(response.Message, Severity.Success);
+    //         else
+    //             MudSnackbar.Add(response.Message, Severity.Error);
+    //     }
+    // }
     private async Task OnDateChanged()
     {
         DailyReports = null;
