@@ -24,5 +24,8 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.Reports.ExportDailyReport)]
         Task<HttpResponseMessage> Export( DateOnly date);
 
+        [Get(ApiUrls.Reports.GetBuildingTotalDist)]
+        Task<decimal> GetBuildingTotalDist(string? BuildingId = null);
+
     }
 }

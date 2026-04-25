@@ -1,0 +1,116 @@
+﻿@* Components/Calculator.razor *@
+<div class="card border-success shadow-sm">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold small"><i class="bi bi-calculator me-1"></i> حاسبة</span>
+        <button type="button" class="btn btn-sm btn-link text-white p-0" @onclick="OnClose">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="card-body p-2">
+        @* الشاشة *@
+        <div class="form-control text-end fw-bold fs-5 mb-2 bg-light" style="min-height: 42px; direction: ltr;">
+            @Display
+        </div>
+
+        @* الأزرار *@
+        <div class="row g-1">
+            <div class="col-3"><button class="btn btn-outline-danger w-100 py-2" @onclick="Clear">C</button></div>
+            <div class="col-3"><button class="btn btn-outline-secondary w-100 py-2" @onclick="() => AppendOperator('/')">÷</button></div>
+            <div class="col-3"><button class="btn btn-outline-secondary w-100 py-2" @onclick="() => AppendOperator('*')">×</button></div>
+            <div class="col-3"><button class="btn btn-outline-secondary w-100 py-2" @onclick="Backspace">⌫</button></div>
+
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('7')">7</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('8')">8</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('9')">9</button></div>
+            <div class="col-3"><button class="btn btn-outline-secondary w-100 py-2" @onclick="() => AppendOperator('-')">−</button></div>
+
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('4')">4</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('5')">5</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('6')">6</button></div>
+            <div class="col-3"><button class="btn btn-outline-secondary w-100 py-2" @onclick="() => AppendOperator('+')">+</button></div>
+
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('1')">1</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('2')">2</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('3')">3</button></div>
+            <div class="col-3" rowspan="2">
+                <button class="btn btn-success w-100 py-2 h-100" @onclick="Calculate">=</button>
+            </div>
+
+            <div class="col-6"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('0')">0</button></div>
+            <div class="col-3"><button class="btn btn-light border w-100 py-2" @onclick="() => Append('.')">.</button></div>
+        </div>
+
+        <button class="btn btn-success w-100 mt-2" @onclick="Confirm">
+            <i class="bi bi-check-lg me-1"></i> تأكيد القيمة
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<decimal> OnConfirm { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string Display = "0";
+    private string previous = "";
+    private char? op = null;
+    private bool resetNext = false;
+
+    private void Append(char c)
+    {
+        if (resetNext || Display == "0")
+        {
+            Display = c.ToString();
+            resetNext = false;
+        }
+        else
+        {
+            Display += c;
+        }
+    }
+
+    private void AppendOperator(char newOp)
+    {
+        if (op.HasValue) Calculate();
+        previous = Display;
+        op = newOp;
+        resetNext = true;
+    }
+
+    private void Calculate()
+    {
+        if (!op.HasValue || !decimal.TryParse(previous, out var a)) return;
+        if (!decimal.TryParse(Display, out var b)) return;
+
+        Display = op.Value switch
+        {
+            '+' => (a + b).ToString("G"),
+            '-' => (a - b).ToString("G"),
+            '*' => (a * b).ToString("G"),
+            '/' => b != 0 ? (a / b).ToString("G") : "0",
+            _ => Display
+        };
+
+        op = null;
+        resetNext = true;
+    }
+
+    private void Clear()
+    {
+        Display = "0";
+        previous = "";
+        op = null;
+    }
+
+    private void Backspace()
+    {
+        Display = Display.Length > 1 ? Display[..^1] : "0";
+    }
+
+    private async Task Confirm()
+    {
+        if (decimal.TryParse(Display, out var value))
+        {
+            await OnConfirm.InvokeAsync(value);
+        }
+    }
+}

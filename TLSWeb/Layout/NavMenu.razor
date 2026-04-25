@@ -254,10 +254,33 @@
             <AuthorizeView Roles="@Roles.Admin">
         @* الإعدادات *@
         <div>
+            <button class="@GroupBtnClass("InCome")"
+                    @onclick='() => ToggleGroup("InCome")'>
+                <span class="material-symbols-outlined" style="font-size:20px">settings</span>
+                <span class="flex-1 text-right">الوارد</span>
+                <span class="material-symbols-outlined @ChevronClass("InCome")" style="font-size:18px">
+                    expand_more
+                </span>
+            </button>
+            @if (openGroup == "InCome")
+            {
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <a href="@PagesUris.InComePages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>الوارد</span>
+                    </a>
+                    <a href="@PagesUris.InComePages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>إضافة وارد</span>
+                    </a>
+                </div>
+            }
+        </div>
+        <div>
             <button class="@GroupBtnClass("settings")"
                     @onclick='() => ToggleGroup("settings")'>
                 <span class="material-symbols-outlined" style="font-size:20px">settings</span>
-                <span class="flex-1 text-right">الإعدادات</span>
+                <span class="flex-1 text-right">الإدارة</span>
                 <span class="material-symbols-outlined @ChevronClass("settings")" style="font-size:18px">
                     expand_more
                 </span>
@@ -268,6 +291,11 @@
                     <a href="@PagesUris.Admin.EditCenters" class="@SubLinkClass" @onclick="CloseSidebar">
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                         <span>المراكز</span>
+                    </a>
+
+                    <a href="@PagesUris.InComePages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>الوارد</span>
                     </a>
                    @*  <a href="#" class="@SubLinkClass" @onclick="CloseSidebar">
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>

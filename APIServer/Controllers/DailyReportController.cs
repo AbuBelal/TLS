@@ -55,5 +55,12 @@ namespace APIServer.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);
         }
+
+        [HttpGet("building-total-dist")]
+        public async Task<ActionResult<decimal>> GetBuildingTotalDist([FromQuery] string? BuildingId = null)
+        {
+            var total = await _repo.GetBuildingTotalDistAsync(BuildingId);
+            return Ok(total);
+        }
     }
 }

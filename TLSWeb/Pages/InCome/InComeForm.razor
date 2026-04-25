@@ -1,0 +1,290 @@
+﻿@* Pages/Incomes/InComeForm.razor *@
+@using SharedLib.Mapper
+@attribute [Route(PagesUris.InComePages.Add)]
+@attribute [Route(PagesUris.InComePages.Edit + "/{Id:long}")]
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi @(IsEdit ? "bi-pencil-square" : "bi-plus-circle") me-2 text-success"></i>
+            @(IsEdit ? "تعديل وارد" : "إضافة وارد جديد")
+        </h3>
+        <button class="btn btn-outline-secondary shadow-sm" @onclick="GoBack">
+            <i class="bi bi-arrow-right me-1"></i> رجوع
+        </button>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cash-coin me-2"></i>
+                        بيانات الوارد
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (isLoading)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-success" role="status"></div>
+                            <p class="mt-2 text-muted">جاري التحميل...</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="model" OnValidSubmit="HandleSubmitAsync">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary class="alert alert-danger" />
+
+                            @* اسم الإيراد *@
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-tag me-1 text-success"></i>
+                                    اسم الوارد <span class="text-danger">*</span>
+                                </label>
+                                <InputText class="form-control form-control-lg" 
+                                           @bind-Value="model.Name" 
+                                           placeholder="أدخل اسم الوارد" />
+                                <ValidationMessage For="@(() => model.Name)" class="text-danger small mt-1" />
+                            </div>
+
+                            @* المركز *@
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-building me-1 text-success"></i>
+                                    المركز <span class="text-danger">*</span>
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="model.CenterId">
+                                    <option value="0">-- اختر المركز --</option>
+                                    @foreach (var center in centers)
+                                    {
+                                        <option value="@center.Id">@center.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => model.CenterId)" class="text-danger small mt-1" />
+                            </div>
+
+                            @* المبلغ مع الحاسبة *@
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-currency-exchange me-1 text-success"></i>
+                                    الكمية <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <InputNumber class="form-control text-end fw-bold fs-5" 
+                                                 @bind-Value="model.Qnty" 
+                                                 step="0.01"
+                                                 placeholder="0" />
+                                    <button type="button" 
+                                            class="btn btn-outline-success" 
+                                            @onclick="ToggleCalculator"
+                                            title="فتح الحاسبة">
+                                        <i class="bi bi-calculator fs-5"></i>
+                                    </button>
+                                </div>
+                                <ValidationMessage For="@(() => model.Qnty)" class="text-danger small mt-1" />
+
+                                @* الحاسبة المنبثقة *@
+                                @if (showCalculator)
+                                {
+                                    <div class="mt-2">
+                                        <Calculator OnConfirm="OnCalculatorConfirm" OnClose="ToggleCalculator" />
+                                    </div>
+                                }
+                            </div>
+
+                            @* التاريخ *@
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-calendar-date me-1 text-success"></i>
+                                    التاريخ <span class="text-danger">*</span>
+                                </label>
+                                <InputDate class="form-control" @bind-Value="model.Date" />
+                                <ValidationMessage For="@(() => model.Date)" class="text-danger small mt-1" />
+                            </div>
+
+                            @* اسم المستلم *@
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-person me-1 text-success"></i>
+                                    اسم المستلم
+                                </label>
+                                <InputText class="form-control" 
+                                           @bind-Value="model.RecipientName" 
+                                           placeholder="اسم المستلم (اختياري)" />
+                            </div>
+
+                            @* الملاحظات *@
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-chat-left-text me-1 text-success"></i>
+                                    ملاحظات
+                                </label>
+                                <InputTextArea class="form-control" 
+                                               @bind-Value="model.Comments" 
+                                               rows="3" 
+                                               placeholder="أي ملاحظات إضافية..." />
+                            </div>
+
+                            @* الأزرار *@
+                            <div class="d-flex gap-2 justify-content-end border-top pt-3">
+                                <button type="button" class="btn btn-light" @onclick="GoBack" disabled="@isSaving">
+                                    <i class="bi bi-x-lg me-1"></i> إلغاء
+                                </button>
+                                <button type="submit" class="btn btn-success px-4" disabled="@isSaving">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-1"></span>
+                                        <span>جاري الحفظ...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        <span>@(IsEdit ? "حفظ التعديلات" : "إضافة الوارد")</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private InComeFormDto model = new();
+    private List<Center> centers = new();
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private bool showCalculator = false;
+
+    private bool IsEdit => Id > 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCentersAsync();
+
+        if (IsEdit)
+        {
+            await LoadIncomeAsync();
+        }
+        else
+        {
+            model.Date = DateOnly.FromDateTime(DateTime.Now);
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadCentersAsync()
+    {
+        try
+        {
+            centers = await CenterApi.GetAll();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading centers: {ex.Message}");
+        }
+    }
+
+    private async Task LoadIncomeAsync()
+    {
+        try
+        {
+            var income = await InComeApi.GetById(Id);
+            if (income is null)
+            {
+                NavManager.NavigateTo(PagesUris.InComePages.Manage);
+                return;
+            }
+
+            model = new InComeFormDto
+            {
+                Id = income.Id,
+                Name = income.Name,
+                CenterId = income.CenterId,
+                Qnty = income.Qnty,
+                Date = income.Date,
+                RecipientName = income.RecipientName,
+                Comments = income.Comments
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading income: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        isSaving = true;
+        try
+        {
+            bool success=false;
+            if (IsEdit)
+            {
+                var updateincomedto = new UpdateInComeDto
+                (
+                    Name : model.Name,
+                    CenterId : model.CenterId,
+                    Qnty : model.Qnty,
+                    Date : model.Date,
+                    RecipientName : model.RecipientName,
+                    Comments : model.Comments
+                );
+                var x = await InComeApi.Update(model.Id,updateincomedto);
+                if (x is not null)
+                    success = true;
+            }
+            else
+            {
+                var createincomedto = new CreateInComeDto
+                (
+                    Name: model.Name,
+                    CenterId: model.CenterId,
+                    Qnty: model.Qnty,
+                    Date: model.Date,
+                    RecipientName: model.RecipientName,
+                    Comments: model.Comments
+                );
+                var x = await InComeApi.Create(createincomedto);
+                if (x is not null)
+                    success = true;
+                
+            }
+
+            if (success)
+            {
+                NavManager.NavigateTo(PagesUris.InComePages.Manage);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving income: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void ToggleCalculator() => showCalculator = !showCalculator;
+
+    private void OnCalculatorConfirm(decimal value)
+    {
+        model.Qnty = value;
+        showCalculator = false;
+        StateHasChanged();
+    }
+
+    private void GoBack() => NavManager.NavigateTo(PagesUris.InComePages.Manage);
+}

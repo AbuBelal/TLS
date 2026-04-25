@@ -369,5 +369,14 @@ namespace APIServerLib.Repositories.Implemntations
                 })
                 .ToListAsync();
         }
+
+        public async Task<List<Employee>> GetAllManagers()
+        {
+            return await _context.Employees.Where(e => e.Job.Name=="مدير مركز")
+                .AsNoTracking()
+                .Include(e => e.EmpCenters).ThenInclude(ec => ec.Center)
+                .ToListAsync();
+        }
+
     }
 }

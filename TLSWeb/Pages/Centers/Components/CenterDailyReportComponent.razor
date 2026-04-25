@@ -122,7 +122,8 @@
 
     <div class="card-footer bg-white text-muted small d-flex justify-content-between align-items-center p-3">
         <span><i class="bi bi-clock me-1"></i> تاريخ التقرير: @item.ReportDate.ToString("yyyy/MM/dd")</span>
-        @if (!ReadOnly)
+        <span> المتبقي من البسكويت : @Rest</span>
+            @if (!ReadOnly)
         {
             <button class="btn btn-success btn-lg px-5 shadow-sm" @onclick="() => SaveCenter()">
                 <i class="bi bi-check-circle me-2"></i>
@@ -144,6 +145,7 @@
     string UserName = string.Empty;
     string UserEmail = string.Empty;
     string UserRole = string.Empty;
+    decimal Rest = 0;
 
     protected async override Task OnInitializedAsync()
     {
@@ -161,6 +163,10 @@
         else
             if (/* item.ReportDate != DateOnly.FromDateTime(DateTime.Now) && */ item.IsLocked)
                 ReadOnly = item.IsLocked;
+
+        var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
+        var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);
+        Rest = TotalReceived - TotalDist;
     }
 
     private async Task SaveCenter()

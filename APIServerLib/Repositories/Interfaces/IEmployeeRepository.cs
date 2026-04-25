@@ -20,5 +20,6 @@ namespace APIServerLib.Repositories.Interfaces
 
         /// <summary>تصدير جميع موظفي المركز بدون فلاتر</summary>
         Task<List<EmployeeListItemDto>> GetAllByCenterAsync(long centerId);
+        Task<List<Employee>> GetAllManagers();
     }
 }

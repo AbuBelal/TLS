@@ -27,13 +27,14 @@ public partial class CenterEdit : ComponentBase
     // أيام الدوام — Checkboxes
     protected readonly string[] AllDays = { "السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة" };
     protected HashSet<string> SelectedDays { get; set; } = new();
+    List<Employee> Managers = new List<Employee>();
 
     // ── تحميل البيانات ─────────────────────────────────────────
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
+        Managers = await EmployeeApi.GetAllManagers();
         if (user.Identity!.IsAuthenticated)
         {
             var roles = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value!;
@@ -77,6 +78,7 @@ public partial class CenterEdit : ComponentBase
         Model.EnName    = c.EnName;
         Model.SortOrder    = c.SortOrder;
         Model.BuildingCode    = c.BuildingCode;
+        Model.ManagerName = Managers.FirstOrDefault(m => m.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault(ec => ec.CenterId == c.Id) != null)?.Name;
 
         // تحليل DaysOfWeek إلى Checkboxes
         SelectedDays.Clear();

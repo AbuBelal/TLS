@@ -63,6 +63,7 @@ namespace TLSClientSharedLib.Helpers
             public const string Paginated = PriorUrl + "/paginated";
             public const string ExportFiltered = PriorUrl + "/export/filtered";   // ← جديد
             public const string ExportAll = PriorUrl + "/export/all";         // ← جديد
+            public const string Managers = PriorUrl + "/Managers";         // ← جديد
         }
         public static class Student
         {
@@ -98,6 +99,7 @@ namespace TLSClientSharedLib.Helpers
             public const string DailyReportForDate = PriorUrl + "/for-date";
             public const string UpdateDailyReport = PriorUrl ;
             public const string ExportDailyReport = PriorUrl+"/export" ;
+            public const string GetBuildingTotalDist = PriorUrl + "/building-total-dist";
         }
 
         public static class EmpCenter
@@ -180,5 +182,20 @@ namespace TLSClientSharedLib.Helpers
             public const string GetByEntityType = PriorUrl + "/entity/{entityType}";
             public const string Paginated = PriorUrl + "/paginated";
         }
+
+        public static class InCome
+        {
+            public const string PriorUrl = "/api/InCome";
+            public const string GetAll = PriorUrl;
+            public const string GetById = PriorUrl + "/{id}";
+            public const string GetByCenter = PriorUrl + "/by-center/{centerId}";
+            public const string GetByDateRange = PriorUrl + "/by-date";
+            public const string GetTotal = PriorUrl + "/total";
+            public const string Insert = PriorUrl;
+            public const string Update = PriorUrl;
+            public const string DeleteById = PriorUrl + "/{id}";
+            public const string GetBuildingTotal = PriorUrl + "/Buildingtotal";
+        }
+        
     }
 }

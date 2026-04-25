@@ -16,6 +16,7 @@ public class CenterUpsertDto
     [Required(ErrorMessage = "اسم المركز مطلوب")]
     [MaxLength(200, ErrorMessage = "الاسم لا يتجاوز 200 حرف")]
     public string Name { get; set; } = string.Empty;
+    public string ManagerName { get; set; } = string.Empty;
 
     [MaxLength(50, ErrorMessage = "الكود لا يتجاوز 50 حرفاً")]
     public string? CenterCode { get; set; }

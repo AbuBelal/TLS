@@ -209,6 +209,13 @@ namespace APIServer.Controllers
                 fileName);
         }
 
+        [HttpGet("Managers")]
+        public async Task<ActionResult<List<Employee>>> GetAllManagers()
+        {
+            var managers = await _employeeRepository.GetAllManagers();
+            return Ok(managers);
+        }
+
         // ── دالة مساعدة ────────────────────────────────────────────────
         private async Task<string> GetCenterNameAsync(long centerId)
         {
@@ -247,6 +254,8 @@ namespace APIServer.Controllers
                 ? "تصفية: " + string.Join(" | ", parts)
                 : "المعروض على الشاشة";
         }
+
+
 
     }
 }

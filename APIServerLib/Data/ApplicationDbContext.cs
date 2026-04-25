@@ -22,6 +22,7 @@ namespace APIServerLib.Data
         public DbSet<StdCenter> StdCenters { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<DailyReport> DailyReports { get; set; }
+        public DbSet<InCome> InComes { get; set; }
 
 
 
@@ -124,6 +125,12 @@ namespace APIServerLib.Data
                       .HasForeignKey(a => a.UserId)
                       .OnDelete(DeleteBehavior.NoAction);
             });
+
+            modelBuilder.Entity<InCome>()
+           .HasOne(i => i.Center)
+           .WithMany() // أو .WithMany(c => c.InComes) إذا أضفت ICollection
+           .HasForeignKey(i => i.CenterId)
+           .OnDelete(DeleteBehavior.Cascade);
 
             //modelBuilder.Entity<DailyReport>(entity =>
             //{

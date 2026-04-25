@@ -22,8 +22,8 @@ namespace SharedLib.Fixed
         #endregion
 
         #region Selected
-        public const string SelectedBaseUrl     =  NorthBaseUrl  ;
-        public const string SelectedAreaAr      =  NorthAreaAr    ;
+        public const string SelectedBaseUrl     = NorthBaseUrl;
+        public const string SelectedAreaAr      =  NorthAreaAr   ;
         public const string SelectedAreaEn      = NorthAreaEn;
         #endregion
     }

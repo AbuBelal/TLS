@@ -62,5 +62,13 @@
         {
             public const string Manage = "/admin/audit-logs";
         }
+
+        public static class InComePages
+        {
+            public const string PriorUrl = "InCome";
+            public const string Manage = PriorUrl + "/Manage";
+            public const string Add = PriorUrl + "/Add";
+            public const string Edit = PriorUrl + "/Edit";
+        }
     }
 }

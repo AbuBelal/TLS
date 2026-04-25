@@ -13,6 +13,8 @@ namespace APIServerLib.Repositories.Interfaces
         Task <List<DailyReport>> GetDailyReportForDateAsync (DateOnly date);
         Task<GeneralResponse> UpdateDailyReportAsync (DailyReport dailyreport);
         Task<GeneralResponse> DeleteDailyReportAsync (long Id);
-         
+        Task<decimal> GetBuildingTotalDistAsync(string? BuildingId = null);
+
+
     }
 }

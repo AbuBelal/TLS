@@ -255,5 +255,11 @@ namespace APIServerLib.Repositories.Implemntations
                 return new GeneralResponse(true, "تم تحديث التقرير بنجاح");
             }
         }
+
+        public async Task<decimal> GetBuildingTotalDistAsync(string? BuildingId = null)
+        {
+            decimal total =await _context.DailyReports.AsNoTracking().Where(dr => dr.Center.BuildingCode== BuildingId).SumAsync(dr => dr.WFPBiscDist)??0 * 1m;
+            return total;
+        }
     }
 }

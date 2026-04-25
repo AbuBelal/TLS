@@ -51,5 +51,7 @@ namespace TLSClientSharedLib.Services.Apis
         /// <summary>تصدير جميع موظفي المركز</summary>
         [Get(ApiUrls.Employee.ExportAll)]
         Task<HttpResponseMessage> ExportAll();
+        [Get(ApiUrls.Employee.Managers)]
+        Task<List<Employee>> GetAllManagers();
     }
 }
