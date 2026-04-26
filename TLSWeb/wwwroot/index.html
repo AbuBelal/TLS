@@ -19,11 +19,11 @@
     <link rel="icon" type="image/png" href="./assets/img/favicon.png">
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
-   
+
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-   
+
     <!--end-->
     <!--begin stitch template-->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -107,8 +107,6 @@
             justify-content: center;
             padding: 40px 20px;
             box-sizing: border-box;
-
-
             opacity: 1;
             transform: translateY(30px);
             /*transition: opacity 1s ease, transform 1s ease;*/
@@ -291,7 +289,7 @@
 </head>
 
 <body dir="rtl">
-    
+
     <div id="app">
         <div class="dua-wrapper" id="dua-wrapper">
             <div class="category-label" id="category">—</div>
@@ -322,22 +320,17 @@
         <span class="dismiss">🗙</span>
     </div>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
-    <script src="_content/MudBlazor/MudBlazor.min.js?v=1"></script>
+    <!--<script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
+    <script src="_content/MudBlazor/MudBlazor.min.js?v=1"></script>-->
     <script>
         window.BlazorDownloadFile = (fileName, contentType, bytes) => {
-            // تحويل الـ bytes إلى Blob
             const blob = new Blob([new Uint8Array(bytes)], { type: contentType });
             const url = URL.createObjectURL(blob);
-
-            // إنشاء رابط مؤقت والنقر عليه
             const a = document.createElement('a');
             a.href = url;
             a.download = fileName;
             document.body.appendChild(a);
             a.click();
-
-            // تنظيف
             setTimeout(() => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
@@ -345,13 +338,11 @@
         };
     </script>
 
-
     <script>
         const API_URL = 'https://ummahapi.com/api/duas/random';
         const wrapper = document.getElementById('dua-wrapper');
-       
-        async function fetchDua() {
 
+        async function fetchDua() {
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('Network error');
@@ -364,8 +355,6 @@
 
                 document.getElementById('category').textContent = catInfo.name || data.category || '';
                 document.getElementById('Zeker').textContent = data.arabic || '';
-                //document.getElementById('transliteration').textContent = data.transliteration || '';
-                //document.getElementById('translation').textContent = data.translation || '';
                 document.getElementById('source').textContent = data.source ? '📖 ' + data.source : '';
                 document.getElementById('repeat').textContent = data.repeat ? 'التكرار: ' + data.repeat + ' مرات' : '';
                 wrapper.classList.add('visible');
@@ -373,20 +362,36 @@
             } catch (err) {
                 console.error(err);
                 document.getElementById('Zeker').textContent = '❌ حدث خطأ في تحميل الدعاء';
-                //document.getElementById('transliteration').textContent = '';
-                //document.getElementById('translation').textContent = 'يرجى التحقق من الاتصال بالإنترنت والمحاولة مرة أخرى';
                 document.getElementById('source').textContent = '';
                 document.getElementById('repeat').textContent = '';
                 document.getElementById('category').textContent = 'خطأ';
-
                 wrapper.classList.add('visible');
             }
-           
+            finally {
+                // تحميل Blazor بعد عرض الذكر (نجاح أو فشل)
+                loadBlazor();
+            }
+        }
+
+        // تأخير تحميل Blazor حتى يتم جلب الدعاء وعرضه
+        function loadBlazor() {
+            const script = document.createElement('script');
+            script.src = '_framework/blazor.webassembly#[.{fingerprint}].js';
+            script.onload = () => {
+                // تحميل MudBlazor وتسجيل service worker بعد Blazor
+                const mudScript = document.createElement('script');
+                mudScript.src = '_content/MudBlazor/MudBlazor.min.js?v=1';
+                document.body.appendChild(mudScript);
+
+                navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
+            };
+            document.body.appendChild(script);
         }
 
         fetchDua();
-       
     </script>
+</body>
+
 </body>
 
 </html>
