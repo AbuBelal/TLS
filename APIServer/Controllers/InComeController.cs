@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Responses;
 
 namespace APIServer.Controllers
 {
@@ -96,13 +97,13 @@ namespace APIServer.Controllers
                 MapToDto(created));
         }
 
-        [HttpPut("{id:long}")]
-        public async Task<ActionResult<InComeDto>> Update(long id, [FromBody] UpdateInComeDto dto)
+        [HttpPut()]
+        public async Task<ActionResult<InComeDto>> Update([FromBody] UpdateInComeDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updated = await _repository.UpdateAsync(id, new InCome
+            var updated = await _repository.UpdateAsync(dto.Id, new InCome
             {
                 Name = dto.Name,
                 Comments = dto.Comments,
@@ -112,18 +113,19 @@ namespace APIServer.Controllers
                 RecipientName = dto.RecipientName
             });
 
-            if (updated == null) return NotFound(new { message = "الإيراد غير موجود" });
+            if (updated == null) return NotFound(new { message = "الوارد غير موجود" });
 
             return Ok(MapToDto(updated));
         }
 
         [HttpDelete("{id:long}")]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<GeneralResponse> Delete(long id)
         {
             var deleted = await _repository.DeleteAsync(id);
-            if (!deleted) return NotFound(new { message = "الإيراد غير موجود" });
+            if (!deleted) return new GeneralResponse (  false,  "الإيراد غير موجود" );
+            //NotFound(new { message = "الإيراد غير موجود" });
 
-            return NoContent();
+            return new GeneralResponse(true, "تم حذف الإيراد بنجاح");
         }
 
         private static InComeDto MapToDto(InCome i) => new(

@@ -23,10 +23,12 @@ namespace TLSClientSharedLib.Services.Apis
         Task<decimal> GetTotal();
         [Post(ApiUrls.InCome.Insert)]
         Task<InComeDto> Create(CreateInComeDto dto);
+
         [Put(ApiUrls.InCome.Update)]
-        Task<InComeDto> Update(long id, UpdateInComeDto dto);
+        Task<InComeDto> Update(UpdateInComeDto dto);
+
         [Delete(ApiUrls.InCome.DeleteById)]
-        Task<bool> Delete(long id);
+        Task<GeneralResponse> Delete(long id);
 
         [Get(ApiUrls.InCome.GetBuildingTotal)]
         Task<decimal> GetBuildingTotal(string? BuildingId = null);

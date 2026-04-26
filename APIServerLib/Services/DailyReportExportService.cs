@@ -103,7 +103,7 @@ public static class DailyReportExportService
             ws.Cell(row, 3).Value = "";
             ws.Cell(row, 4).Value  = "";
             ws.Cell(row, 5).Value = report.Center?.Name;
-            ws.Cell(row, 6).Value  = report.Center?.Rooms??0 + report.Center?.Tarpaulins ?? 0;
+            ws.Cell(row, 6).Value  = report.Center?.Rooms + report.Center?.Tarpaulins;
             ws.Cell(row, 7).Value = report.AttMale01;
             ws.Cell(row, 8).Value = report.AttFemale01;
             ws.Cell(row, 9).Value = report.AttMale02;

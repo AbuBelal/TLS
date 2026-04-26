@@ -32,6 +32,7 @@
     </div>
 </div>
 
+
 @if(DailyReports is null || DailyReports.Count<=0)
 {
     <LoadingComponent></LoadingComponent>
@@ -45,7 +46,22 @@ else
             <span class="badge bg-secondary p-2">التاريخ: @DateTime.Now.ToString("yyyy-MM-dd")</span>
         </div>
 
-        @foreach (var item in DailyReports)
+        <div class="input-group input-group-sm mb-5" style="width:50%">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search"></i>
+            </span>
+
+            <input type="text"
+                   class="form-control"
+                   placeholder="ابحث هنا باستخدام اسم المركز ..."
+                   @bind="searchText"
+                   @bind:event="oninput"
+                   @bind:after="OnSearchChanged" />
+
+
+        </div>
+
+        @foreach (var item in DailyReportSrchRs)
         {
             <CenterDailyReportComponent item="@item"  ></CenterDailyReportComponent>
         }
@@ -60,13 +76,16 @@ else
 
 @code {
     List<SharedLib.Entities.DailyReport> DailyReports = new();
+    List<SharedLib.Entities.DailyReport> DailyReportSrchRs;
     DateOnly SelectedDate = DateOnly.FromDateTime(DateTime.Now);
     bool IsLoading = false;
+    private string searchText = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         DailyReports =await DailyReportApi.GetDailyReport();
-        
+        DailyReportSrchRs = DailyReports;
+
     }
 
     // private async Task SaveCenter(long CenterId)
@@ -92,10 +111,26 @@ else
     private async void ExportToExcel(MouseEventArgs args)
     {
         IsLoading = true;
-        if (DailyReports == null) return;
+        try
+        {
+            if (DailyReports == null) return;
 
-        var response = await DailyReportApi.Export(SelectedDate);
-        await ExcelService.DownloadFromResponse(response, $"التقرير اليومي {SelectedDate.ToString("yyyy-MM-dd")}.xlsx");
-        IsLoading = false;
+            var response = await DailyReportApi.Export(SelectedDate);
+            await ExcelService.DownloadFromResponse(response, $"التقرير اليومي {SelectedDate.ToString("yyyy-MM-dd")}.xlsx");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+    private async Task OnSearchChanged()
+    {
+        DailyReportSrchRs = DailyReports.Where(x => x.Center.Name.ToLower().Contains(searchText.ToLower()) 
+        // ||x.Center.CenterCode.ToLower().Contains(searchText.ToLower()) ||
+        // x.Center.EnName.Contains(searchText)
+        ).ToList();
+
+        //currentPage = 1;
+        //await LoadDataAsync();
     }
 }

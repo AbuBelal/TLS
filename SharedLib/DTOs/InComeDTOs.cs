@@ -37,6 +37,7 @@ namespace SharedLib.DTOs
     );
 
     public record UpdateInComeDto(
+        long Id,
         [Required]
     [StringLength(250)]
     string Name,
@@ -65,8 +66,8 @@ namespace SharedLib.DTOs
         [Range(1, long.MaxValue, ErrorMessage = "يجب اختيار مركز صحيح")]
         public long CenterId { get; set; }
 
-        [Required(ErrorMessage = "المبلغ مطلوب")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "المبلغ يجب أن يكون أكبر من صفر")]
+        [Required(ErrorMessage = "الكمية مطلوبة")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "الكمية يجب أن تكون أكبر من صفر")]
         public decimal Qnty { get; set; }
 
         [Required(ErrorMessage = "التاريخ مطلوب")]

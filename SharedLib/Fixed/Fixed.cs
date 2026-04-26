@@ -9,8 +9,8 @@ namespace SharedLib.Fixed
         public const string DebugBaseUrl = "https://localhost:7075";
 
         #region North
-        //public const string NorthBaseUrl = "https://manapi.runasp.net/";
-        public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
+        public const string NorthBaseUrl = "https://manapi.runasp.net/";
+        //public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
         public const string NorthAreaAr = "الشمال";
             public const string NorthAreaEn = "North";
         #endregion
@@ -22,10 +22,11 @@ namespace SharedLib.Fixed
         #endregion
 
         #region Selected
-        public const string SelectedBaseUrl     = NorthBaseUrl;
-        public const string SelectedAreaAr      =  NorthAreaAr   ;
-        public const string SelectedAreaEn      = NorthAreaEn;
+        public const string SelectedBaseUrl     = WestMiddleBaseUrl;
+        public const string SelectedAreaAr      = WestMiddleAreaAr ;
+        public const string SelectedAreaEn      = WestMiddleAreaEn;
         #endregion
+
     }
     public static class Roles
     {

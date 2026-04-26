@@ -122,7 +122,19 @@
 
     <div class="card-footer bg-white text-muted small d-flex justify-content-between align-items-center p-3">
         <span><i class="bi bi-clock me-1"></i> تاريخ التقرير: @item.ReportDate.ToString("yyyy/MM/dd")</span>
-        <span> المتبقي من البسكويت : @Rest</span>
+        @if (Rest >= 500)
+        {
+            <span style="color:forestgreen"> المتبقي من البسكويت : @Rest</span>
+        }
+        else if (Rest <= 0)
+        {
+            <span style="color:red"> المتبقي من البسكويت : @Rest </span>
+        }
+        else
+        {
+            <span style="color:yellowgreen"> المتبقي من البسكويت : @Rest </span>
+        }
+
             @if (!ReadOnly)
         {
             <button class="btn btn-success btn-lg px-5 shadow-sm" @onclick="() => SaveCenter()">
@@ -175,9 +187,9 @@
 
         if (reportToSave != null)
         {
-            if (reportToSave.IsUNRWA > reportToSave.RegUNRWA)
+            if (reportToSave.IsUNRWA > reportToSave.AttTotal)
             {
-                MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور أكبر من المسجلين !", Severity.Error);
+                MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور أكبر من الحضور !", Severity.Error);
                 return;
             }
             else

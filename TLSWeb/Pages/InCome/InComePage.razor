@@ -75,7 +75,14 @@
                                         <small class="text-muted">@income.Comments</small>
                                     }
                                 </td>
-                                <td><span class="badge bg-success bg-opacity-10 text-success fw-bold fs-5">@income.Qnty.ToString("N0")</span></td>
+                                @if (income.Qnty < 0)
+                                {
+                                    <td><span class="badge bg-danger bg-opacity-10 text-danger fw-bold fs-5">@income.Qnty.ToString("N0")</span></td>
+                                }
+                                else
+                                {
+                                    <td><span class="badge bg-success bg-opacity-10 text-success fw-bold fs-5">@income.Qnty.ToString("N0")</span></td>
+                                }
                                 <td>@income.Date.ToString("dd/MM/yyyy")</td>
                                 <td>@income.CenterName</td>
                                 <td>@(string.IsNullOrEmpty(income.RecipientName) ? "-" : income.RecipientName)</td>
@@ -159,7 +166,7 @@
                     <p class="mb-0">
                         هل أنت متأكد من حذف الإيراد <strong>@incomeToDelete.Name</strong>؟
                     </p>
-                    <p class="text-muted small">المبلغ: @incomeToDelete.Qnty.ToString("N0") د.ع</p>
+                    <p class="text-muted small">الكمية: @incomeToDelete.Qnty.ToString("N0")</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" @onclick="CancelDelete" disabled="@isDeleting">إلغاء</button>
@@ -177,8 +184,8 @@
 }
 
 @code
- {
-                      
+{
+
     private List<InComeDto> incomes = new();
     private List<InComeDto> pagedIncomes = new();
     private InComeDto? incomeToDelete;
@@ -255,11 +262,12 @@
         try
         {
             var result = await InComeApi.Delete(incomeToDelete.Id);
-            if (result)
+            if (result.Success)
             {
                 await LoadIncomesAsync();
                 showDeleteModal = false;
                 incomeToDelete = null;
+                MudSnackbar.Add("تمت عملية الحذف ", Severity.Success);
             }
         }
         catch (Exception ex)

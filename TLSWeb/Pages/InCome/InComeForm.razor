@@ -234,6 +234,7 @@
             {
                 var updateincomedto = new UpdateInComeDto
                 (
+                    Id: model.Id,
                     Name : model.Name,
                     CenterId : model.CenterId,
                     Qnty : model.Qnty,
@@ -241,7 +242,7 @@
                     RecipientName : model.RecipientName,
                     Comments : model.Comments
                 );
-                var x = await InComeApi.Update(model.Id,updateincomedto);
+                var x = await InComeApi.Update(updateincomedto);
                 if (x is not null)
                     success = true;
             }

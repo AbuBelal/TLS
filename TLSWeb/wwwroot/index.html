@@ -94,6 +94,157 @@
         }
     </script>
     <style>
+        /* ===== Dua Container ===== */
+        .dua-wrapper {
+            position: fixed;
+            bottom: 0; /* الالتصاق بالأسفل */
+            left: 0;
+            right: 0; /* لضمان التمدد من اليمين لليسار */
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+
+
+            opacity: 1;
+            transform: translateY(30px);
+            /*transition: opacity 1s ease, transform 1s ease;*/
+        }
+
+            .dua-wrapper.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        /* Category Label */
+        .category-label {
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(180, 140, 30, 0.8);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        /* The Dua Text */
+        #Zeker {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            line-height: 2;
+            text-align: center;
+            max-width: 800px;
+            color: #1a1a1a;
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.08);
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        /* Divider */
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #b4881e, transparent);
+            margin-bottom: 30px;
+        }
+
+        /* Transliteration */
+        .transliteration {
+            font-style: italic;
+            font-size: 1rem;
+            color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            padding: 0 20px;
+        }
+
+        /* Translation */
+        .translation {
+            font-size: 1.05rem;
+            color: rgba(0, 0, 0, 0.7);
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.9;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        /* Source */
+        .source {
+            font-size: 0.8rem;
+            color: rgba(0, 0, 0, 0.4);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        /* Repeat badge */
+        .repeat {
+            font-size: 0.75rem;
+            color: rgba(180, 140, 30, 0.8);
+            background: rgba(212, 175, 55, 0.08);
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            background: transparent;
+            border: 1px solid rgba(180, 140, 30, 0.3);
+            color: #b4881e;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .refresh-btn:hover {
+                background: rgba(212, 175, 55, 0.08);
+                border-color: rgba(180, 140, 30, 0.6);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(212, 175, 55, 0.1);
+            }
+
+            .refresh-btn:active {
+                transform: translateY(0);
+            }
+
+            .refresh-btn.spinning svg {
+                animation: spinIcon 0.8s linear infinite;
+            }
+
+        @keyframes spinIcon {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Subtle background glow */
+        .glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.04) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+
+        /**/
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
@@ -140,7 +291,24 @@
 </head>
 
 <body dir="rtl">
+    
     <div id="app">
+        <div class="dua-wrapper" id="dua-wrapper">
+            <div class="category-label" id="category">—</div>
+
+            <div>
+                <label id="Zeker">—</label>
+            </div>
+
+            <div class="divider"></div>
+
+            <!--<div class="transliteration" id="transliteration">—</div>-->
+            <!--<div class="translation" id="translation">—</div>-->
+            <div class="source" id="source">—</div>
+            <div class="repeat" id="repeat">—</div>
+        </div>
+
+
         <svg class="loading-progress">
             <circle r="40%" cx="50%" cy="50%" />
             <circle r="40%" cx="50%" cy="50%" />
@@ -175,6 +343,49 @@
                 URL.revokeObjectURL(url);
             }, 100);
         };
+    </script>
+
+
+    <script>
+        const API_URL = 'https://ummahapi.com/api/duas/random';
+        const wrapper = document.getElementById('dua-wrapper');
+       
+        async function fetchDua() {
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network error');
+
+                const result = await response.json();
+                if (!result.success || !result.data) throw new Error('Invalid data');
+
+                const data = result.data;
+                const catInfo = data.category_info || {};
+
+                document.getElementById('category').textContent = catInfo.name || data.category || '';
+                document.getElementById('Zeker').textContent = data.arabic || '';
+                //document.getElementById('transliteration').textContent = data.transliteration || '';
+                //document.getElementById('translation').textContent = data.translation || '';
+                document.getElementById('source').textContent = data.source ? '📖 ' + data.source : '';
+                document.getElementById('repeat').textContent = data.repeat ? 'التكرار: ' + data.repeat + ' مرات' : '';
+                wrapper.classList.add('visible');
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('Zeker').textContent = '❌ حدث خطأ في تحميل الدعاء';
+                //document.getElementById('transliteration').textContent = '';
+                //document.getElementById('translation').textContent = 'يرجى التحقق من الاتصال بالإنترنت والمحاولة مرة أخرى';
+                document.getElementById('source').textContent = '';
+                document.getElementById('repeat').textContent = '';
+                document.getElementById('category').textContent = 'خطأ';
+
+                wrapper.classList.add('visible');
+            }
+           
+        }
+
+        fetchDua();
+       
     </script>
 </body>
 

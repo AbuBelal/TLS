@@ -115,8 +115,9 @@ namespace APIServer.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<GeneralResponse>> Delete(long id)
         {
+            var std = await _studentRepository.GetById(id);
             var response = await _studentRepository.DeleteById(id);
-            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $"تم حذف طالب");
+            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $" تم حذف طالب {std?.Name ?? "غير معروف"}");
             return Ok(response);
         }
 
