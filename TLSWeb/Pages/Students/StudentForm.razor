@@ -35,7 +35,7 @@
                     </div>
 
                     @* المنسدلات (Lookups) *@
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">الجنس</label>
                         <InputSelect @bind-Value="student.GenderId" class="form-select">
                             <option value="">-- اختر الجنس --</option>
@@ -47,24 +47,28 @@
                         <ValidationMessage For="@(() => student.GenderId)" />
                     </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">المستوى الدراسي</label>
+                    <div class="col-md-2">
+                        <label class="form-label">الصف</label>
                         <InputSelect @bind-Value="student.LevelId" class="form-select">
-                            <option value="">-- اختر المستوى --</option>
+                            <option value="">-- اختر الصف --</option>
                             @foreach (var l in levels)
                             {
                                 <option value="@l.Id">@l.Name</option>
                             }
                         </InputSelect>
                     </div>
+                    <div class="col-md-2">
+                        <label class="form-label">الشعبة</label>
+                        <InputNumber @bind-Value="student.SectionNo" class="form-control" min="1"/>
+                    </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">تاريخ الميلاد</label>
                         <InputDate TValue="DateOnly?" @bind-Value="student.BirthDate" class="form-control" />
                     </div>
 
                     <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin" Context="student">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label">المركز</label>
                             <InputSelect @bind-Value="selectedCenterId" class="form-select">
                                 <option value="">-- اختر المركز --</option>
@@ -80,7 +84,7 @@
 
 
                     @* خيارات إضافية *@
-                    <div class="col-md-12 mt-3">
+                    <div class="col-md-12 mt-6">
                         <div class="form-check form-check-inline">
                             <label class="form-check-label" for="IsUnrwa">هل من طلاب الأنروا؟</label>
                             <InputCheckbox @bind-Value="student.IsUnrwa" class="form-check-input" id="IsUnrwa" />

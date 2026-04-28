@@ -21,5 +21,9 @@ namespace APIServerLib.Repositories.Interfaces
         /// <summary>تصدير جميع موظفي المركز بدون فلاتر</summary>
         Task<List<EmployeeListItemDto>> GetAllByCenterAsync(long centerId);
         Task<List<Employee>> GetAllManagers();
+        Task<Employee> GetCenterManagers(long centerId);
+        Task<Employee?> IsCivilIdDuplicateAsync(EmployeeDuplicateCheckRequest request);
+        Task<Employee?> IsEmpIdDuplicateAsync(EmployeeDuplicateCheckRequest request);
+        Task<GeneralResponse> UpdateWithCenter(EmployeeUpsertDto item);
     }
 }

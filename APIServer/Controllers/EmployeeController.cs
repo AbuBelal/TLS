@@ -127,10 +127,9 @@ namespace APIServer.Controllers
         [HttpPut]
         public async Task<ActionResult<GeneralResponse>> Update(EmployeeUpsertDto employee)
         {
-            var employeeToSave = (new EmployeeMapper()).ToEntity(employee);
-            
-            var response = await _employeeRepository.Update(employeeToSave);
-            await _auditLogService.LogAsync("Update", "Employee", employeeToSave.Id.ToString(), $"تم تعديل موظف: {employeeToSave.Name}");
+           
+            var response = await _employeeRepository.UpdateWithCenter(employee);
+            await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {employee.Name}");
             return Ok(response);
         }
 
@@ -215,6 +214,37 @@ namespace APIServer.Controllers
             var managers = await _employeeRepository.GetAllManagers();
             return Ok(managers);
         }
+        [HttpGet("CenterManager")]
+        public async Task<ActionResult<Employee>> GetCenterManagers(long centerId)
+        {
+            var managers = await _employeeRepository.GetCenterManagers(centerId);
+            return Ok(managers);
+        }
+
+        [HttpPost("IsCivilIdDuplicate")]
+        public async Task<ActionResult<Employee?>> IsCivilIdDuplicateAsync(EmployeeDuplicateCheckRequest request)
+        {
+            var isDuplicate = await _employeeRepository.IsCivilIdDuplicateAsync(request);
+            if (isDuplicate == null)
+                return Ok(new Employee() { Id=-1});
+            else
+                return Ok(isDuplicate);
+        }
+
+        [HttpPost("IsEmpIdDuplicate")]
+        public async Task<ActionResult<Employee?>> IsEmpIdDuplicateAsync(EmployeeDuplicateCheckRequest request)
+        {
+            var isDuplicate = await _employeeRepository.IsEmpIdDuplicateAsync(request);
+            if (isDuplicate == null)
+                return Ok(new Employee() { Id = -1 });
+            else
+                return Ok(isDuplicate);
+        }
+
+
+
+
+
 
         // ── دالة مساعدة ────────────────────────────────────────────────
         private async Task<string> GetCenterNameAsync(long centerId)

@@ -319,9 +319,9 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
-    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
-    <!--<script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
-    <script src="_content/MudBlazor/MudBlazor.min.js?v=1"></script>-->
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
+    <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
+    <script src="_content/MudBlazor/MudBlazor.min.js?v=1"></script>
     <script>
         window.BlazorDownloadFile = (fileName, contentType, bytes) => {
             const blob = new Blob([new Uint8Array(bytes)], { type: contentType });
@@ -343,6 +343,7 @@
         const wrapper = document.getElementById('dua-wrapper');
 
         async function fetchDua() {
+            var readingTime = 2000; // وقت افتراضي للقراءة (10 ثواني)
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('Network error');
@@ -359,6 +360,9 @@
                 document.getElementById('repeat').textContent = data.repeat ? 'التكرار: ' + data.repeat + ' مرات' : '';
                 wrapper.classList.add('visible');
 
+                const wordCount = data.arabic.split(/\s+/).filter(w => w).length;
+                readingTime = Math.max(2000, Math.min(15000, wordCount * 200));
+
             } catch (err) {
                 console.error(err);
                 document.getElementById('Zeker').textContent = '❌ حدث خطأ في تحميل الدعاء';
@@ -369,29 +373,32 @@
             }
             finally {
                 // تحميل Blazor بعد عرض الذكر (نجاح أو فشل)
-                loadBlazor();
+                //loadBlazor();
+                
+
+                setTimeout(() => {
+                    Blazor.start();
+                }, 2000);
             }
         }
 
         // تأخير تحميل Blazor حتى يتم جلب الدعاء وعرضه
-        function loadBlazor() {
-            const script = document.createElement('script');
-            script.src = '_framework/blazor.webassembly#[.{fingerprint}].js';
-            script.onload = () => {
-                // تحميل MudBlazor وتسجيل service worker بعد Blazor
-                const mudScript = document.createElement('script');
-                mudScript.src = '_content/MudBlazor/MudBlazor.min.js?v=1';
-                document.body.appendChild(mudScript);
+        //function loadBlazor() {
+        //    const script = document.createElement('script');
+        //    script.src = '_framework/blazor.webassembly#[.{fingerprint}].js';
+        //    script.onload = () => {
+        //        // تحميل MudBlazor وتسجيل service worker بعد Blazor
+        //        const mudScript = document.createElement('script');
+        //        mudScript.src = '_content/MudBlazor/MudBlazor.min.js?v=1';
+        //        document.body.appendChild(mudScript);
 
-                navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
-            };
-            document.body.appendChild(script);
-        }
+        //        navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
+        //    };
+        //    document.body.appendChild(script);
+        //}
 
         fetchDua();
     </script>
-</body>
-
 </body>
 
 </html>

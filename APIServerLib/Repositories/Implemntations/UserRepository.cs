@@ -27,6 +27,8 @@ namespace APIServerLib.Repositories.Implemntations
             if (user == null)
                 return new GeneralResponse(false, "User not found.", 0);
 
+            user.EmployeeId = null; // Unlink the user from the employee
+            _context.AuditLogs.RemoveRange(_context.AuditLogs.Where(log => log.UserId == Id));
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return new GeneralResponse(true, "User deleted successfully.");

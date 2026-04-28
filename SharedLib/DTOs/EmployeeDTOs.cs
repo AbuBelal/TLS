@@ -59,12 +59,20 @@ namespace SharedLib.DTOs
         public long? SpecializationId { get; set; }
         public string? Comments { get; set; }
         public string? CenterName { get; set; }
+        public long? CenterId { get; set; }
     }
 
     public class EmployeeWithCenter
     {
         public Entities.Employee Employee { get; set; }
         public long CenterId { get; set; }
+    }
+
+    public class EmployeeDuplicateCheckRequest
+    {
+        public string CivilId { get; set; } = string.Empty;
+        public string EmpId { get; set; } = string.Empty;
+        public long? ExcludeEmployeeId { get; set; }
     }
 
 }

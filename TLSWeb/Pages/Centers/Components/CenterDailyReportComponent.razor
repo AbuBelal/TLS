@@ -2,6 +2,11 @@
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold">
             <i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name
+            <span class="badge bg-light text-dark ms-2">@ManagerName</span>
+            @if(!IsWorkingDay)
+            {
+                <span class="badge bg-danger text-warning ms-2">اليوم ليس يوم عمل لهذا المركز ، لا يمكن تعبئة التقرير</span>
+            }
             <span style="color:darkred"> @(item.Id == 0 ? "  -  جديد" : "")  </span>
         </h5>
         <span class="small opacity-75">كود المركز: @item.Center?.CenterCode</span>
@@ -132,7 +137,7 @@
         }
         else
         {
-            <span style="color:yellowgreen"> المتبقي من البسكويت : @Rest </span>
+            <span style="color:yellowgreen"> المتبقي من البسكويت : @Rest.ToString("F0") </span>
         }
 
             @if (!ReadOnly)
@@ -152,11 +157,14 @@
 
 @code {
     [Parameter] public DailyReport item { get; set; }
+    [Parameter] public string ManagerName { get; set; }
+
     string[] Levels = new[] { "الصف الأول", "الصف الثاني", "الصف الثالث", "الصف الرابع", "الصف الخامس", "الصف السادس", "الصف السابع", "الصف الثامن", "الصف التاسع" };
-    bool ReadOnly = false;
+    bool ReadOnly = true;
     string UserName = string.Empty;
     string UserEmail = string.Empty;
     string UserRole = string.Empty;
+    bool IsWorkingDay = true;
     decimal Rest = 0;
 
     protected async override Task OnInitializedAsync()
@@ -169,12 +177,27 @@
             UserEmail = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
             UserRole = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value!;
         }
+        string dayInEnglish = item.ReportDate.ToString("dddd");
+        string dayInArabic = SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(dayInEnglish, dayInEnglish);
 
-        if (user.IsInRole("Admin") )
-            ReadOnly = false;
-        else
-            if (/* item.ReportDate != DateOnly.FromDateTime(DateTime.Now) && */ item.IsLocked)
+        if (item.Center?.DaysOfWeek?.Contains(dayInArabic) ?? false)
+        {
+            IsWorkingDay = true;
+            if (user.IsInRole("Admin"))
+                ReadOnly = false;
+            else
                 ReadOnly = item.IsLocked;
+        }
+        else
+        {
+            IsWorkingDay = false;
+            ReadOnly = true;
+        }
+
+
+
+        // var managers = await EmployeeApi.GetAllManagers();
+         // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
 
         var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
         var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);

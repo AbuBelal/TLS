@@ -17,6 +17,7 @@ public partial class Students : ComponentBase
     private string selectedGender = string.Empty;
     private string selectedLevel = string.Empty;
     private string selectedCenter = string.Empty;
+    private short SelectedSection = 0;
 
     // خيارات الفلاتر (من الـ LookupValues)
     private List<string> genderOptions = [];
@@ -92,7 +93,8 @@ public partial class Students : ComponentBase
                 SearchText = searchText,
                 Gender = selectedGender,
                 Level = selectedLevel,
-                Center = selectedCenter
+                Center = selectedCenter,
+                Section = SelectedSection
             };
 
             var response = await StudentApi.GetPaginated(request);
@@ -128,6 +130,7 @@ public partial class Students : ComponentBase
         searchText = string.Empty;
         selectedGender = string.Empty;
         selectedLevel = string.Empty;
+        SelectedSection = 0;
         currentPage = 1;
         await LoadData();
     }

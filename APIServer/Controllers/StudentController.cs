@@ -186,7 +186,7 @@ namespace APIServer.Controllers
             var centerName = await GetCenterNameAsync(centerId);
             var students = await _studentRepository.GetAllByCenterAsync(centerId);
 
-            var bytes = StudentExportService.GenerateExcel(
+            var bytes = StudentExportService.GenerateExcelForAdmin(
                 students, "جميع الطلاب", centerName);
 
             var fileName = $"جميع_طلاب_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";

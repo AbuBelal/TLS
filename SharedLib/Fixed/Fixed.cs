@@ -9,10 +9,10 @@ namespace SharedLib.Fixed
         public const string DebugBaseUrl = "https://localhost:7075";
 
         #region North
-        public const string NorthBaseUrl = "https://manapi.runasp.net/";
         //public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
-        public const string NorthAreaAr = "الشمال";
-            public const string NorthAreaEn = "North";
+        public const string     NorthBaseUrl    = "https://manapi.runasp.net/";
+        public const string     NorthAreaAr     = "الشمال";
+            public const string NorthAreaEn     = "North";
         #endregion
 
         #region WestMiddle
@@ -22,9 +22,9 @@ namespace SharedLib.Fixed
         #endregion
 
         #region Selected
-        public const string SelectedBaseUrl     = NorthBaseUrl;
-        public const string SelectedAreaAr      = NorthAreaAr ;
-        public const string SelectedAreaEn      = NorthAreaEn;
+        public const string SelectedBaseUrl     = NorthBaseUrl           ;
+        public const string SelectedAreaAr      = NorthAreaAr            ;
+        public const string SelectedAreaEn      = NorthAreaEn            ;
         #endregion
 
     }
@@ -43,5 +43,19 @@ namespace SharedLib.Fixed
         public const string Specialization = "Specialization";
         public const string WHoures = "WHoures";
 
+    }
+    public static class GlobalData
+    {
+        // تعريف القاموس كـ static و readonly
+            public static readonly Dictionary<string, string> ArabicDays = new Dictionary<string, string>
+        {
+            { "Satarday", "السبت" },
+            { "Sunday", "الأحد" },
+            { "Monday", "الاثنين" },
+            { "Tuesday", "الثلاثاء" },
+            { "Wednesday", "الأربعاء" },
+            { "Thursday", "الخميس" },
+            { "Friday", "الجمعة" }
+        };
     }
 }

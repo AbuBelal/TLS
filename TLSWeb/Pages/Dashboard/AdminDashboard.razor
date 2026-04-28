@@ -361,7 +361,7 @@
                                     <div class="fw-semibold small text-muted mb-2">
                                         <i class="bi bi-bar-chart me-1 text-primary"></i>توزيع الطلاب حسب المستوى
                                     </div>
-                                    @foreach (var level in center.LevelDistribution)
+                                    @foreach (var level in center.LevelDistribution.OrderBy(x=>x.Order))
                                     {
                                         <div class="mb-2">
                                             <div class="d-flex justify-content-between mb-1">

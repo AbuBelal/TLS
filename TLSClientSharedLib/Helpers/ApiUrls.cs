@@ -61,9 +61,12 @@ namespace TLSClientSharedLib.Helpers
             //    /api/Employee/EmployeeCenterCount/{CenterId}
             public const string EmployeesCenterCount = PriorUrl + "/EmployeeCenterCount/{id}";
             public const string Paginated = PriorUrl + "/paginated";
-            public const string ExportFiltered = PriorUrl + "/export/filtered";   // ← جديد
-            public const string ExportAll = PriorUrl + "/export/all";         // ← جديد
-            public const string Managers = PriorUrl + "/Managers";         // ← جديد
+            public const string ExportFiltered = PriorUrl + "/export/filtered";   
+            public const string ExportAll = PriorUrl + "/export/all";         
+            public const string Managers = PriorUrl + "/Managers";         
+            public const string CenterManager = PriorUrl + "/CenterManager";         
+            public const string IsCivilIdDuplicate = PriorUrl + "/IsCivilIdDuplicate";         
+            public const string IsEmpIdDuplicate = PriorUrl + "/IsEmpIdDuplicate";         
         }
         public static class Student
         {

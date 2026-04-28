@@ -27,7 +27,9 @@ namespace APIServerLib.Repositories.Implemntations
             //{
                 var students = await _context.Students
                     .Include(x => x.Level)
-                    .Include(x => x.Gender).ToListAsync();
+                    .Include(x => x.Gender)
+                    .Include(x => x.StdCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()).ThenInclude(x => x.Center)
+                    .ToListAsync();
             return students;
             //}
             //return  new List<Student>();
@@ -147,6 +149,12 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(s =>
                     s.Level != null && s.Level.Name == request.Level);
             }
+            // فلتر الشعبة
+            if (request.Section is not null && request.Section>0)
+            {
+                query = query.Where(s =>
+                    s.Level != null && s.SectionNo == request.Section);
+            }
             // فلتر المركز
             if (!string.IsNullOrWhiteSpace(request.Center))
             {
@@ -185,7 +193,8 @@ namespace APIServerLib.Repositories.Implemntations
                 Mobile = s.Mobile,
                 GenderName=s.Gender?.Name,
                 LevelName=s.Level?.Name,
-                CenterName=s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
+                Section = s.SectionNo,
+                CenterName =s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
                 AddedDate = s.StdCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,
             }).OrderByDescending(s=>s.AddedDate).ToList();
 

@@ -1,5 +1,6 @@
 using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
 using SharedLib.Entities;
@@ -18,19 +19,19 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<List<Employee>> GetAll()
         {
-            return await _context.Employees.AsNoTracking().Include(x=>x.EmpCenters).ThenInclude(x=>x.Center).ToListAsync();
+            return await _context.Employees.AsNoTracking().Include(x => x.EmpCenters).ThenInclude(x => x.Center).ToListAsync();
         }
 
         public async Task<Employee> GetById(long id)
         {
-            return await _context.Employees.Where(x=> x.Id == id).Include(x=>x.EmpCenters).FirstOrDefaultAsync();
+            return await _context.Employees.Where(x => x.Id == id).Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
         }
 
         public async Task<GeneralResponse> Insert(Employee item)
         {
             _context.Employees.Add(item);
             await _context.SaveChangesAsync();
-            return new GeneralResponse (  true,  "Employee added successfully." ,item.Id);
+            return new GeneralResponse(true, "Employee added successfully.", item.Id);
         }
 
         public async Task<GeneralResponse> AddEmployeeWithCenter(Employee employee, long centerid)
@@ -43,54 +44,87 @@ namespace APIServerLib.Repositories.Implemntations
             if (centerid <= 0)
                 return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
             else
-            if (emp is null)
-            {
-
-                //if (centerid == 0) return await Insert(employee);
-
-                await _context.Database.BeginTransactionAsync();
-                _context.Employees.Add(employee);
-                await _context.SaveChangesAsync(); // للحصول على Id employee بعد الحفظ
-
-                var empCenter = new EmpCenter
+                if (emp is null)
                 {
-                    EmployeeId = employee.Id,
-                    CenterId = centerid,
-                    FromDate = DateOnly.FromDateTime(DateTime.Now)
-                };
-                _context.EmpCenters.Add(empCenter);
-                await _context.SaveChangesAsync();
-                await _context.Database.CommitTransactionAsync();
 
-                return new GeneralResponse(true, "تم إضافة الموظف للمركز بنجاح.");
-            }
-            if(emp.EmpCenters is null|| emp.EmpCenters.Count() == 0)
-            return new GeneralResponse(false, $"رقم الهوية أو رقم الموظف موجود مسبقاً في مركز ", 0);
-                else
-            return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً   {emp.EmpCenters?.OrderByDescending(x => x.FromDate)?.First()?.Center?.Name} لموظف اسمه {emp.Name} في التخصص {emp.Specialization?.Name} ", 0);
+                    //if (centerid == 0) return await Insert(employee);
+
+                    await _context.Database.BeginTransactionAsync();
+                    _context.Employees.Add(employee);
+                    await _context.SaveChangesAsync(); // للحصول على Id employee بعد الحفظ
+
+                    var empCenter = new EmpCenter
+                    {
+                        EmployeeId = employee.Id,
+                        CenterId = centerid,
+                        FromDate = DateOnly.FromDateTime(DateTime.Now)
+                    };
+                    _context.EmpCenters.Add(empCenter);
+                    await _context.SaveChangesAsync();
+                    await _context.Database.CommitTransactionAsync();
+
+                    return new GeneralResponse(true, "تم إضافة الموظف للمركز بنجاح.");
+                }
+            if (emp.EmpCenters is null || emp.EmpCenters.Count() == 0)
+                return new GeneralResponse(false, $"رقم الهوية أو رقم الموظف موجود مسبقاً في مركز ", 0);
+            else
+                return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً   {emp.EmpCenters?.OrderByDescending(x => x.FromDate)?.First()?.Center?.Name} لموظف اسمه {emp.Name} في التخصص {emp.Specialization?.Name} ", 0);
         }
 
         public async Task<GeneralResponse> Update(Employee item)
         {
+
+            /////// تحديث بيانات الموظف
             _context.Employees.Update(item);
             await _context.SaveChangesAsync();
-            return new GeneralResponse( true,  "Employee updated successfully." );
+            return new GeneralResponse(true, "Employee updated successfully.");
+        }
+
+        public async Task<GeneralResponse> UpdateWithCenter(EmployeeUpsertDto item)
+        {
+            var employeeToSave = (new EmployeeMapper()).ToEntity(item);
+
+            //var managers = await GetAllManagers();
+            //long EmpCurCenterId = managers.FirstOrDefault(x => x.EmpId == item.EmpId)?.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId ?? 0;
+            long EmpCurCenterId = _context.Employees
+                .AsNoTracking()
+                .Where(x => x.EmpId == item.EmpId)
+                .Include(x => x.EmpCenters)
+                .FirstOrDefault()?
+                .EmpCenters.OrderByDescending(ec => ec.FromDate)
+                .FirstOrDefault()?
+                .CenterId ?? 0;
+
+            await _context.Database.BeginTransactionAsync();
+            if (EmpCurCenterId != 0 && EmpCurCenterId != item.CenterId)
+            {
+                _context.EmpCenters.Where(x => x.EmployeeId == item.Id).OrderByDescending(x => x.FromDate).FirstOrDefault()?.ToDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+                // تم تغيير مركز الموظف، قم بتحديث EmpCenters
+               _context.EmpCenters.Add(new EmpCenter() { FromDate=DateOnly.FromDateTime(DateTime.Now),EmployeeId = employeeToSave.Id, CenterId = item.CenterId ?? 0});
+            }
+
+            /////// تحديث بيانات الموظف
+            _context.Employees.Update(employeeToSave);
+            await _context.SaveChangesAsync();
+
+            await _context.Database.CommitTransactionAsync();
+            return new GeneralResponse(true, "تم تحديث بيانات الموظف.");
         }
 
         public async Task<GeneralResponse> DeleteById(long id)
         {
             var employee = await _context.Employees.FindAsync(id);
             if (employee == null)
-                return new GeneralResponse (false,  "Employee not found." );
+                return new GeneralResponse(false, "Employee not found.");
 
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
-            return new GeneralResponse  ( true, "Employee deleted successfully." );
+            return new GeneralResponse(true, "Employee deleted successfully.");
         }
 
         public async Task<int> GetCenterEmployeesCountAsync(long CenterId)
         {
-           var count =await _context.Employees.Where(e => e.EmpCenters.OrderByDescending(x => x.FromDate).First().CenterId == CenterId).CountAsync();
+            var count = await _context.Employees.Where(e => e.EmpCenters.OrderByDescending(x => x.FromDate).First().CenterId == CenterId).CountAsync();
             return count;
         }
 
@@ -111,15 +145,15 @@ namespace APIServerLib.Repositories.Implemntations
             //}
             //else
             //{
-                 query = _context.Employees
-                    .Where(e => CenterId==0 ? true: e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().CenterId == CenterId)
-                    .AsNoTracking()
-                    .OrderBy(e=> e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name)
-                    .Include(e => e.Gender)
-                    .Include(e => e.Job)
-                    .Include(e => e.Specialization)
-                    .Include(x=> x.EmpCenters).ThenInclude(x=>x.Center)
-                    .AsQueryable();
+            query = _context.Employees
+               .Where(e => CenterId == 0 ? true : e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().CenterId == CenterId)
+               .AsNoTracking()
+               .OrderBy(e => e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name)
+               .Include(e => e.Gender)
+               .Include(e => e.Job)
+               .Include(e => e.Specialization)
+               .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
+               .AsQueryable();
             //}
 
             if (!string.IsNullOrWhiteSpace(request.SearchText))
@@ -145,7 +179,7 @@ namespace APIServerLib.Repositories.Implemntations
 
             if (!string.IsNullOrWhiteSpace(request.Center))
             {
-                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
+                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name == request.Center);
             }
 
             // فلتر تاريخ الإضافة
@@ -171,7 +205,7 @@ namespace APIServerLib.Repositories.Implemntations
                     Id = e.Id,
                     Name = e.Name,
                     EnName = e.EnName,
-                    EmpId= e.EmpId,
+                    EmpId = e.EmpId,
                     CivilId = e.CivilId,
                     Mobile = e.Mobile,
                     GenderName = e.Gender != null ? e.Gender.Name : null,
@@ -200,7 +234,7 @@ namespace APIServerLib.Repositories.Implemntations
                 .Distinct()
                 .OrderBy(v => v)
                 .ToListAsync();
-            
+
 
             return new EmployeePaginatedResponse
             {
@@ -218,10 +252,10 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<EmployeeUpsertDto?> GetByCivilId(string CivilId)
         {
             var E = await _context.Employees.Where(x => x.CivilId == CivilId)
-                .Include(x=>x.EmpCenters).ThenInclude(x=>x.Center).FirstOrDefaultAsync();
+                .Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
             if (E is null) return null;
 
-           var R =(new EmployeeMapper()).ToEmployeeUpsertDTO(E);
+            var R = (new EmployeeMapper()).ToEmployeeUpsertDTO(E);
             R.CenterName = E.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()?.Center.Name;
             return R;
         }
@@ -232,7 +266,7 @@ namespace APIServerLib.Repositories.Implemntations
                 .Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
             if (E is null) return null;
 
-           var R =(new EmployeeMapper()).ToEmployeeUpsertDTO(E);
+            var R = (new EmployeeMapper()).ToEmployeeUpsertDTO(E);
             R.CenterName = E.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()?.Center.Name;
             return R;
         }
@@ -289,7 +323,7 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(e => e.Job != null && e.Job.Name == request.Job);
 
             if (!string.IsNullOrWhiteSpace(request.Center))
-                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
+                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name == request.Center);
 
             if (request.FromDate.HasValue)
                 query = query.Where(e =>
@@ -342,41 +376,56 @@ namespace APIServerLib.Repositories.Implemntations
                .ToListAsync();
             }
             else
-            return await _context.Employees
-                    .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
-                .Where(e => e.EmpCenters
-                    .OrderByDescending(ec => ec.FromDate)
-                    .FirstOrDefault()!.CenterId == centerId)
-                .AsNoTracking()
-                .Include(e => e.Gender)
-                .Include(e => e.Job)
-                .Include(e => e.Specialization)
-                .OrderBy(e => e.Job!.Name)
-                .ThenBy(e => e.Name)
-                .Select(e => new EmployeeListItemDto
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    EnName = e.EnName,
-                    EmpId = e.EmpId,
-                    CivilId = e.CivilId,
-                    Mobile = e.Mobile,
-                    GenderName = e.Gender != null ? e.Gender.Name : null,
-                    JobName = e.Job != null ? e.Job.Name : null,
-                    SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
-                    CenterName=e.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name,
-                    AddedDate = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,  // ← جديد
-                })
-                .ToListAsync();
+                return await _context.Employees
+                        .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
+                    .Where(e => e.EmpCenters
+                        .OrderByDescending(ec => ec.FromDate)
+                        .FirstOrDefault()!.CenterId == centerId)
+                    .AsNoTracking()
+                    .Include(e => e.Gender)
+                    .Include(e => e.Job)
+                    .Include(e => e.Specialization)
+                    .OrderBy(e => e.Job!.Name)
+                    .ThenBy(e => e.Name)
+                    .Select(e => new EmployeeListItemDto
+                    {
+                        Id = e.Id,
+                        Name = e.Name,
+                        EnName = e.EnName,
+                        EmpId = e.EmpId,
+                        CivilId = e.CivilId,
+                        Mobile = e.Mobile,
+                        GenderName = e.Gender != null ? e.Gender.Name : null,
+                        JobName = e.Job != null ? e.Job.Name : null,
+                        SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
+                        CenterName = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center.Name,
+                        AddedDate = e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().FromDate,  // ← جديد
+                    })
+                    .ToListAsync();
         }
 
         public async Task<List<Employee>> GetAllManagers()
         {
-            return await _context.Employees.Where(e => e.Job.Name=="مدير مركز")
+            return await _context.Employees
+                .Where(e => e.Job.Name == "مدير مركز" && e.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault() != null)
                 .AsNoTracking()
                 .Include(e => e.EmpCenters).ThenInclude(ec => ec.Center)
                 .ToListAsync();
         }
+        public async Task<Employee> GetCenterManagers(long centerId)
+        {
+            var managers = await GetAllManagers();
+            return managers.FirstOrDefault(m => m.EmpCenters.OrderByDescending(d => d.FromDate).FirstOrDefault().CenterId == centerId);
 
+        }
+
+        public async Task<Employee?> IsCivilIdDuplicateAsync(EmployeeDuplicateCheckRequest request)
+        {
+            return await _context.Employees.FirstOrDefaultAsync(e => e.CivilId == request.CivilId && e.Id != request.ExcludeEmployeeId);
+        }
+        public async Task<Employee?> IsEmpIdDuplicateAsync(EmployeeDuplicateCheckRequest request)
+        {
+            return await _context.Employees.FirstOrDefaultAsync(e => e.EmpId == request.EmpId && e.Id != request.ExcludeEmployeeId);
+        }
     }
 }

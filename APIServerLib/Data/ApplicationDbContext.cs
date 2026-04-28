@@ -123,7 +123,7 @@ namespace APIServerLib.Data
                 entity.HasOne<ApplicationUser>()
                       .WithMany()
                       .HasForeignKey(a => a.UserId)
-                      .OnDelete(DeleteBehavior.NoAction);
+                      .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<InCome>()

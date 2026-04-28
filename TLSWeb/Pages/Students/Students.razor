@@ -102,14 +102,14 @@
                                @bind:after="OnFilterChanged" />
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label fw-semibold text-muted small">
                         <i class="bi bi-gender-ambiguous me-1"></i> الجنس
                     </label>
                     <select class="form-select"
                             @bind="selectedGender"
                             @bind:after="OnFilterChanged">
-                        <option value="">— الكل —</option>
+                        <option value="">الكل</option>
                         @foreach (var gender in genderOptions)
                         {
                             <option value="@gender">@gender</option>
@@ -129,6 +129,12 @@
                             <option value="@level">@level</option>
                         }
                     </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">الشعبة</label>
+                    <InputNumber @bind-Value="SelectedSection" class="form-control" min="0"
+                                 @onfocusout="OnFilterChanged" />
                 </div>
                 
                 <AuthorizeView Roles=@SharedLib.Fixed.Roles.Admin>
@@ -262,7 +268,7 @@
                                         text-success border border-success
                                         border-opacity-25">
                                         @* <i class="bi bi-mortarboard me-1"></i> *@
-                                        @student.LevelName
+                                        @student.LevelName - @student.Section
                                     </span>
                                 </td>
                                 <td>

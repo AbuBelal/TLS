@@ -192,4 +192,181 @@ public static class StudentExportService
         wb.SaveAs(ms);
         return ms.ToArray();
     }
+    public static byte[] GenerateExcelForAdmin(List<Student> students, string sheetTitle, string centerName)
+    {
+        using var wb = new XLWorkbook();
+        var ws = wb.AddWorksheet("الطلاب");
+
+        // ── إعداد اتجاه RTL للورقة ─────────────────────────────
+        ws.RightToLeft = true;
+        int totalCols = 12;
+        // ══════════════════════════════════════════════════════
+        //  الصف الأول: رؤوس الأعمدة
+        // ══════════════════════════════════════════════════════
+        int headerRow = 1;
+        var headers = new[]
+        {
+            ("المنطقة التعليمية",           10),
+            ("كود المركز التعليمي",           10),
+            ("اسم المركز التعليمي",           25),
+            ("رقم هوية الطالب",  15),
+            ("اسم الطالب",  25),
+            ("الجنس",         8),
+            ("تاريخ الميلاد", 12),
+            ("الصف",       10),
+            ("رقم الجوال",   13),
+            ("هل انروا؟",       8),
+            ("هل ذوي اح تياجات خاصة؟", 8),
+            ("ملاحظات", 25)
+        };
+
+        for (int c = 0; c < headers.Length; c++)
+        {
+            var cell = ws.Cell(headerRow, c + 1);
+            cell.Value = headers[c].Item1;
+            cell.Style.Font.Bold      = true;
+            cell.Style.Font.FontSize  = 11;
+            cell.Style.Font.FontColor = XLColor.White;
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#00658E");
+            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            cell.Style.Alignment.Vertical   = XLAlignmentVerticalValues.Center;
+            cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            cell.Style.Border.OutsideBorderColor = XLColor.FromHtml("#005577");
+            ws.Column(c + 1).Width = headers[c].Item2;
+        }
+        ws.Row(headerRow).Height = 22;
+
+        // ══════════════════════════════════════════════════════
+        //  بيانات الطلاب
+        // ══════════════════════════════════════════════════════
+        for (int i = 0; i < students.Count; i++)
+        {
+            var student = students[i];
+            int row = headerRow + 1 + i;
+            bool isEven = i % 2 == 0;
+
+            var rowBg = isEven
+                ? XLColor.FromHtml("#FFFFFF")
+                : XLColor.FromHtml("#C0E6F5");
+            var center = student.StdCenters.OrderByDescending(x => x.FromDate).FirstOrDefault().Center;
+            // قيم الخلايا
+            int c = 1;
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = center?.CenterCode ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = center?.Name ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.CivilId ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.Name ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.Gender?.Name ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.BirthDate?.ToString("dd/MM/yyyy");
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.Level?.Name ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.Mobile ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.IsUnrwa ? "نعم" : "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.IsSpecialNeeds ? "نعم" : "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.Comments ?? ""; 
+
+            // تنسيق الصف كاملاً
+            var rowRange = ws.Range(row, 1, row, totalCols);
+            rowRange.Style.Fill.BackgroundColor = rowBg;
+            rowRange.Style.Font.FontSize  = 11;
+            rowRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            rowRange.Style.Border.OutsideBorderColor = XLColor.Black; //FromHtml("#DDDDDD");
+            rowRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            rowRange.Style.Border.InsideBorderColor = XLColor.Black;//FromHtml("#EEEEEE");
+
+            // توسيط بعض الأعمدة
+            //ws.Cell(row, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            //ws.Cell(row, 6).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            //ws.Cell(row, 7).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            // تلوين خلية الجنس
+            //if (student.Gender?.Name == "ذكر")
+            //    ws.Cell(row, 7).Style.Font.FontColor = XLColor.FromHtml("#0D6EFD");
+            //else if (student.Gender?.Name == "أنثى")
+            //    ws.Cell(row, 7).Style.Font.FontColor = XLColor.FromHtml("#DC3545");
+
+            // تلوين أنروا واحتياجات خاصة
+            //if (student.IsUnrwa)
+            //{
+            //    ws.Cell(row, 9).Style.Font.Bold = true;
+            //    ws.Cell(row, 9).Style.Font.FontColor = XLColor.FromHtml("#0DCAF0");
+            //    ws.Cell(row, 9).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            //}
+            //if (student.IsSpecialNeeds)
+            //{
+            //    ws.Cell(row, 10).Style.Font.Bold = true;
+            //    ws.Cell(row, 10).Style.Font.FontColor = XLColor.FromHtml("#FFC107");
+            //    ws.Cell(row, 10).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            //}
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  صف الإجماليات
+        // ══════════════════════════════════════════════════════
+        //int totalRow = headerRow + students.Count + 1;
+
+        //ws.Range(totalRow, 1, totalRow, 5).Merge();
+        //ws.Cell(totalRow, 1).Value = $"الإجمالي: {students.Count} طالب";
+        //ws.Cell(totalRow, 1).Style.Font.Bold = true;
+        //ws.Cell(totalRow, 1).Style.Font.FontSize = 11;
+        //ws.Cell(totalRow, 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F4FD");
+        //ws.Cell(totalRow, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
+
+        //var maleCount   = students.Count(s => s.Gender?.Name == "ذكر");
+        //var femaleCount = students.Count(s => s.Gender?.Name == "أنثى");
+        //var unrwaCount  = students.Count(s => s.IsUnrwa);
+        //var specialCount= students.Count(s => s.IsSpecialNeeds);
+
+        //ws.Cell(totalRow, 6).Value = $"ذ:{maleCount} | إ:{femaleCount}";
+        //ws.Cell(totalRow, 6).Style.Font.Bold = true;
+        //ws.Cell(totalRow, 6).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F4FD");
+        //ws.Cell(totalRow, 6).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        //ws.Range(totalRow, 6, totalRow, 7).Merge();
+
+        //ws.Cell(totalRow, 8).Value = unrwaCount.ToString();
+        //ws.Cell(totalRow, 8).Style.Font.Bold = true;
+        //ws.Cell(totalRow, 8).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F4FD");
+        //ws.Cell(totalRow, 8).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        //ws.Cell(totalRow, 9).Value = specialCount.ToString();
+        //ws.Cell(totalRow, 9).Style.Font.Bold = true;
+        //ws.Cell(totalRow, 9).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F4FD");
+        //ws.Cell(totalRow, 9).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        //ws.Row(totalRow).Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+        //ws.Row(totalRow).Style.Border.OutsideBorderColor = XLColor.FromHtml("#009EDB");
+        //ws.Row(totalRow).Height = 20;
+
+        // ══════════════════════════════════════════════════════
+        //  تجميد الصفوف العلوية عند التمرير
+        // ══════════════════════════════════════════════════════
+        ws.SheetView.FreezeRows(headerRow);
+
+        // ── تحويل إلى bytes ────────────────────────────────────
+        using var ms = new MemoryStream();
+        wb.SaveAs(ms);
+        return ms.ToArray();
+    }
 }

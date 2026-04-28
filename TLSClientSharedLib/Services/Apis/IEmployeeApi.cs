@@ -53,5 +53,12 @@ namespace TLSClientSharedLib.Services.Apis
         Task<HttpResponseMessage> ExportAll();
         [Get(ApiUrls.Employee.Managers)]
         Task<List<Employee>> GetAllManagers();
+
+        [Get(ApiUrls.Employee.CenterManager)]
+        Task<Employee> GetCenterManager(long centerId);
+        [Post(ApiUrls.Employee.IsCivilIdDuplicate)]
+        Task<Employee?> IsCivilIdDuplicate(EmployeeDuplicateCheckRequest request);
+        [Post(ApiUrls.Employee.IsEmpIdDuplicate)]
+        Task<Employee?> IsEmpIdDuplicate(EmployeeDuplicateCheckRequest request);
     }
 }
