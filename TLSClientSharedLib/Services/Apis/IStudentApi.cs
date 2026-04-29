@@ -24,7 +24,7 @@ namespace TLSClientSharedLib.Services.Apis
         Task<GeneralResponse> AddWithCenter([Body] StdWithCenterId student);
 
         [Put(ApiUrls.Student.Update)]
-        Task<GeneralResponse> Update([Body] Student student);
+        Task<GeneralResponse> Update([Body] StdWithCenterId student);
 
         [Delete(ApiUrls.Student.DeleteById)]
         Task<GeneralResponse> DeleteById(long id);

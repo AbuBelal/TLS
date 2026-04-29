@@ -16,12 +16,13 @@ namespace SharedLib.Entities
 
         public long CenterId { get; set; }
         [ForeignKey(nameof( CenterId))]
-        [JsonIgnore]
+        //[JsonIgnore]
         public Center? Center { get; set; }
 
         ///
         public DateOnly FromDate { get; set; } = DateOnly.FromDateTime(DateTime.Now.Date);
         public DateOnly? ToDate { get; set; }
         public String? Comments { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }

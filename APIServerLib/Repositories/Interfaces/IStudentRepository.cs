@@ -10,6 +10,7 @@ namespace APIServerLib.Repositories.Interfaces
         // أضف هنا أي دوال خاصة بـ Student إذا لزم الأمر
         Task<int> GetCenterStudentsCountAsync(long CenterId);
         Task<GeneralResponse> AddStudentWithCenter(Student student , long centerid);
+        Task<GeneralResponse> UpdateStudentWithCenter(Student student , long centerid);
         Task<PaginatedResponse<StudentDto>> GetPaginatedStudentsAsync(StudentFilterRequest request, long CenterId=0);
         // ── جديد: للتصدير ──────────────────────────────────────────
 

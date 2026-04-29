@@ -1,0 +1,83 @@
+﻿@if (IsOpen)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header @TitleColor text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>@Title
+                    </h5>
+                    <button class="btn-close btn-close-white"
+                    @onclick="Cancel"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi @Icon display-4 text-danger d-block mb-3"></i>
+                    <h3 class="fw-bold mb-3">@Message</h3>
+
+                    <p class="small text-muted">
+                        لا يمكن التراجع عن هذا الإجراء
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                   
+                    <button class="btn btn-success"
+                    @onclick="Confirmed"
+                    disabled="@isDoing">
+                        @if (isDoing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            <span>جاري العمل...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-check2 me-1"></i>
+                            <span>نعم </span>
+                        }
+                    </button>
+
+                    <button class="btn btn-secondary"
+                            @onclick="Cancel"
+                            disabled="@isDoing">
+                        <i class="bi bi-x-lg me-1"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+    [Parameter]
+    public string Message { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public StudentDto studentToDelete { get; set; }
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    [Parameter]
+    public EventCallback OnConfirmed { get; set; }
+    [Parameter]
+    public string TitleColor { get; set; } = "bg-warning";
+    [Parameter]
+    public string Icon { get; set; } = "bi-exclamation-triangle";
+
+    private bool isDoing = false;
+    private async Task Cancel()
+    {
+        if (isDoing) return;
+        await OnCancel.InvokeAsync(null);
+        IsOpen = false;
+    }
+    private async Task Confirmed()
+    {
+        if (isDoing) return;
+        isDoing = true;
+        await OnConfirmed.InvokeAsync(null);
+        isDoing = false;
+        IsOpen = false;
+    }
+
+}

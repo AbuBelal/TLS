@@ -5,7 +5,7 @@
             <span class="badge bg-light text-dark ms-2">@ManagerName</span>
             @if(!IsWorkingDay)
             {
-                <span class="badge bg-danger text-warning ms-2">اليوم ليس يوم عمل لهذا المركز ، لا يمكن تعبئة التقرير</span>
+                <span class="badge bg-danger text-warning ms-2">ليس يوم عمل</span>
             }
             <span style="color:darkred"> @(item.Id == 0 ? "  -  جديد" : "")  </span>
         </h5>

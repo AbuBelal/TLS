@@ -105,10 +105,15 @@ namespace APIServer.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<GeneralResponse>> Update(Student student)
+        public async Task<ActionResult<GeneralResponse>> Update(StdWithCenterId student)
         {
-            var response = await _studentRepository.Update(student);
-            await _auditLogService.LogAsync("Update", "Student", student.Id.ToString(), $"تم تعديل طالب: {student.Name}");
+            if (student.CenterId <= 0)
+            {
+                student.CenterId = await CurrentCenterId();
+                //return await Insert(student.Student);
+            }
+            var response = await _studentRepository.UpdateStudentWithCenter(student.Student , student.CenterId);
+            await _auditLogService.LogAsync("Update", "Student", student.Student.Id.ToString(), $"تم تعديل طالب: {student.Student.Name}");
             return Ok(response);
         }
 

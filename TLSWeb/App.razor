@@ -1,37 +1,4 @@
-﻿
-@*  <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <AuthorizeView Context="AppAuthState">
-
-                <Authorized>
-                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-                </Authorized>
-
-                <NotAuthorized>
-                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(AuthLayout)">
-                        @*  <NotAuthorized>
-                            <RedirectToLogin />
-                        </NotAuthorized> *
-                    </AuthorizeRouteView>
-                         <RedirectToLogin /> 
-                </NotAuthorized>
-
-            </AuthorizeView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState> 
- *@
-
- 
-<CascadingAuthenticationState>
+﻿<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
@@ -39,9 +6,26 @@
                 @* سيتم توجيه المستخدم غير المسجل إلى صفحة تسجيل الدخول *@
                 <RedirectToLogin />
             </NotAuthorized>
-            <Authorizing>
+           @*  <Authorizing>
                 <p>جاري التحقق من الصلاحيات...</p>
-            </Authorizing>
+            </Authorizing> *@
+                <Authorizing>
+                    <div class="auth-container">
+                        <div class="auth-card">
+                            <div class="lock-wrapper">
+                                <div class="shimmer-circle"></div>
+                                <i class="fas fa-shield-alt auth-icon"></i>
+                            </div>
+
+                            <h3>جاري التحقق</h3>
+                            <p>يرجى الانتظار قليلاً، نقوم بمراجعة صلاحيات الوصول الخاصة بك.</p>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </Authorizing>
         </AuthorizeRouteView>
     </Found>
     <NotFound>
@@ -52,3 +36,4 @@
     </NotFound>
 </Router> 
 </CascadingAuthenticationState> 
+

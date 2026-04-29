@@ -1,4 +1,5 @@
-﻿@attribute [Route(PagesUris.StudentsPages.Add)]
+﻿@using TLSWeb.Components
+@attribute [Route(PagesUris.StudentsPages.Add)]
 @attribute [Route(PagesUris.StudentsPages.Edit + "/{Id:long}")]
 
 <div class="container mt-4">
@@ -126,6 +127,66 @@
         </div>
     </div>
 </div>
+<DialogMsg IsOpen="@isDialogOpen" Title="تأكيد الإضافة" Message="@dialogMessage"   
+OnConfirmed="ConfirmDialog" OnCancel="CancelDialog" TitleColor="bg-warning"
+Icon="bi-exclamation-triangle" />
+
+
+<div class="container mt-4 mb-10">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">تنقلات الطالب </h4>
+        </div>
+        <div class="table-responsive shadow-sm rounded m-2">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" class="py-3">اسم المركز</th>
+                        <th scope="col" class="py-3">تاريخ البدء (من)</th>
+                        <th scope="col" class="py-3">تاريخ الانتهاء (إلى)</th>
+                        <th scope="col" class="py-3">الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stdcenter in student.StdCenters?.OrderByDescending(x => x.FromDate))
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">
+                                @stdcenter.Center?.Name
+                            </td>
+                            <td>
+                                <i class="bi bi-calendar-check me-1"></i>
+                                @stdcenter.FromDate.ToString("dd/MM/yyyy")
+                            </td>
+                            <td>
+                                @if (stdcenter.ToDate.HasValue)
+                                {
+                                    <i class="bi bi-calendar-x me-1"></i>
+                                    @stdcenter.ToDate.Value.ToString("dd/MM/yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted italic">-- / -- / ----</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!stdcenter.ToDate.HasValue)
+                                {
+                                    <span class="badge bg-success">حالي</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">سابق</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 
 @code {
     [Parameter] public long Id { get; set; }
@@ -135,6 +196,8 @@
     private bool isLoading = false;
     private List<Center> centers = new();          // ← جديد
     private long? selectedCenterId;                  // ← جديد
+    bool isDialogOpen = false;
+    string dialogMessage = "هذا الطالب غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
 
     protected override async Task OnInitializedAsync()
     {
@@ -144,6 +207,7 @@
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
         centers = await CenterApi.GetAll();          // ← جديد
+        selectedCenterId = student.StdCenters?.FirstOrDefault(x => x.IsActive)?.CenterId;
         isLoading = false;
     }
     private async Task TranslateName()
@@ -161,12 +225,18 @@
         isLoading = true;
         if (Id != 0)
         {
-            var response = await StudentApi.Update(student);
+            StdWithCenterId studentToSave = new StdWithCenterId
+            {
+                Student = student,
+                CenterId = selectedCenterId ?? 0
+            };
+            var response = await StudentApi.Update(studentToSave);
             if (response.Success)
             {
                 NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
             }
-            MudSnackbar.Add(response.Message, Severity.Success);
+            else
+                MudSnackbar.Add(response.Message, Severity.Success);
         }
         else
         {
@@ -190,10 +260,30 @@
                 MudSnackbar.Add(response.Message, Severity.Success);
             }
             else
-            MudSnackbar.Add(response.Message, Severity.Error);
+                if (response.Message.Contains("هل تريد إضافته في مركزكم ؟"))
+                {
+                    dialogMessage = $"\n {response.Message} "; 
+                    isDialogOpen = true;
+                    StateHasChanged();
+                    Id = response.ReturnId; // تخزين الـ Id الجديد للطالب الذي تم إنشاؤه بدون مركز
+                    //NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+                }
+                else
+                    MudSnackbar.Add(response.Message, Severity.Error);
         }
         isLoading = false;
     }
 
     private void Cancel() => NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+    private void CancelDialog()
+    {
+        isDialogOpen = false;
+        StateHasChanged();
+    }
+    private async void ConfirmDialog()
+    {
+        isDialogOpen = false;
+        student = await StudentApi.GetById(Id);
+        HandleSubmit(); 
+    }
 }

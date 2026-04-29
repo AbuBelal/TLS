@@ -213,7 +213,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
         // جلب جميع الطلاب النشطين مع البيانات المطلوبة
         var allStdCenters = await _context.StdCenters
             .AsNoTracking()
-            .Where(sc => sc.ToDate == null)
+            .Where(sc => sc.IsActive)
             .Include(sc => sc.Student)
                 .ThenInclude(s => s!.Gender)
             .Include(sc => sc.Student)
