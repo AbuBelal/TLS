@@ -67,6 +67,7 @@ namespace TLSClientSharedLib.Helpers
             public const string CenterManager = PriorUrl + "/CenterManager";         
             public const string IsCivilIdDuplicate = PriorUrl + "/IsCivilIdDuplicate";         
             public const string IsEmpIdDuplicate = PriorUrl + "/IsEmpIdDuplicate";         
+            public const string IsEmployeeDuplicate = PriorUrl + "/IsEmployeeDuplicate";         
         }
         public static class Student
         {

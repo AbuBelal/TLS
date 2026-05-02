@@ -18,7 +18,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
     // This ignores circular references (common in complex models)
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-}); ;
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // تحديد مدة انتهاء صلاحية الكوكي (مثلاً 30 يوم)
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+
+    // تفعيل خاصية "Sliding Expiration" لإعادة تمديد الوقت طالما المستخدم نشط
+    options.SlidingExpiration = true;
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -37,27 +46,18 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 
 //cors
 AllowCors.AddCorsPolicy(builder);
-//string[] WebAppUrl = builder.Configuration.GetSection("CorsOrigins").Get<string[]>();
+
 
 //builder.Services.AddCors(options =>
 //{
-//    options.AddPolicy("AllowBlazorWasm",
-//        policy => policy.WithOrigins(WebAppUrl!) // تأكد من مطابقة بورت الـ Client
-//            .AllowAnyMethod()
-//            .AllowAnyHeader()
-//            .AllowCredentials());
+//    options.AddPolicy("AllowSpecificOrigin", policy =>
+//    {
+//        policy.WithOrigins("https://man.runasp.net") // الرابط الخاص بك
+//              .AllowAnyHeader()
+//              .AllowAnyMethod()
+//              .AllowCredentials(); // إذا كنت تستخدم Authentication/Cookies
+//    });
 //});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin", policy =>
-    {
-        policy.WithOrigins("https://man.runasp.net") // الرابط الخاص بك
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // إذا كنت تستخدم Authentication/Cookies
-    });
-});
 
 
 //App Services
@@ -105,7 +105,7 @@ app.UseHttpsRedirection();
 
 app.MapIdentityApi<ApplicationUser>();
 //app.UseAuthorization();
-app.UseCors("AllowSpecificOrigin");
+//app.UseCors("AllowSpecificOrigin");
 
 //app.UseAuthentication();
 app.UseAuthorization();

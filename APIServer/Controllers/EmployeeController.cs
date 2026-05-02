@@ -127,7 +127,8 @@ namespace APIServer.Controllers
         [HttpPut]
         public async Task<ActionResult<GeneralResponse>> Update(EmployeeUpsertDto employee)
         {
-           
+            if (employee.CenterId is null || employee.CenterId <= 0)
+                employee.CenterId = await CurrentCenterId();
             var response = await _employeeRepository.UpdateWithCenter(employee);
             await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {employee.Name}");
             return Ok(response);
@@ -235,6 +236,15 @@ namespace APIServer.Controllers
         public async Task<ActionResult<Employee?>> IsEmpIdDuplicateAsync(EmployeeDuplicateCheckRequest request)
         {
             var isDuplicate = await _employeeRepository.IsEmpIdDuplicateAsync(request);
+            if (isDuplicate == null)
+                return Ok(new Employee() { Id = -1 });
+            else
+                return Ok(isDuplicate);
+        }
+        [HttpPost("IsEmployeeDuplicate")]
+        public async Task<ActionResult<Employee?>> IsEmployeeDuplicateAsync(EmployeeDuplicateCheckRequest request)
+        {
+            var isDuplicate = await _employeeRepository.IsEmployeeDuplicateAsync(request);
             if (isDuplicate == null)
                 return Ok(new Employee() { Id = -1 });
             else

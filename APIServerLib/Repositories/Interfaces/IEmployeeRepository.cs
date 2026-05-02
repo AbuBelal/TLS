@@ -25,5 +25,6 @@ namespace APIServerLib.Repositories.Interfaces
         Task<Employee?> IsCivilIdDuplicateAsync(EmployeeDuplicateCheckRequest request);
         Task<Employee?> IsEmpIdDuplicateAsync(EmployeeDuplicateCheckRequest request);
         Task<GeneralResponse> UpdateWithCenter(EmployeeUpsertDto item);
+        Task<Employee?> IsEmployeeDuplicateAsync(EmployeeDuplicateCheckRequest request);
     }
 }

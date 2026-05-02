@@ -10,7 +10,7 @@ namespace SharedLib.Fixed
 
         #region North
         //public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
-        public const string     NorthBaseUrl    = "https://manapi.runasp.net/";
+        public const string NorthBaseUrl = "https://manapi.runasp.net/";
         public const string     NorthAreaAr     = "الشمال";
             public const string NorthAreaEn     = "North";
         #endregion
@@ -49,7 +49,7 @@ namespace SharedLib.Fixed
         // تعريف القاموس كـ static و readonly
             public static readonly Dictionary<string, string> ArabicDays = new Dictionary<string, string>
         {
-            { "Satarday", "السبت" },
+            { "Saturday", "السبت" },
             { "Sunday", "الأحد" },
             { "Monday", "الاثنين" },
             { "Tuesday", "الثلاثاء" },

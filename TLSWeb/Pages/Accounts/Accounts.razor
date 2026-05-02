@@ -177,10 +177,10 @@
                                     </button>
                                 </li>
 
-                                @foreach (var page in GetPageNumbers())
+                                @foreach (var pagee in GetPageNumbers())
                                 {
-                                    <li class="page-item @(page == currentPage ? "active" : "")">
-                                        <button class="page-link" @onclick="@(() => GoToPageAsync(page))"> page </button>
+                                    <li class="page-item @(pagee == currentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="@(() => GoToPageAsync(pagee))"> @pagee </button>
                                     </li>
                                 }
 

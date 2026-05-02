@@ -1,4 +1,5 @@
-﻿@* @page "/employees/add"
+﻿@using TLSWeb.Components
+@* @page "/employees/add"
 @page "/employees/edit/{Id:long}" *@
 @attribute [Route(PagesUris.EmployeesPages.Add)]
 @attribute [Route(PagesUris.EmployeesPages.Edit + "/{Id:long}")]
@@ -240,7 +241,9 @@
 </div>
 </div>
 </div>
-
+<DialogMsg IsOpen="@isDialogOpen" Title="تأكيد الإضافة" Message="@dialogMessage"   
+OnConfirmed="ConfirmDialog" OnCancel="CancelDialog" TitleColor="bg-warning"
+Icon="bi-exclamation-triangle" />
 
 @* 
 <h3>@(Id == 0 ? "إضافة موظف جديد" : "تعديل بيانات الموظف")</h3>
@@ -354,3 +357,6 @@
         NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
     }
 } *@
+
+
+

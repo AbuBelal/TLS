@@ -108,6 +108,7 @@ namespace APIServerLib.Repositories.Implemntations
 
                 return new GeneralResponse(true, "تم إضافة الطالب للمركز بنجاح.");
             }
+
             var StdCenter = Std.StdCenters?.FirstOrDefault(x => x.IsActive);
             if(StdCenter is not null)
              return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {StdCenter?.Center?.Name} لطالب اسمه {Std.Name} في الصف {Std.Level?.Name} ", Std.Id);
@@ -138,7 +139,7 @@ namespace APIServerLib.Repositories.Implemntations
                     {
                         StdCenters.ForEach(x =>
                         {
-                            x.ToDate = DateOnly.FromDateTime(DateTime.Now);
+                            x.ToDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
                             x.IsActive = false;
                         });
 
@@ -149,7 +150,7 @@ namespace APIServerLib.Repositories.Implemntations
                             StudentId = student.Id,
                             CenterId = centerid,
                             IsActive = true,
-                            FromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1))
+                            FromDate = DateOnly.FromDateTime(DateTime.Now)
                         };
                         _context.StdCenters.Add(stdCenter);
                     }

@@ -58,7 +58,10 @@ namespace TLSClientSharedLib.Services.Apis
         Task<Employee> GetCenterManager(long centerId);
         [Post(ApiUrls.Employee.IsCivilIdDuplicate)]
         Task<Employee?> IsCivilIdDuplicate(EmployeeDuplicateCheckRequest request);
+
         [Post(ApiUrls.Employee.IsEmpIdDuplicate)]
         Task<Employee?> IsEmpIdDuplicate(EmployeeDuplicateCheckRequest request);
+        [Post(ApiUrls.Employee.IsEmployeeDuplicate)]
+        Task<Employee?> IsEmployeeDuplicate(EmployeeDuplicateCheckRequest request);
     }
 }

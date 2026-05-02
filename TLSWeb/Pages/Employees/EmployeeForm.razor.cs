@@ -30,10 +30,12 @@ public partial class EmployeeForm : ComponentBase
     protected string DuplicateMessage = string.Empty;
     private List<Center> centers = new();          // ← جديد
     private long? selectedCenterId;
+    bool isDialogOpen = false;
+    string dialogMessage = "هذا الموظف غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
     // ────────────────────────────────────────────────
     //  Computed
     // ────────────────────────────────────────────────
-    protected bool IsEditMode => Id != 0;
+    protected bool IsEditMode=false;
     protected string PageTitle => IsEditMode ? "تعديل بيانات موظف" : "إضافة موظف جديد";
     protected string SaveButtonText => IsEditMode ? "حفظ التعديل" : "حفظ الموظف";
 
@@ -42,6 +44,7 @@ public partial class EmployeeForm : ComponentBase
     // ────────────────────────────────────────────────
     protected override async Task OnInitializedAsync()
     {
+        IsEditMode = Id != 0;
         // تحميل بيانات الموظف إذا كنا في وضع التعديل
         if (IsEditMode)
         {
@@ -142,41 +145,11 @@ public partial class EmployeeForm : ComponentBase
     // ────────────────────────────────────────────────
     //  Submit
     // ────────────────────────────────────────────────
-    protected async Task HandleSubmit()
+    protected async Task SaveEmployee()
     {
-        IsSaving = true;
         var mapper = new EmployeeMapper();
         var employeeToSend = mapper.ToEmployeeUpsertDTO(employee);
         employeeToSend.CenterId = selectedCenterId;
-        EmployeeDuplicateCheckRequest request = new EmployeeDuplicateCheckRequest
-        {
-            EmpId = employee.EmpId,
-            CivilId = employee.CivilId,
-            ExcludeEmployeeId = Id
-        };
-
-        var IsCivilIdDublicate = await EmployeeApi.IsCivilIdDuplicate(request);
-        if (IsCivilIdDublicate?.Id > 0)
-        {
-            IsDuplicate = true;
-            DuplicateMessage = $"رقم الهوية مكرر مع الموظف: {IsCivilIdDublicate.Name}";
-            IsSaving = false;
-            MudSnackbar.Add(DuplicateMessage, Severity.Error);
-            return;
-        }
-        else
-        {
-            var IsEmpIdDublicate = await EmployeeApi.IsEmpIdDuplicate(request);
-            if (IsEmpIdDublicate?.Id > 0)
-            {
-                IsDuplicate = true;
-                DuplicateMessage = $"رقم الوظيفة مكرر مع الموظف: {IsEmpIdDublicate.Name}";
-                IsSaving = false;
-                MudSnackbar.Add(DuplicateMessage, Severity.Error);
-                return;
-            }
-        }
-
         try
         {
             if (IsEditMode)
@@ -224,11 +197,72 @@ public partial class EmployeeForm : ComponentBase
             IsSaving = false;
         }
         IsSaving = false;
+    }
+    protected async Task HandleSubmit()
+    {
+        
+        IsSaving = true;
+        
+        EmployeeDuplicateCheckRequest request = new EmployeeDuplicateCheckRequest
+        {
+            EmpId = employee.EmpId,
+            CivilId = employee.CivilId,
+            ExcludeEmployeeId = Id
+        };
 
+        //var IsCivilIdDublicate = await EmployeeApi.IsCivilIdDuplicate(request);
+        //if (IsCivilIdDublicate?.Id > 0)
+        //{
+        //    IsDuplicate = true;
+        //    DuplicateMessage = $"رقم الهوية مكرر مع الموظف: {IsCivilIdDublicate.Name}";
+        //    IsSaving = false;
+        //    MudSnackbar.Add(DuplicateMessage, Severity.Error);
+        //    return;
+        //}
+        //else
+        //{
+        //    var IsEmpIdDublicate = await EmployeeApi.IsEmpIdDuplicate(request);
+        //    if (IsEmpIdDublicate?.Id > 0)
+        //    {
+        //        IsDuplicate = true;
+        //        DuplicateMessage = $"رقم الوظيفة مكرر مع الموظف: {IsEmpIdDublicate.Name}";
+        //        IsSaving = false;
+        //        MudSnackbar.Add(DuplicateMessage, Severity.Error);
+        //        return;
+        //    }
+        //}
 
-
-
-
+        var IsDublicate = await EmployeeApi.IsEmployeeDuplicate(request);
+        if (IsDublicate?.Id > 0)
+        {
+            IsDuplicate = true;
+            if (IsDublicate.EmpId == employee.EmpId && IsDublicate.CivilId == employee.CivilId)
+            {
+                if (IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive) != null)
+                {
+                    DuplicateMessage = $"رقم الوظيفة ورقم الهوية مكرران مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
+                }
+                else
+                {
+                    DuplicateMessage = $"رقم الوظيفة ورقم الهوية مكرران مع الموظف: {IsDublicate.Name} في مركز غير محدد";
+                    dialogMessage = $"هذا الموظف / {IsDublicate.Name} موجود مسبقاُ وغير مسجل في أي مركز ، هل ترغب بنقله لمركزكم ؟";
+                    isDialogOpen = true;
+                    StateHasChanged();
+                    return;
+                }
+            }
+            else if (IsDublicate.EmpId == employee.EmpId)
+                DuplicateMessage = $"رقم الوظيفة مكرر مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
+            else if (IsDublicate.CivilId == employee.CivilId)
+                DuplicateMessage = $"رقم الهوية مكرر مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
+           
+            
+            IsSaving = false;
+            MudSnackbar.Add(DuplicateMessage, Severity.Error);
+            return;
+        }
+        else
+        SaveEmployee();
         //IsSaving = true;
         ////حماية مزدوجة: تحقق من التكرار قبل الحفظ
         //await CheckDuplicateAsync();
@@ -305,5 +339,18 @@ public partial class EmployeeForm : ComponentBase
     {
         IsDuplicate = false;
         DuplicateMessage = string.Empty;
+    }
+    private void CancelDialog()
+    {
+        IsSaving = false;
+        isDialogOpen = false;
+        StateHasChanged();
+    }
+    private async void ConfirmDialog()
+    {
+        IsSaving = false;
+        isDialogOpen = false;
+        IsEditMode = true;
+        SaveEmployee();
     }
 }
