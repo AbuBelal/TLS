@@ -1,7 +1,7 @@
 @* ╔══════════════════════════════════════════════════════════════╗ *@
-@* ║  TLSWeb/Layout/NavMenu.razor  — Responsive                  ║ *@
-@* ║  يعتمد على Tailwind (كما في المشروع الأصلي)                 ║ *@
-@* ║  + material-symbols-outlined للأيقونات                      ║ *@
+@* ║  TLSWeb/Layout/NavMenu.razor  — Responsive                   ║ *@
+@* ║  يعتمد على Tailwind (كما في المشروع الأصلي)                   ║ *@
+@* ║  + material-symbols-outlined للأيقونات                        ║ *@
 @* ╚══════════════════════════════════════════════════════════════╝ *@
 
 @implements IDisposable
@@ -252,11 +252,12 @@
             }
         </div>
             <AuthorizeView Roles="@Roles.Admin">
-        @* الإعدادات *@
+        @* income *@
         <div>
             <button class="@GroupBtnClass("InCome")"
                     @onclick='() => ToggleGroup("InCome")'>
-                <span class="material-symbols-outlined" style="font-size:20px">settings</span>
+                 <i class="bi bi-box-seam"></i>
+                @* <span class="material-symbols-outlined" style="font-size:20px">settings</span> *@
                 <span class="flex-1 text-right">الوارد</span>
                 <span class="material-symbols-outlined @ChevronClass("InCome")" style="font-size:18px">
                     expand_more

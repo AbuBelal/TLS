@@ -57,6 +57,27 @@
                             <td class="fw-bold text-success small border-end-0">
                                 <i class="bi bi-check-circle-fill me-1"></i>الحضور
                                 <div class="text-xs text-secondary mt-1">(ذكر / أنثى)</div>
+                            @{
+                                string badgeClass = "";
+                                
+                                if (item.AttPercentage < 50)
+                                {
+                                    badgeClass = "bg-danger-custom";
+                                }
+                                else if (item.AttPercentage >= 50 && item.AttPercentage <= 80)
+                                {
+                                    badgeClass = "bg-warning-custom";
+                                }
+                                else // أكبر من 80
+                                {
+                                    badgeClass = "bg-success-custom";
+                                }
+                            }
+
+                            <span class="percentage-badge @badgeClass mt-2">
+                                @item.AttPercentage%
+                            </span>
+
                             </td>
                             @for (int i = 1; i <= 9; i++)
                             {
@@ -142,9 +163,18 @@
 
             @if (!ReadOnly)
         {
-            <button class="btn btn-success btn-lg px-5 shadow-sm" @onclick="() => SaveCenter()">
-                <i class="bi bi-check-circle me-2"></i>
-                حفظ البيانات
+            <button class="btn btn-success btn-lg px-5 shadow-sm" @onclick="() => SaveCenter()" disabled="@(IsSaving)" >
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    <span>جاري الحفظ...</span>
+                }
+                else
+                {
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span>حفظ البيانات</span>
+                    
+                }
             </button>
         }
         else
@@ -159,6 +189,7 @@
     [Parameter] public DailyReport item { get; set; }
     [Parameter] public string ManagerName { get; set; }
 
+    bool IsSaving = false;
     string[] Levels = new[] { "الصف الأول", "الصف الثاني", "الصف الثالث", "الصف الرابع", "الصف الخامس", "الصف السادس", "الصف السابع", "الصف الثامن", "الصف التاسع" };
     bool ReadOnly = true;
     string UserName = string.Empty;
@@ -166,7 +197,6 @@
     string UserRole = string.Empty;
     bool IsWorkingDay = true;
     decimal Rest = 0;
-
     protected async override Task OnInitializedAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -197,7 +227,7 @@
 
 
         // var managers = await EmployeeApi.GetAllManagers();
-         // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
+        // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
 
         var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
         var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);
@@ -206,6 +236,7 @@
 
     private async Task SaveCenter()
     {
+        IsSaving = true;
         var reportToSave = item;
 
         if (reportToSave != null)
@@ -213,12 +244,14 @@
             if (reportToSave.IsUNRWA > reportToSave.AttTotal)
             {
                 MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور أكبر من الحضور !", Severity.Error);
+                IsSaving = false;
                 return;
             }
             else
              if (reportToSave.IsUNRWA ==0 && reportToSave.RegUNRWA > 0)
             {
                 MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور صفر !", Severity.Error);
+                    IsSaving = false;
                 return;
             }
             Center center = reportToSave.Center;
@@ -235,8 +268,10 @@
             else
                 MudSnackbar.Add(response.Message, Severity.Error);
             item.Center = center;
+            IsSaving = false;
             StateHasChanged();
         }
+        IsSaving = false;
     }
 
     void OnRegValueClick(string propertyName)

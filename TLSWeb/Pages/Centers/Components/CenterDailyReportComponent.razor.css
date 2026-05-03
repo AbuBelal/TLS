@@ -1,4 +1,30 @@
-﻿.compact-field {
+﻿/* تنسيق عام للحاوية */
+.percentage-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* حالة الرسوب أو الحضور المنخفض جداً */
+.bg-danger-custom {
+    background-color: #e74c3c; /* أحمر */
+}
+
+/* حالة الحضور المتوسط (مقبول) */
+.bg-warning-custom {
+    background-color: #f1c40f; /* أصفر/برتقالي */
+    color: #2c3e50;
+}
+
+/* حالة الحضور الممتاز */
+.bg-success-custom {
+    background-color: #2ecc71; /* أخضر */
+}
+.compact-field {
     position: relative;
     padding-top: 12px;
 }

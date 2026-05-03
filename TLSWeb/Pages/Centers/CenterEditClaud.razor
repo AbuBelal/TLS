@@ -1,0 +1,322 @@
+@* ╔══════════════════════════════════════════════════════════════╗ *@
+@* ║  TLSWeb/Pages/Centers/CenterEdit.razor                       ║ *@
+@* ║  صفحة تعديل بيانات المركز — لمدير المركز (Role=User) فقط   ║ *@
+@* ╚══════════════════════════════════════════════════════════════╝ *@
+
+@* @attribute [Route(PagesUris.CenterPages.Edit)] *@
+
+<div class="container-fluid px-4 border-2 " dir="rtl" style="background:@BackgroundColor">
+
+    @* ══ رأس الصفحة ══ *@
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi bi-building-gear me-2 text-primary"></i>تعديل بيانات المركز
+        </h3>
+    </div>
+
+    @* ══ تحميل ══ *@
+@if (IsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="min-height:50vh">
+            <div class="text-center">
+                <div class="spinner-border text-primary" style="width:3rem;height:3rem" role="status"></div>
+                <p class="mt-3 text-muted small">جاري تحميل بيانات المركز...</p>
+            </div>
+        </div>
+    }
+    @* ══ خطأ ══ *@
+    else if (ErrorMsg is not null)
+    {
+        <div class="alert alert-warning d-flex align-items-center gap-2 mt-3">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span>@ErrorMsg</span>
+        </div>
+    }
+    @* ══ النموذج ══ *@
+    else
+    {
+        @* ============================================
+   توليد class الخلفية ديناميكياً حسب كود المركز
+   ============================================ *@
+        <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="wrap">
+
+                @* ── Topbar ── *@
+                <div class="topbar">
+                    <div class="topbar-inner">
+                        <div class="topbar-left">
+                            <div class="un-logo">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="20" cy="20" r="18" fill="none" stroke="#009EDB" stroke-width="2" />
+                                    <ellipse cx="20" cy="20" rx="8" ry="18" fill="none" stroke="#009EDB" stroke-width="1.5" />
+                                    <line x1="2" y1="20" x2="38" y2="20" stroke="#009EDB" stroke-width="1.5" />
+                                    <line x1="4" y1="13" x2="36" y2="13" stroke="#009EDB" stroke-width="1.2" />
+                                    <line x1="4" y1="27" x2="36" y2="27" stroke="#009EDB" stroke-width="1.2" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="topbar-title">تعديل بيانات المركز</div>
+                                <div class="topbar-sub">مركز الأمم المتحدة · رقم المركز: @Model.SortOrder</div>
+                            </div>
+                        </div>
+                        <div class="topbar-badge">المركز رقم @Model.SortOrder</div>
+                    </div>
+                    <div class="section-strip">
+                        <div class="strip-dot"></div>
+                        <span class="strip-text">جميع الحقول المميزة بـ * إلزامية</span>
+                    </div>
+                </div>
+
+                <div class="grid">
+
+                    @* ── العمود الأيمن ── *@
+                    <div>
+
+                        @* بطاقة المعلومات الأساسية *@
+                        <div class="card">
+                            <div class="card-head">
+                                <div class="head-icon">
+                                    <svg viewBox="0 0 16 16"><circle cx="8" cy="5" r="3" /><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" /></svg>
+                                </div>
+                                <span class="card-title">المعلومات الأساسية</span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="mgr-row">
+                                    <div class="mgr-icon">
+                                        <svg viewBox="0 0 16 16"><circle cx="8" cy="5" r="3" /><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" /></svg>
+                                    </div>
+                                    <div>
+                                        <div class="mgr-lbl">مدير المركز</div>
+                                        <div class="mgr-val">@Model.ManagerName</div>
+                                    </div>
+                                </div>
+
+                                <div class="fcols">
+                                    <div class="c8">
+                                        <label>اسم المركز <span class="req">*</span></label>
+                                        <InputText @bind-Value="Model.Name" disabled="@(!IsAdmin)" placeholder="أدخل اسم المركز" />
+                                        <ValidationMessage For="@(() => Model.Name)" class="req" />
+                                    </div>
+                                    <div class="c4">
+                                        <label>كود المركز</label>
+                                        <InputText @bind-Value="Model.CenterCode" disabled="@(!IsAdmin)" placeholder="JB-001" />
+                                        <ValidationMessage For="@(() => Model.CenterCode)" class="req" />
+                                    </div>
+                                    <div class="c8">
+                                        <label>اسم المركز بالإنجليزية <span class="req">*</span></label>
+                                        <InputText @bind-Value="Model.EnName" disabled="@(!IsAdmin)" placeholder="Enter center name" />
+                                        <ValidationMessage For="@(() => Model.EnName)" class="req" />
+                                    </div>
+                                    <div class="c3">
+                                        <label>رقم المبنى</label>
+                                        <InputText @bind-Value="Model.BuildingCode" disabled="@(!IsAdmin)" placeholder="2xxxxxx" />
+                                        <ValidationMessage For="@(() => Model.BuildingCode)" class="req" />
+                                    </div>
+                                    <div class="c1e" style="grid-column:span 1">
+                                        <label>الترتيب</label>
+                                        <InputNumber @bind-Value="Model.SortOrder" disabled="@(!IsAdmin)" placeholder="01" />
+                                        <ValidationMessage For="@(() => Model.SortOrder)" class="req" />
+                                    </div>
+                                    <div class="c8">
+                                        <label>العنوان</label>
+                                        <InputText @bind-Value="Model.Address" placeholder="الحي، الشارع، المنطقة" />
+                                        <ValidationMessage For="@(() => Model.Address)" class="req" />
+                                    </div>
+                                    <div class="c4">
+                                        <label>فترة الدوام</label>
+                                        <InputSelect @bind-Value="Model.WHours">
+                                            <option value="">-- اختر --</option>
+                                            @foreach (var g in WHoures)
+                                            {
+                                                <option value="@g.Id">@g.Name</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => Model.WHours)" class="req" />
+                                    </div>
+                                    <div class="c12">
+                                        <label>ملاحظات</label>
+                                        <InputTextArea @bind-Value="Model.Comments" rows="3" placeholder="أي ملاحظات إضافية..." />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        @* بطاقة أيام الدوام *@
+                        <div class="card">
+                            <div class="card-head">
+                                <div class="head-icon">
+                                    <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5" /><line x1="2" y1="7" x2="14" y2="7" /><line x1="6" y1="3" x2="6" y2="1" /><line x1="10" y1="3" x2="10" y2="1" /></svg>
+                                </div>
+                                <span class="card-title">أيام الدوام <span class="req">*</span></span>
+                            </div>
+                            <div class="card-body">
+                                <div class="days-wrap">
+                                    @foreach (var day in AllDays)
+                                    {
+                                        var selected = IsDaySelected(day);
+                                        <button type="button"
+                                                disabled="@(!IsAdmin)"
+                                                class="day-pill @(selected ? "on" : "")"
+                                                @onclick="() => ToggleDay(day)">
+                                            @day
+                                        </button>
+                                    }
+                                </div>
+                                <div class="days-result">
+                                    <div class="dlbl">أيام الدوام المحددة:</div>
+                                    <div class="dval">@(string.IsNullOrEmpty(Model.DaysOfWeek) ? "—" : Model.DaysOfWeek)</div>
+                                </div>
+                                <ValidationMessage For="@(() => Model.DaysOfWeek)" class="req" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    @* ── العمود الأيسر ── *@
+                    <div>
+
+                        @* بطاقة المرافق *@
+                        <div class="card" style="margin-bottom:1rem">
+                            <div class="card-head">
+                                <div class="head-icon">
+                                    <svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" /><rect x="9" y="2" width="5" height="5" rx="1" /><rect x="2" y="9" width="5" height="5" rx="1" /><rect x="9" y="9" width="5" height="5" rx="1" /></svg>
+                                </div>
+                                <span class="card-title">المرافق والمساحات</span>
+                            </div>
+                            <div class="card-body">
+
+                                <div style="margin-bottom:1rem">
+                                    <div class="ctr-lbl-row">
+                                        <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1" /><line x1="8" y1="3" x2="8" y2="13" /></svg>
+                                        <label style="margin-bottom:0">عدد الغرف</label>
+                                    </div>
+                                    <div class="ctr-group">
+                                        <button type="button" class="ctr-btn"
+                                                @onclick='() => Model.Rooms = Math.Max(0, (Model.Rooms ?? 0) - 1)'>
+                                            −
+                                        </button>
+                                        <InputNumber @bind-Value="Model.Rooms" min="0" max="999" />
+                                        <button type="button" class="ctr-btn"
+                                                @onclick='() => Model.Rooms = Math.Min(999, (Model.Rooms ?? 0) + 1)'>
+                                            +
+                                        </button>
+                                    </div>
+                                    <ValidationMessage For="@(() => Model.Rooms)" class="req" />
+                                </div>
+
+                                <div style="margin-bottom:1rem">
+                                    <div class="ctr-lbl-row">
+                                        <svg viewBox="0 0 16 16"><path d="M2 13L8 4l6 9z" /><line x1="2" y1="13" x2="14" y2="13" /></svg>
+                                        <label style="margin-bottom:0">عدد الخيام</label>
+                                    </div>
+                                    <div class="ctr-group">
+                                        <button type="button" class="ctr-btn"
+                                                @onclick='() => Model.Tarpaulins = Math.Max(0, (Model.Tarpaulins ?? 0) - 1)'>
+                                            −
+                                        </button>
+                                        <InputNumber @bind-Value="Model.Tarpaulins" min="0" max="999" />
+                                        <button type="button" class="ctr-btn"
+                                                @onclick='() => Model.Tarpaulins = Math.Min(999, (Model.Tarpaulins ?? 0) + 1)'>
+                                            +
+                                        </button>
+                                    </div>
+                                    <ValidationMessage For="@(() => Model.Tarpaulins)" class="req" />
+                                </div>
+
+                                <div>
+                                    <div class="ctr-lbl-row">
+                                        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" /></svg>
+                                        <label style="margin-bottom:0">مساحات أخرى</label>
+                                    </div>
+                                    <div class="ctr-group">
+                                        <button type="button" class="ctr-btn"
+                                                @onclick='() => Model.OtherSpaces = Math.Max(0, (Model.OtherSpaces ?? 0) - 1)'>
+                                            −
+                                        </button>
+                                        <InputNumber @bind-Value="Model.OtherSpaces" min="0" max="999" />
+                                        <button type="button" class="ctr-btn"
+                                                @onclick='() => Model.OtherSpaces = Math.Min(999, (Model.OtherSpaces ?? 0) + 1)'>
+                                            +
+                                        </button>
+                                    </div>
+                                    <ValidationMessage For="@(() => Model.OtherSpaces)" class="req" />
+                                </div>
+
+                            </div>
+                        </div>
+
+                        @* Mini stats *@
+                        <div class="mini-stats">
+                            <div class="mini-card">
+                                <div class="mini-num">@(Model.Rooms ?? 0)</div>
+                                <div class="mini-lbl">غرفة</div>
+                            </div>
+                            <div class="mini-card">
+                                <div class="mini-num">@(Model.Tarpaulins ?? 0)</div>
+                                <div class="mini-lbl">خيمة</div>
+                            </div>
+                        </div>
+
+                        @* ملخص سريع *@
+                        <div class="summary">
+                            <div class="sum-title">
+                                <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" /><line x1="8" y1="5" x2="8" y2="9" /></svg>
+                                ملخص سريع
+                            </div>
+                            <div class="sum-row">
+                                <span class="sum-lbl">كود المركز</span>
+                                <span class="sum-val">@(Model.CenterCode ?? "—")</span>
+                            </div>
+                            <div class="sum-row">
+                                <span class="sum-lbl">الغرف</span>
+                                <span class="sum-val accent">@(Model.Rooms ?? 0) غرفة</span>
+                            </div>
+                            <div class="sum-row">
+                                <span class="sum-lbl">الخيام</span>
+                                <span class="sum-val accent">@(Model.Tarpaulins ?? 0) خيمة</span>
+                            </div>
+                            <div class="sum-row">
+                                <span class="sum-lbl">مساحات أخرى</span>
+                                <span class="sum-val accent">@(Model.OtherSpaces ?? 0)</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                @* ── شريط الأزرار ── *@
+                <div class="bottom-bar">
+                    <div class="sec-note">
+                        <div class="sec-icon">
+                            <svg viewBox="0 0 14 14"><path d="M7 1L2 3.5v4c0 3 2.2 5.4 5 6 2.8-.6 5-3 5-6v-4L7 1z" /></svg>
+                        </div>
+                        التعديلات تُطبَّق على مركزك فقط
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn-cancel"
+                                @onclick="() => NavManager.NavigateTo(PagesUris.Home)"
+                                disabled="@IsSaving">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn-save" disabled="@IsSaving">
+                            @if (IsSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                <span>جاري الحفظ...</span>
+                            }
+                            else
+                            {
+                                <span>حفظ التعديلات</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </EditForm>
+    }
+    </div>

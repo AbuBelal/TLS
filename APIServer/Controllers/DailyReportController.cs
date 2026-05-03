@@ -31,6 +31,7 @@ namespace APIServer.Controllers
         public async Task<IActionResult> UpdateDailyReport([FromBody] DailyReport dailyReport)
         {
             var result = await _repo.UpdateDailyReportAsync(dailyReport);
+            await _auditLogService.LogAsync("Update", "Update Daily Report", "", $"تحديث التقرير اليومي: {dailyReport.ReportDate}");
             return Ok(result);
         }
 

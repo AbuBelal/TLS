@@ -66,10 +66,10 @@ namespace SharedLib.Entities
         public int? AttFemale09 { get; set; } = 0;
 
         //
-        public int? IsUNRWA { get; set; }
-        public int? Disabilities { get; set; }
-        public int? WFPBiscDist { get; set; }
-        public int? WFPBiscLost { get; set; }
+        public int? IsUNRWA { get; set; } = 0;
+        public int? Disabilities { get; set; } = 0;
+        public int? WFPBiscDist { get; set; } = 0;
+        public int? WFPBiscLost { get; set; } = 0;
 
         [NotMapped]
         public int? IsNotUNRWA => AttTotal - (IsUNRWA ?? 0);
@@ -124,6 +124,8 @@ namespace SharedLib.Entities
         public int? RegFemaleTotal => RegFemale01 + RegFemale02 + RegFemale03 + RegFemale04 + RegFemale05 + RegFemale06 + RegFemale07 + RegFemale08 + RegFemale09;
         [NotMapped]
         public int AttTotal => AttStd01 + AttStd02 + AttStd03 + AttStd04 + AttStd05 + AttStd06 + AttStd07 + AttStd08 + AttStd09;
+        [NotMapped]
+        public decimal AttPercentage =>Math.Round( (AttTotal / (RegTotal*1m))*100,2);
         [NotMapped]
         public int? AttMaleTotal => AttMale01 + AttMale02 + AttMale03 + AttMale04 + AttMale05 + AttMale06 + AttMale07 + AttMale08 + AttMale09;
         [NotMapped]

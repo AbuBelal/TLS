@@ -1,0 +1,225 @@
+@* ╔══════════════════════════════════════════════════════════════╗ *@
+@* ║  TLSWeb/Pages/Centers/CenterEdit.razor                       ║ *@
+@* ║  صفحة تعديل بيانات المركز — لمدير المركز (Role=User) فقط   ║ *@
+@* ╚══════════════════════════════════════════════════════════════╝ *@
+
+@* @attribute [Route(PagesUris.CenterPages.Edit)] *@
+@{
+    // مصفوفة ألوان لطيفة تتغير بناءً على رقم المركز
+    var bgColors = new[] { "#f8f9fa", "#f0f4ff", "#f5fff0", "#fffaf0", "#f0faff", "#fff0f5" };
+    var selectedBg = bgColors[Model.Id % bgColors.Length]; // افترضنا وجود Id للمركز
+}
+
+<div class="container-fluid px-4 border-2 " dir="rtl" style="background:@BackgroundColor">
+
+    @* ══ رأس الصفحة ══ *@
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h3 class="mb-0">
+            <i class="bi bi-building-gear me-2 text-primary"></i>تعديل بيانات المركز
+        </h3>
+    </div>
+
+    @* ══ تحميل ══ *@
+    @if (IsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="min-height:50vh">
+            <div class="text-center">
+                <div class="spinner-border text-primary" style="width:3rem;height:3rem" role="status"></div>
+                <p class="mt-3 text-muted small">جاري تحميل بيانات المركز...</p>
+            </div>
+        </div>
+    }
+
+    @* ══ خطأ ══ *@
+    else if (ErrorMsg is not null)
+    {
+        <div class="alert alert-warning d-flex align-items-center gap-2 mt-3">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span>@ErrorMsg</span>
+        </div>
+    }
+
+    @* ══ النموذج ══ *@
+    else
+    {
+        <div class="center-dashboard shadow-sm border">
+            <EditForm Model="@Model" OnValidSubmit="HandleSubmit" >
+                <DataAnnotationsValidator />
+
+                <div class="row g-4">
+                    @* ── العمود الأيمن: المعلومات الأساسية ── *@
+                    <div class="col-lg-8">
+                        <div class="card custom-card shadow-sm mb-4">
+                            <div class="card-header bg-white border-bottom-0 py-3 d-flex align-items-center">
+                                <div class="icon-box bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                                    <i class="bi bi-info-circle text-primary"></i>
+                                </div>
+                                <h5 class="mb-0 fw-bold">المعلومات الأساسية</h5>
+                            </div>
+
+                            <div class="card-body pt-0">
+                                <div class="alert alert-light border-0 d-flex align-items-center gap-3 mb-4 py-2">
+                                    <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center p-2">
+                                        <i class="bi bi-person-badge"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">مدير المركز الحالي</small>
+                                        <span class="fw-bold">@Model.ManagerName</span>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold text-secondary">اسم المركز العربي</label>
+                                        <InputText @bind-Value="Model.Name" disabled=@(!IsAdmin) class="form-control form-control-custom" placeholder="أدخل اسم المركز" />
+                                        <ValidationMessage For="@(() => Model.Name)" class="text-danger small" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-secondary">كود المركز</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash"></i></span>
+                                            <InputText @bind-Value="Model.CenterCode" disabled=@(!IsAdmin) class="form-control form-control-custom border-start-0" placeholder="JB-001" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold text-secondary">English Center Name</label>
+                                        <InputText @bind-Value="Model.EnName" disabled=@(!IsAdmin) class="form-control form-control-custom text-start" placeholder="Enter center name" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-secondary">المبنى</label>
+                                        <InputText @bind-Value="Model.BuildingCode" disabled=@(!IsAdmin) class="form-control form-control-custom text-center" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-secondary">الترتيب</label>
+                                        <InputNumber @bind-Value="Model.SortOrder" disabled=@(!IsAdmin) class="form-control form-control-custom text-center" />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label small fw-bold text-secondary">العنوان الجغرافي</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
+                                            <InputText @bind-Value="Model.Address" class="form-control form-control-custom" placeholder="الحي، الشارع..." />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">فترة الدوام</label>
+                                        <InputSelect @bind-Value="Model.WHours" class="form-select form-control-custom">
+                                            <option value="">-- اختر الفترة --</option>
+                                            @foreach (var g in WHoures)
+                                            {
+                                                <option value="@g.Id">@g.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-secondary">ملاحظات إضافية</label>
+                                        <InputTextArea @bind-Value="Model.Comments" class="form-control form-control-custom" rows="2" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* بطاقة أيام الدوام *@
+                        <div class="card custom-card shadow-sm border-0">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-calendar-check me-2 text-primary"></i>جدول أيام العمل</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var day in AllDays)
+                                    {
+                                        var selected = IsDaySelected(day);
+                                        <button type="button" disabled=@(!IsAdmin)
+                                                class="btn btn-sm @(selected ? "btn-primary shadow-sm" : "btn-outline-light text-dark border") rounded-pill px-4 py-2 transition-all"
+                                                @onclick="() => ToggleDay(day)">
+                                            @day
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* ── العمود الأيسر: المرافق والملخص ── *@
+                    <div class="col-lg-4">
+                        <div class="card custom-card shadow-sm mb-4 bg-white">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="mb-0 fw-bold"><i class="bi bi-building me-2 text-primary"></i>تجهيزات المرافق</h6>
+                            </div>
+                            <div class="card-body pt-0">
+                                @{
+                                    var facilities = new[] {
+                                new { Label = "عدد الغرف", Icon = "door-open", Value = Model.Rooms, Action = "Rooms" },
+                                new { Label = "عدد الخيام", Icon = "tent", Value = Model.Tarpaulins, Action = "Tarpaulins" },
+                                new { Label = "مساحات أخرى", Icon = "grid", Value = Model.OtherSpaces, Action = "OtherSpaces" }
+                            };
+                                }
+
+                                @foreach (var item in facilities)
+                                {
+                                    <div class="mb-4 p-3 border rounded-3 bg-light bg-opacity-50">
+                                        <label class="form-label small fw-bold d-block mb-2">@item.Label</label>
+                                        <div class="input-group input-group-sm shadow-sm">
+                                            <button type="button" class="btn btn-white border" @onclick='() => UpdateValue(item.Action, -1)'><i class="bi bi-dash-lg"></i></button>
+                                            <input type="text" class="form-control text-center fw-bold bg-white" value="@item.Value" readonly />
+                                            <button type="button" class="btn btn-white border" @onclick='() => UpdateValue(item.Action, 1)'><i class="bi bi-plus-lg"></i></button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        @* بطاقة الإحصائيات *@
+                        <div class="card border-0 shadow-sm bg-primary text-white overflow-hidden">
+                            <div class="card-body position-relative">
+                                <div class="position-absolute end-0 bottom-0 opacity-25" style="font-size: 5rem; transform: translate(20%, 20%)">
+                                    <i class="bi bi-activity"></i>
+                                </div>
+                                <h6 class="fw-bold mb-3 small">نظرة عامة على السعة</h6>
+                                <div class="d-flex justify-content-around text-center">
+                                    <div>
+                                        <div class="fs-4 fw-bold">@(Model.Rooms ?? 0)</div>
+                                        <div class="small opacity-75">غرف</div>
+                                    </div>
+                                    <div class="border-start border-white border-opacity-25"></div>
+                                    <div>
+                                        <div class="fs-4 fw-bold">@(Model.Tarpaulins ?? 0)</div>
+                                        <div class="small opacity-75">خيام</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* ══ شريط الأزرار السفلي ══ *@
+                <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-white rounded-3 shadow-sm border">
+                    <div class="d-none d-md-block text-muted small">
+                        <i class="bi bi-info-circle me-1"></i> يتم حفظ البيانات بشكل آمن لمركزك
+                    </div>
+                    <div class="d-flex gap-2 w-100 w-md-auto">
+                        <button type="button" class="btn btn-light px-4 border" @onclick="() => NavManager.NavigateTo(PagesUris.Home)">إلغاء</button>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold" disabled="@IsSaving">
+                            @if (IsSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                            }
+                            else
+                            {
+
+                                <i class="bi bi-cloud-check me-2"></i>
+                            }
+                            حفظ البيانات
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    }
+</div>
+
+@code { }

@@ -115,6 +115,7 @@ namespace APIServerLib.Repositories.Implemntations
                 DailyReportList.Add(await GetDailyReportByCenterIdAsync(allStdCenters, Center, date));
             }
 
+            DailyReportList = DailyReportList.OrderBy(x => x.Center.SortOrder).ToList();
             return DailyReportList;
         }
 

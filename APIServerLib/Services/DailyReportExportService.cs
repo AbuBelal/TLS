@@ -123,10 +123,10 @@ public static class DailyReportExportService
             ws.Cell(row, 23).Value = report.AttMale09;
             ws.Cell(row, 24).Value = report.AttFemale09;
             ws.Cell(row, 25).Value = report.IsUNRWA;
-            ws.Cell(row, 26).Value = report.Disabilities;
+            ws.Cell(row, 26).Value = report.AttTotal > 0 ? report.Disabilities : 0;
             ws.Cell(row, 27).Value = report.RegTotal;
-            ws.Cell(row, 28).Value = report.WFPBiscDist;
-            ws.Cell(row, 29).Value = report.WFPBiscLost;
+            ws.Cell(row, 28).Value = report.WFPBiscDist??0;
+            ws.Cell(row, 29).Value = report.WFPBiscLost??0;
             ws.Cell(row, 30).Value = report.WFPBiscTotal;
             ws.Cell(row, 31).Value = report.IsNotUNRWA;
             ws.Cell(row, 32).Value = report.AttMaleTotal;

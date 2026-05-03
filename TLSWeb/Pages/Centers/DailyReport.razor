@@ -21,15 +21,16 @@
     </div>
 </AuthorizeView>
 
-<h3>
-    <i class="bi bi-table me-2 text-primary"></i>
-تقرير حضور الطلاب اليومي</h3>
+<h2 class="mb-2 text-primary fw-bold">
+    <i class="bi bi-table me-2 text-primary fw-bold"></i>
+تقرير حضور الطلاب اليومي</h2>
 
 <div class="alert alert-info d-flex align-items-center" role="alert">
-    <i class="bi bi-info-circle me-2"></i>
+    <i class="fas fa-calendar-alt ml-2"></i> <!-- أيقونة اختيارية -->
     <div>
         <InputDate @bind-Value="SelectedDate" @bind-Value:after="@(()=>OnDateChanged())"></InputDate>
     </div>
+    <span class="badge badge-pill badge-warning bg-warning ms-2 text-2xl text-primary"> @SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(SelectedDate.ToString("dddd"), SelectedDate.ToString("dddd"))</span>
 </div>
 
 
@@ -42,7 +43,7 @@ else
     
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-            <h2 class="text-primary fw-bold">تقرير الحضور اليومي</h2>
+           
             <span class="badge bg-secondary p-2">التاريخ: @DateTime.Now.ToString("yyyy-MM-dd")</span>
         </div>
 
@@ -124,6 +125,7 @@ else
         finally
         {
             IsLoading = false;
+            StateHasChanged();
         }
     }
     private async Task OnSearchChanged()
