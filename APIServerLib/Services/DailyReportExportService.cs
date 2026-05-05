@@ -103,7 +103,7 @@ public static class DailyReportExportService
             ws.Cell(row, 3).Value = "";
             ws.Cell(row, 4).Value  = "";
             ws.Cell(row, 5).Value = report.Center?.Name;
-            ws.Cell(row, 6).Value  = report.Center?.Rooms + report.Center?.Tarpaulins;
+            ws.Cell(row, 6).Value  = report.AttTotal > 0 ? report.Center?.Rooms + report.Center?.Tarpaulins:1;
             ws.Cell(row, 7).Value = report.AttMale01;
             ws.Cell(row, 8).Value = report.AttFemale01;
             ws.Cell(row, 9).Value = report.AttMale02;
@@ -124,7 +124,7 @@ public static class DailyReportExportService
             ws.Cell(row, 24).Value = report.AttFemale09;
             ws.Cell(row, 25).Value = report.IsUNRWA;
             ws.Cell(row, 26).Value = report.AttTotal > 0 ? report.Disabilities : 0;
-            ws.Cell(row, 27).Value = report.RegTotal;
+            ws.Cell(row, 27).Value = report.AttTotal > 0 ? report.RegTotal:0;
             ws.Cell(row, 28).Value = report.WFPBiscDist??0;
             ws.Cell(row, 29).Value = report.WFPBiscLost??0;
             ws.Cell(row, 30).Value = report.WFPBiscTotal;

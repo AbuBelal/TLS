@@ -200,6 +200,10 @@ namespace TLSClientSharedLib.Helpers
             public const string DeleteById = PriorUrl + "/{id}";
             public const string GetBuildingTotal = PriorUrl + "/Buildingtotal";
         }
-        
+        public static class Attendance
+        {
+            public const string PriorUrl = "/api/Attendance";
+            public const string GetAttendancesAvg = PriorUrl + "/get-attendancesAvg";
+        }
     }
 }

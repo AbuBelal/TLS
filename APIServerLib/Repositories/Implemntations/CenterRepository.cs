@@ -118,5 +118,23 @@ namespace APIServerLib.Repositories.Implemntations
             await _context.SaveChangesAsync();
             return new GeneralResponse(true, "Center updated successfully.", item.Id);
         }
+
+        public async Task<bool> IsWorkDayAsync(long centerId, DateOnly date)
+        {
+            var Center = await _context.Centers.FindAsync(centerId);
+            if (Center == null) return false;
+
+            string dayInEnglish = date.ToString("dddd");
+            string dayInArabic = SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(dayInEnglish, dayInEnglish);
+            if (Center?.DaysOfWeek?.Contains(dayInArabic) ?? false)
+            {
+                return true;
+
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

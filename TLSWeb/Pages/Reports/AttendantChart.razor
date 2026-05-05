@@ -1,0 +1,85 @@
+﻿@using MudBlazor.Charts
+@using TLSWeb.Components
+@page "/reports/attendant-chart"
+
+@if (AttendancesData == null || AttendancesData.Count == 0)
+{
+    <LoadingComponent />
+}
+else
+{
+    <MudPaper Class="doc-section-component-container">
+        <MudChart ChartType="ChartType.Line" 
+        ChartSeries="@_series" 
+        ChartLabels="@_xAxisLabels" 
+        ChartOptions="@_options" 
+        Width="100%" 
+        Height="@($"{_height}px")"
+                  @bind-SelectedIndex="_index" MatchBoundsToSize="_matchBoundsToSize" />
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public long CenterId { get; set; } = 1;
+    [Parameter] public DateOnly From { get; set; } = DateOnly.FromDateTime(DateTime.Now).AddDays(-7);
+    [Parameter] public DateOnly To { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+
+    // 1. تأكد أن القائمة التي يفحصها الـ IF هي التي تمتلئ بالبيانات
+    List<DailyAttendance> AttendancesData = new List<DailyAttendance>();
+    private bool _matchBoundsToSize = false;
+
+    private int _index = -1;
+    private int _height = 350;
+    private string[] _xAxisLabels = { };
+    private List<ChartSeries<double>> _series = new List<ChartSeries<double>>(); // تغيير النوع ليكون أبسط
+
+    private LineChartOptions _options = new LineChartOptions()
+    {
+        XAxisTitle = "الزمن",
+        YAxisTitle = "عدد الحضور",
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        DateOnly from = From;
+        DateOnly to = To;
+
+        var request = new AttendanceRequest()
+        {
+            CenterId = CenterId,
+            From = from,
+            To = to
+        };
+
+        // تصحيح: حذفنا var لملء المتغير العام التابع للكلاس
+        AttendancesData = await AttendanceApi.GetAttendancesAvg(request);
+
+        if (AttendancesData != null && AttendancesData.Any())
+        {
+            var ser0Data = new List<double>();
+            var ser1Data = new List<double>();
+            var labels = new List<string>();
+
+            foreach (var item in AttendancesData)
+            {
+                // MudChart يتوقع double في البيانات غالباً
+                ser0Data.Add((double)item.CenterAttendanceCount);
+                ser1Data.Add((double)item.AreaAttendanceCount);
+                labels.Add(item.Date.ToString("dd"));
+            }
+
+            // تحديث السلاسل بالكامل
+            _series = new List<ChartSeries<double>>()
+            {
+                new ChartSeries<double>() { Name = "حضور المركز", Data = ser0Data.ToArray() },
+                new ChartSeries<double>() { Name = "متوسط المنطقة", Data = ser1Data.ToArray() }
+            };
+
+            _xAxisLabels = labels.ToArray();
+        }
+
+        // StateHasChanged ستعمل الآن لأن AttendancesData.Count أصبح > 0
+        StateHasChanged();
+    }
+}

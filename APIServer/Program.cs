@@ -46,7 +46,7 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 
 //cors
 AllowCors.AddCorsPolicy(builder);
-
+builder.Services.AddHttpClient();
 
 //builder.Services.AddCors(options =>
 //{

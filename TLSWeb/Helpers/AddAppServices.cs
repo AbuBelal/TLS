@@ -102,7 +102,14 @@ namespace TLSWeb.Helpers
            {
                c.BaseAddress = new Uri(ApiUrls.BaseUrl);
            }).AddHttpMessageHandler<CookieHandler>();
+
             builder.Services.AddRefitClient<IInComeApi>()
+           .ConfigureHttpClient(c =>
+           {
+               c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+           }).AddHttpMessageHandler<CookieHandler>();
+
+            builder.Services.AddRefitClient<IAttendanceApi>()
            .ConfigureHttpClient(c =>
            {
                c.BaseAddress = new Uri(ApiUrls.BaseUrl);

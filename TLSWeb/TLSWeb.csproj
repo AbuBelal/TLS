@@ -28,4 +28,10 @@
     <ProjectReference Include="..\TLSClientSharedLib\TLSClientSharedLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\manifest.webmanifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

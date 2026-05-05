@@ -19,6 +19,27 @@ namespace SharedLib.Entities
 
         public Center? Center { get; set; }
         public bool IsLocked { get; set; } = false;
+
+        [NotMapped]
+        public bool IsWorkingDay
+        {
+            get {
+
+                if(Center == null) return false;
+
+                string dayInEnglish = ReportDate.ToString("dddd");
+                string dayInArabic = SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(dayInEnglish, dayInEnglish);
+                if (Center?.DaysOfWeek?.Contains(dayInArabic) ?? false)
+                {
+                    return true;
+                    
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
         public DateTime? LockedAt { get; set; }
         public string? LockedBy { get; set; } // User ID who locked it
 

@@ -1,0 +1,69 @@
+﻿@page "/view-students"
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4>بيانات الطلاب من نظام EMIS</h4>
+        </div>
+        <div class="card-body">
+            @if (studentList == null)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>جاري استدعاء البيانات عبر الـ Proxy...</p>
+                </div>
+            }
+            else
+            {
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>رقم الطالب</th>
+                            <th>الاسم الكامل</th>
+                            <th>المدرسة</th>
+                            <th>الصف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in studentList)
+                        {
+                            <tr>
+                                <td>@item.StudentId</td>
+                                <td>@item.ArabicFullNameWithoutQuoted</td>
+                                <td>@item.School</td>
+                                <td>@item.Grade</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<StudentItem>? studentList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Http.BaseAddress = new Uri("https://localhost:7075/");
+        // استدعاء الكنترولر الخاص بنا
+        var response = await Http.GetStringAsync("api/StudentProxy/fetch-students");
+        if (response != null)
+        {
+            // studentList = response.aaData;
+        }
+    }
+
+    // الـ Models لفك التشفير
+    public class EmisData { public List<StudentItem> aaData { get; set; } }
+    public class StudentItem
+    {
+        public string StudentId { get; set; }
+        public string ArabicFullNameWithoutQuoted { get; set; }
+        public string School { get; set; }
+        public string Grade { get; set; }
+    }
+}
