@@ -41,13 +41,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">اسم المستخدم</label>
-                            <InputText class="form-control" @bind-Value="ProfileModel.UserName" />
+                            <InputText class="form-control" @bind-Value="ProfileModel.UserName" disabled />
                             <ValidationMessage For="@(() => ProfileModel.UserName)" />
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">البريد الإلكتروني</label>
                             @* استخدام input عادي لأنه للقراءة فقط *@
-                            <input class="form-control" value="@ProfileModel.Email" readonly />
+                            <input class="form-control" value="@ProfileModel.Email" disabled readonly />
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">رقم الهاتف</label>
@@ -56,13 +56,13 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">الدور</label>
-                            <input class="form-control" value="@CurrentRole" readonly />
+                            <input class="form-control" value="@CurrentRole" readonly disabled />
                         </div>
                         @if (!string.IsNullOrEmpty(ProfileModel.EmpName))
                         {
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">الموظف المرتبط</label>
-                                <input class="form-control" value="@ProfileModel.EmpName" readonly />
+                                <input class="form-control" value="@ProfileModel.EmpName" readonly disabled />
                             </div>
                         }
                     </div>

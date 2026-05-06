@@ -146,7 +146,7 @@ namespace SharedLib.Entities
         [NotMapped]
         public int AttTotal => AttStd01 + AttStd02 + AttStd03 + AttStd04 + AttStd05 + AttStd06 + AttStd07 + AttStd08 + AttStd09;
         [NotMapped]
-        public decimal AttPercentage =>Math.Round( (AttTotal / (RegTotal*1m))*100,2);
+        public double AttPercentage =>((double)Math.Round( (AttTotal / (RegTotal*1m))*100,2));
         [NotMapped]
         public int? AttMaleTotal => AttMale01 + AttMale02 + AttMale03 + AttMale04 + AttMale05 + AttMale06 + AttMale07 + AttMale08 + AttMale09;
         [NotMapped]

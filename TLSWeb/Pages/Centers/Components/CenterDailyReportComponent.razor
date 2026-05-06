@@ -3,7 +3,7 @@
         <h5 class="mb-0 fw-bold">
             <i class="bi bi-house-door-fill me-2"></i> @item.Center?.Name
             <span class="badge bg-light text-dark ms-2">@ManagerName</span>
-            @if(!IsWorkingDay)
+            @if(!item.IsWorkingDay)
             {
                 <span class="badge bg-danger text-warning ms-2">ليس يوم عمل</span>
             }
@@ -212,7 +212,7 @@
 
         if (item.Center?.DaysOfWeek?.Contains(dayInArabic) ?? false)
         {
-            IsWorkingDay = true;
+            // IsWorkingDay = true;
             if (user.IsInRole("Admin"))
                 ReadOnly = false;
             else
@@ -220,7 +220,7 @@
         }
         else
         {
-            IsWorkingDay = false;
+            // IsWorkingDay = false;
             ReadOnly = true;
         }
 

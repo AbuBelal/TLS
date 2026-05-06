@@ -57,5 +57,11 @@ namespace APIServer.Controllers
             var attendances = await _attendanceRepository.GetAttendancesAsync(request.CenterId, request.From, request.To);
             return Ok(attendances);
         }
+        [HttpPost("get-attendances-all-centersAvg")]
+        public async Task<ActionResult<List<AllCentersDailyAttendance>>> GetAttendancesAllCentersAvg(AttendanceRequest request)
+        {
+            var attendances = await _attendanceRepository.GetAttendancesAllCentersAsync(request.From, request.To);
+            return Ok(attendances);
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace APIServer.Controllers
             profile.UserName = user.UserName;
             profile.UserId = user.Id;
             profile.EmployeeId = user1.EmployeeId;
-            profile.EmployeeName = user1.Employee.Name != null ? user.Employee.Name : null;
+            profile.EmployeeName = user1.Employee?.Name != null ? user.Employee?.Name : null;
             if (profile.EmployeeId is not null)
             {
                 var Center =  user1.Employee?.EmpCenters.OrderByDescending(x => x.FromDate).FirstOrDefault();

@@ -11,8 +11,8 @@ namespace SharedLib.Fixed
         #region North
         public const string NorthBaseUrl = "https://tlsapi.runasp.net/";
         //public const string NorthBaseUrl = "https://manapi.runasp.net/";
-        public const string     NorthAreaAr     = "الشمال";
-            public const string NorthAreaEn     = "North";
+        public const string NorthAreaAr     = "الشمال";
+        public const string NorthAreaEn     = "North";
         #endregion
 
         #region WestMiddle
@@ -22,9 +22,9 @@ namespace SharedLib.Fixed
         #endregion
 
         #region Selected
-        public const string SelectedBaseUrl     = NorthBaseUrl        ;
-        public const string SelectedAreaAr      = NorthAreaAr         ;
-        public const string SelectedAreaEn      = NorthAreaEn       ;
+        public const string SelectedBaseUrl     = NorthBaseUrl;
+        public const string SelectedAreaAr      = NorthAreaAr        ;
+        public const string SelectedAreaEn      = NorthAreaEn;
         #endregion
 
     }

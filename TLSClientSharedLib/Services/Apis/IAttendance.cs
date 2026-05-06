@@ -13,7 +13,7 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.Attendance.GetAttendancesAvg)]
         Task<List<DailyAttendance>> GetAttendancesAvg(AttendanceRequest request);
 
-
-        // أضف هنا أي عمليات أخرى مثل تغيير كلمة المرور أو استرجاعها إذا لزم الأمر
+        [Post(ApiUrls.Attendance.GetAttendancesAllCentersAvg)]
+        Task<List<AllCentersDailyAttendance>> GetAttendancesAllCentersAvg(AttendanceRequest request);
     }
 }

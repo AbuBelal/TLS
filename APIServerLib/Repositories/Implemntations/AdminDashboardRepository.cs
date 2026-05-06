@@ -76,7 +76,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
 
         var centerSummaries = new List<CenterSummaryDto>();
 
-        foreach (var center in centers)
+        foreach (var center in centers.OrderBy(x=>x.SortOrder))
         {
             // طلاب هذا المركز
             var centerStudents = allStdCenters

@@ -1,10 +1,11 @@
 ﻿@using TLSWeb.Components
 @using TLSWeb.Pages.Centers.Components
+
 @inject ExcelDownloadService ExcelService
 
 @attribute [Route(PagesUris.CenterPages.DailyReport)]
 
-<AuthorizeView>
+<AuthorizeView Roles="Admin">
     <div class="d-flex justify-content-end align-items-center mb-4 mt-3" dir="rtl">
         <button class="btn btn-success" @onclick="ExportToExcel" disabled="@(IsLoading)">
             @if (IsLoading)
@@ -24,44 +25,87 @@
 <h2 class="mb-2 text-primary fw-bold">
     <i class="bi bi-table me-2 text-primary fw-bold"></i>
 تقرير حضور الطلاب اليومي</h2>
+<div class="alert alert-info shadow-sm border-0 d-flex flex-wrap align-items-center gap-4 py-3 px-4" role="alert" style="border-radius: 15px;">
 
-<div class="alert alert-info d-flex align-items-center" role="alert">
-    <i class="fas fa-calendar-alt ml-2"></i> <!-- أيقونة اختيارية -->
-    <div>
-        <InputDate @bind-Value="SelectedDate" @bind-Value:after="@(()=>OnDateChanged())"></InputDate>
+    <!-- قسم التاريخ -->
+    <div class="d-flex align-items-center">
+        <div class="icon-circle bg-white text-info me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border-radius: 10px;">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="d-flex flex-column">
+            <InputDate @bind-Value="SelectedDate"
+                       @bind-Value:after="OnDateChanged"
+                       class="form-control form-control-sm border-0 shadow-sm"></InputDate>
+            <span class="badge bg-warning text-dark mt-1 shadow-sm" style="font-size: 0.85rem;">
+                <i class="fas fa-clock me-1"></i>
+                @SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(SelectedDate.ToString("dddd"), SelectedDate.ToString("dddd"))
+            </span>
+        </div>
     </div>
-    <span class="badge badge-pill badge-warning bg-warning ms-2 text-2xl text-primary"> @SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(SelectedDate.ToString("dddd"), SelectedDate.ToString("dddd"))</span>
+    <AuthorizeView Roles="Admin">
+        <!-- فاصل عمودي شفاف -->
+        <div class="vr d-none d-lg-block opacity-25" style="height: 50px;"></div>
+
+        <!-- قسم تصفية المراكز (Checkbox) -->
+        <div class="d-flex align-items-center bg-white-50 p-2 px-3 rounded-pill shadow-sm border border-white">
+            <div class="form-check form-switch m-0 d-flex align-items-center">
+                <input type="checkbox"
+                       class="form-check-input ms-0 me-2"
+                       role="switch"
+                       id="centerFilter"
+                       @bind="ShowActiveCenters"
+                       @bind:after="OnSearchChanged"
+                       style="width: 2.5em; height: 1.25em; cursor: pointer;" />
+                <label class="form-check-label fw-bold text-dark mb-0" for="centerFilter" style="font-size: 0.9rem; cursor: pointer;">
+                    دوام التاريخ المحدد فقط
+                </label>
+            </div>
+        </div>
+
+        <!-- قسم فترة الدوام (Select) -->
+        <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
+            <div class="input-group input-group-sm shadow-sm">
+                <span class="input-group-text bg-primary text-white border-0">فترة الدوام</span>
+                <select @bind="SelectedShift" class="form-select border-0 px-3" @bind:after="OnSearchChanged" style="min-width: 150px;">
+                    <option value="0">-- الكل --</option>
+                    @foreach (var g in WHoures)
+                    {
+                        <option value="@g.Id">@g.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </AuthorizeView>
 </div>
-
-
+  
 @if(DailyReports is null || DailyReports.Count<=0)
 {
     <LoadingComponent></LoadingComponent>
 }
 else
 {
-    
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
            
             <span class="badge bg-secondary p-2">التاريخ: @DateTime.Now.ToString("yyyy-MM-dd")</span>
         </div>
 
-        <div class="input-group input-group-sm mb-5" style="width:50%">
-            <span class="input-group-text bg-white border-end-0">
-                <i class="bi bi-search"></i>
-            </span>
+        <AuthorizeView Roles="Admin">
+            <div class="input-group input-group-sm mb-5" style="width:50%">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search"></i>
+                </span>
 
-            <input type="text"
-                   class="form-control"
-                   placeholder="ابحث هنا باستخدام اسم المركز ..."
-                   @bind="searchText"
-                   @bind:event="oninput"
-                   @bind:after="OnSearchChanged" />
+                <input type="text"
+                       class="form-control"
+                       placeholder="ابحث هنا باستخدام اسم المركز ..."
+                       @bind="searchText"
+                       @bind:event="oninput"
+                       @bind:after="OnSearchChanged" />
 
 
-        </div>
-
+            </div>
+        </AuthorizeView>
         @foreach (var item in DailyReportSrchRs)
         {
             <CenterDailyReportComponent item="@item"  ManagerName="@Managers.FirstOrDefault(m => m.EmpCenters?.FirstOrDefault().CenterId== item.CenterId)?.Name"></CenterDailyReportComponent>
@@ -79,8 +123,12 @@ else
     List<SharedLib.Entities.DailyReport> DailyReports = new();
     List<SharedLib.Entities.DailyReport> DailyReportSrchRs;
     DateOnly SelectedDate = DateOnly.FromDateTime(DateTime.Now);
+    List<LookupValue> WHoures=new List<LookupValue>();
+
     List<Employee> Managers;
     bool IsLoading = false;
+    bool ShowActiveCenters = false;
+    long SelectedShift = 0;
     private string searchText = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -88,7 +136,7 @@ else
         DailyReports = await DailyReportApi.GetDailyReportForDate(SelectedDate); 
         DailyReportSrchRs = DailyReports;
         Managers = await EmployeeApi.GetAllManagers();
-
+        WHoures = await LookupValueApi.GetByValueType(SharedLib.Fixed.LookupTypes.WHoures);
     }
 
     // private async Task SaveCenter(long CenterId)
@@ -134,7 +182,10 @@ else
         // ||x.Center.CenterCode.ToLower().Contains(searchText.ToLower()) ||
         // x.Center.EnName.Contains(searchText)
         ).ToList();
-
+        if (ShowActiveCenters)
+            DailyReportSrchRs = DailyReportSrchRs.Where(d => d.IsWorkingDay).ToList();
+         if( SelectedShift >0)
+            DailyReportSrchRs = DailyReportSrchRs.Where(d => d.Center?.WhoursId==SelectedShift).ToList();
         //currentPage = 1;
         //await LoadDataAsync();
     }

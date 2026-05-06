@@ -204,6 +204,7 @@ namespace TLSClientSharedLib.Helpers
         {
             public const string PriorUrl = "/api/Attendance";
             public const string GetAttendancesAvg = PriorUrl + "/get-attendancesAvg";
+            public const string GetAttendancesAllCentersAvg = PriorUrl + "/get-attendances-all-centersAvg";
         }
     }
 }

@@ -358,7 +358,7 @@
                             @* توزيع المستويات — عند النقر *@
                             @if (isSelected && center.LevelDistribution.Any())
                             {
-                                <AttendantChart CenterId="@center.CenterId" From="@DateOnly.FromDateTime(DateTime.Now).AddDays(-7)" To="@DateOnly.FromDateTime(DateTime.Now)" />
+                                <AttendantChart CenterId="@center.CenterId" From="@DateOnly.FromDateTime(DateTime.Now).AddDays(-15)" To="@DateOnly.FromDateTime(DateTime.Now)" />
                                 <div class="border-top pt-3 mt-1">
                                     <div class="fw-semibold small text-muted mb-2">
                                         <i class="bi bi-bar-chart me-1 text-primary"></i>توزيع الطلاب حسب المستوى

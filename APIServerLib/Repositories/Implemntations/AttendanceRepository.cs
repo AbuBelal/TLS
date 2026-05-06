@@ -3,6 +3,7 @@ using APIServerLib.Repositories.Interfaces;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
+using SharedLib.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,7 +23,7 @@ namespace APIServerLib.Repositories.Implemntations
             
             var AllCentersDailyReports = await _context.DailyReports.Where(x => x.ReportDate >= From && x.ReportDate <= To).ToListAsync();
             var CenterDailyReports =  AllCentersDailyReports.Where(x => x.CenterId == CenterId).ToList();
-            var AllCenterAvgAttendance = AllCentersDailyReports.GroupBy(x => x.ReportDate).Select(g => new { Date = g.Key, AvgAttendance = g.Average(x => x.AttTotal) }).ToList();
+            var AllCenterAvgAttendance = AllCentersDailyReports.GroupBy(x => x.ReportDate).Select(g => new { Date = g.Key, AvgAttendance = g.Average(x => x.AttPercentage) }).ToList();
             List<DailyAttendance> dailyAttendances = new List<DailyAttendance>();
             int order = 1;
             for (DateOnly date = From; date <= To; date = date.AddDays(1))
@@ -36,10 +37,49 @@ namespace APIServerLib.Repositories.Implemntations
                 DailyAttendance dailyAttendance = new DailyAttendance();
                 dailyAttendance.Date = date;
                 dailyAttendance.Order = order++;
-                dailyAttendance.CenterAttendanceCount = CenterDailyReport != null ? CenterDailyReport.AttTotal : 0;
-                dailyAttendance.AreaAttendanceCount = (int)AllCenterAvgAttendance.Where(x => x.Date == date).Select(x => x.AvgAttendance).FirstOrDefault();
+                dailyAttendance.CenterAttendanceAvg = CenterDailyReport != null ? CenterDailyReport.AttPercentage : 0;
+                dailyAttendance.AreaAttendanceAvg = AllCenterAvgAttendance.Where(x => x.Date == date).Select(x => x.AvgAttendance).FirstOrDefault();
 
                 dailyAttendances.Add(dailyAttendance);
+            }
+            return dailyAttendances;
+        }
+        public async Task<List<AllCentersDailyAttendance>> GetAttendancesAllCentersAsync(DateOnly From, DateOnly To)
+        {
+            
+            var AllCentersDailyReports = await _context.DailyReports.Where(x => x.ReportDate >= From && x.ReportDate <= To).ToListAsync();
+            //var CenterDailyReports =  AllCentersDailyReports.Where(x => x.CenterId == CenterId).ToList();
+            var AllCenterAvgAttendance = AllCentersDailyReports.GroupBy(x => x.ReportDate).Select(g => new { Date = g.Key, AvgAttendance = g.Average(x => x.AttPercentage) }).ToList();
+            List<AllCentersDailyAttendance> dailyAttendances = new List<AllCentersDailyAttendance>();
+            int order = 1;
+            for (DateOnly date = From; date <= To; date = date.AddDays(1))
+            {
+               AllCentersDailyAttendance dailyAttendance = new ();
+               dailyAttendance.Order = order++;
+               dailyAttendance.AreaAttendanceAvg = AllCenterAvgAttendance.Where(x => x.Date == date).Select(x => x.AvgAttendance).FirstOrDefault();
+                foreach (var Center in await _context.Centers.ToListAsync())
+                {
+                    var IsWorkingDay = await IsWorkDayAsync(Center.Id, date);
+
+                    //if (!IsWorkingDay)
+                    //    continue;
+                    var CenterDailyReports = AllCentersDailyReports.Where(x => x.CenterId == Center.Id).ToList();
+                    var CenterDailyReport = CenterDailyReports.FirstOrDefault(x =>x.CenterId==Center.Id && x.ReportDate == date);
+
+                    dailyAttendance.Date = date;
+
+                    CenterAttendance centerAttendance = new CenterAttendance
+                    {
+                        CenterId = Center.Id,
+                        CenterName = Center.Name,
+                        CenterAttendanceAvg = CenterDailyReport != null ? CenterDailyReport.AttPercentage : 0,
+                        IsWorkingDay = IsWorkingDay
+                    };
+                    dailyAttendance.CentersAttendance.Add(centerAttendance);
+
+                }
+                if(dailyAttendance.CentersAttendance.Count > 0)
+                 dailyAttendances.Add(dailyAttendance);
             }
             return dailyAttendances;
         }
@@ -61,7 +101,6 @@ namespace APIServerLib.Repositories.Implemntations
                 return false;
             }
         }
-
     }
 }
   

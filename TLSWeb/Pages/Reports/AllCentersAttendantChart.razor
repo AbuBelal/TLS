@@ -1,0 +1,98 @@
+﻿@using MudBlazor
+@page "/reports/attendant-chart"
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h6" GutterBottom="true">تحليل نسبة الحضور اليومي للمراكز</MudText>
+
+    <MudChart ChartType="ChartType.Line"
+              ChartSeries="@Series"
+              XAxisLabels="@Labels"
+              Width="100%"
+              Height="400px"
+              ChartOptions="@_options" />
+</MudPaper>
+
+@code {
+    // private ChartOptions options = new ChartOptions { InterpolationOption = InterpolationOption.NaturalSpline, YAxisFormat = "0'%' " };
+    private LineChartOptions _options = new LineChartOptions()
+    {
+        XAxisTitle = "الزمن",
+        YAxisTitle = "نسبة الحضور",
+
+    };
+    private string[] Labels;
+    private List<ChartSeries<double>> Series = new List<ChartSeries<double>>();
+    public Dictionary<string, List<double>> CenterAttendanceData = new Dictionary<string, List<double>>(); // لتخزين بيانات الحضور لكل مركز
+    // لنفترض أن هذه هي القائمة التي أرفقتها في سؤالك
+    [Parameter] public List<AllCentersDailyAttendance> RawData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        DateOnly from =DateOnly.FromDateTime( DateTime.Today.AddDays(-7));
+        DateOnly to = DateOnly.FromDateTime(DateTime.Today);
+
+        var request = new AttendanceRequest()
+        {
+            CenterId = 0,
+            From = from,
+            To = to
+        };
+        RawData =await AttendanceApi.GetAttendancesAllCentersAvg(request); // تأكد من أن هذه الطريقة تعيد البيانات بشكل صحيح
+        PrepareChartData();
+    }
+
+    private void PrepareChartData()
+    {
+        if (RawData == null || !RawData.Any()) return;
+
+        // 1. تحضير التسميات للمحور الأفقي (التواريخ)
+        Labels = RawData.OrderBy(x => x.Order)
+                        .Select(x => x.Date.ToString("dd/MM"))
+                        .ToArray();
+
+        // 2. إنشاء سلسلة البيانات لمتوسط المنطقة العام
+        var areaAvgData = RawData.OrderBy(x => x.Order)
+                                 .Select(x => (double)x.AreaAttendanceAvg)
+                                 .ToArray();
+
+        Series.Add(new ChartSeries<double>
+        {
+            Name = "متوسط المنطقة العام",
+            Data = areaAvgData
+        });
+
+        // 3. (اختياري) إضافة خطوط للمراكز الفردية - سنأخذ أول مركز كمثال
+        // يمكنك تكرار هذه العملية لكل مركز إذا أردت مقارنة المراكز ببعضها
+        foreach (var data in RawData)
+        {
+            // List<double> centerData = new List<double>();
+            string CenterName = "";
+            foreach (var center in data.CentersAttendance)
+            {
+                CenterName = center.CenterName;
+                 var centerData =data.CentersAttendance
+                .FirstOrDefault(c => c.CenterId == center.CenterId)?.CenterAttendanceAvg??0;
+
+               CenterAttendanceData[CenterName].Add(centerData);
+            }
+            // Series.Add(new ChartSeries<double>
+            // {
+            //  Name = CenterName,
+            //  Data = centerData
+            // });
+        }
+
+       
+        // var firstCenterName = RawData.First().CentersAttendance.First().CenterName;
+        // var centerData = RawData.OrderBy(x => x.Order)
+        //                         .Select(x => (double)x.CentersAttendance
+        //                             .FirstOrDefault(c => c.CenterName == firstCenterName)?.CenterAttendanceAvg)
+        //                         .ToArray();
+
+        // Series.Add(new ChartSeries<double>
+        // {
+        //     Name = firstCenterName,
+        //     Data = centerData
+        // });
+    }
+}

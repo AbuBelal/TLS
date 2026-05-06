@@ -8,5 +8,6 @@ namespace APIServerLib.Repositories.Interfaces
     public interface IAttendanceRepository
     {
         Task<List<DailyAttendance>> GetAttendancesAsync(long CenterId, DateOnly From, DateOnly To);
+        Task<List<AllCentersDailyAttendance>> GetAttendancesAllCentersAsync(DateOnly From, DateOnly To);
     }
 }

@@ -38,13 +38,22 @@
 
     int MaleReg=0;
     int FemaleReg = 0;
-    protected async override Task OnInitializedAsync()
+
+    protected async override Task OnParametersSetAsync()
     {
         string MaleRegname = MalePropertyName.Replace("Att", "Reg");
         string FemaleRegname = FemalePropertyName.Replace("Att", "Reg");
         MaleReg = int.Parse(item.GetType().GetProperty(MaleRegname)?.GetValue(item)?.ToString() ?? "0");
         FemaleReg = int.Parse(item.GetType().GetProperty(FemaleRegname)?.GetValue(item)?.ToString() ?? "0");
     }
+
+    // protected async override Task OnInitializedAsync()
+    // {
+    //     string MaleRegname = MalePropertyName.Replace("Att", "Reg");
+    //     string FemaleRegname = FemalePropertyName.Replace("Att", "Reg");
+    //     MaleReg = int.Parse(item.GetType().GetProperty(MaleRegname)?.GetValue(item)?.ToString() ?? "0");
+    //     FemaleReg = int.Parse(item.GetType().GetProperty(FemaleRegname)?.GetValue(item)?.ToString() ?? "0");
+    // }
 
     private object GetValue() =>
         item.GetType().GetProperty(MalePropertyName)?.GetValue(item);
