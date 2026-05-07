@@ -24,9 +24,10 @@ namespace SharedLib.DTOs
 
     public class AttendanceRequest
     {
-        public long CenterId { get; set; }=0;
+        public long? CenterId { get; set; }=0;
         public DateOnly From { get; set; }= DateOnly.FromDateTime(DateTime.Now.AddDays(30));
         public DateOnly To { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public string DaysOfWeek { get; set; } = "السبت-الاثنين-الأربعاء";
     }
 
     public class CenterAttendance
@@ -36,5 +37,6 @@ namespace SharedLib.DTOs
         public int CenterAttendanceCount { get; set; } = 0;
         public double CenterAttendanceAvg { get; set; } = 0;
         public bool IsWorkingDay { get; set; } = false;
+        public string DaysOfWeek { get; set; } = string.Empty;
     }
 }

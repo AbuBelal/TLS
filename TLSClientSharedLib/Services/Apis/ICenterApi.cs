@@ -31,5 +31,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Put(ApiUrls.Center.MyCenter)]
         Task<GeneralResponse> UpdateMyCenter([Body] CenterUpsertDto dto);
+
+        [Get(ApiUrls.Center.GetDaysOfWorks)]
+        Task<List<string?>> GetDaysOfWorks();
     }
 }

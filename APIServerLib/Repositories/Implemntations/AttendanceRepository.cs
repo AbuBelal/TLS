@@ -44,19 +44,23 @@ namespace APIServerLib.Repositories.Implemntations
             }
             return dailyAttendances;
         }
-        public async Task<List<AllCentersDailyAttendance>> GetAttendancesAllCentersAsync(DateOnly From, DateOnly To)
+        public async Task<List<AllCentersDailyAttendance>> GetAttendancesAllCentersAsync(DateOnly From, DateOnly To, string DaysOfWeek)
         {
             
-            var AllCentersDailyReports = await _context.DailyReports.Where(x => x.ReportDate >= From && x.ReportDate <= To).ToListAsync();
+            var AllCentersDailyReports = await _context.DailyReports.Where(x => x.ReportDate >= From && x.ReportDate <= To && x.Center.DaysOfWeek == DaysOfWeek).ToListAsync();
             //var CenterDailyReports =  AllCentersDailyReports.Where(x => x.CenterId == CenterId).ToList();
             var AllCenterAvgAttendance = AllCentersDailyReports.GroupBy(x => x.ReportDate).Select(g => new { Date = g.Key, AvgAttendance = g.Average(x => x.AttPercentage) }).ToList();
+           
             List<AllCentersDailyAttendance> dailyAttendances = new List<AllCentersDailyAttendance>();
             int order = 1;
             for (DateOnly date = From; date <= To; date = date.AddDays(1))
             {
-               AllCentersDailyAttendance dailyAttendance = new ();
+                var AreaAttendanceAvg = AllCenterAvgAttendance.Where(x => x.Date == date).Select(x => x.AvgAttendance).FirstOrDefault();
+                if(AreaAttendanceAvg <= 0)
+                    continue;
+                AllCentersDailyAttendance dailyAttendance = new ();
                dailyAttendance.Order = order++;
-               dailyAttendance.AreaAttendanceAvg = AllCenterAvgAttendance.Where(x => x.Date == date).Select(x => x.AvgAttendance).FirstOrDefault();
+                dailyAttendance.AreaAttendanceAvg = AreaAttendanceAvg;
                 foreach (var Center in await _context.Centers.ToListAsync())
                 {
                     var IsWorkingDay = await IsWorkDayAsync(Center.Id, date);
@@ -73,7 +77,9 @@ namespace APIServerLib.Repositories.Implemntations
                         CenterId = Center.Id,
                         CenterName = Center.Name,
                         CenterAttendanceAvg = CenterDailyReport != null ? CenterDailyReport.AttPercentage : 0,
-                        IsWorkingDay = IsWorkingDay
+                        IsWorkingDay = IsWorkingDay,
+                        DaysOfWeek = Center.DaysOfWeek ?? ""
+
                     };
                     dailyAttendance.CentersAttendance.Add(centerAttendance);
 

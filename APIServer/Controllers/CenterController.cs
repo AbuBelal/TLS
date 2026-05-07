@@ -99,5 +99,12 @@ namespace APIServer.Controllers
             await _auditLogService.LogAsync("Update", "Center", dto.Id.ToString(), $"تم تعديل مركز المستخدم: {dto.Name}");
             return Ok(result);
         }
+
+        [HttpGet("Get-Days-of-Works")]
+        public async Task<ActionResult<List<string?>>> GetDaysofWorks()
+        {
+            var days = await _centerRepository.GetDaysofWorksAsync();
+            return Ok(days);
+        }
     }
 }

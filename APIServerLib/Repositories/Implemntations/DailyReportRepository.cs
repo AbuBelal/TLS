@@ -233,7 +233,7 @@ namespace APIServerLib.Repositories.Implemntations
             {
                 await _context.DailyReports.AddAsync(dailyreport);
                 await _context.SaveChangesAsync();
-                return new GeneralResponse(true, "تم إضافة التقرير بنجاح");
+                return new GeneralResponse(true, "تم إضافة التقرير بنجاح",dailyreport.Id);
             }
             else
             {
@@ -253,7 +253,7 @@ namespace APIServerLib.Repositories.Implemntations
 
                 //_context.DailyReports.Update(dailyreport);
                 await _context.SaveChangesAsync();
-                return new GeneralResponse(true, "تم تحديث التقرير بنجاح");
+                return new GeneralResponse(true, "تم تحديث التقرير بنجاح",existingReport.Id);
             }
         }
 

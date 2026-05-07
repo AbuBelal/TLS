@@ -248,12 +248,12 @@
                 return;
             }
             else
-             if (reportToSave.IsUNRWA ==0 && reportToSave.RegUNRWA > 0)
-            {
-                MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور صفر !", Severity.Error);
+                if (reportToSave.IsUNRWA ==0 && reportToSave.RegUNRWA > 0)
+                {
+                    MudSnackbar.Add("لا يمكن أن يكون طلاب الأنرو الحضور صفر !", Severity.Error);
                     IsSaving = false;
-                return;
-            }
+                    return;
+                }
             Center center = reportToSave.Center;
             reportToSave.Center = null;
 
@@ -264,7 +264,11 @@
             reportToSave.LockedBy = UserName;
             var response = await DailyReportApi.UpdateDailyReport(reportToSave);
             if (response.Success)
+            {
                 MudSnackbar.Add(response.Message, Severity.Success);
+                item.Id=response.ReturnId;
+                reportToSave.Id = response.ReturnId;
+            }
             else
                 MudSnackbar.Add(response.Message, Severity.Error);
             item.Center = center;

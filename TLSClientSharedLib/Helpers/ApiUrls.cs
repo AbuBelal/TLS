@@ -9,18 +9,17 @@ namespace TLSClientSharedLib.Helpers
     {
         //public const string BaseUrl = "https://manapi.runasp.net/";    // "https://localhost:7075";
 
+        //#if DEBUG
+        //        //public const string BaseUrl = "https://localhost:7075";
+        //        public const string BaseUrl = SharedLib.Fixed.SystemSettings.DebugBaseUrl;
+        //#else
 
-        
-#if DEBUG
-        //public const string BaseUrl = "https://localhost:7075";
-        public const string BaseUrl = SharedLib.Fixed.SystemSettings.DebugBaseUrl;
-#else
-
-     //public const string BaseUrl = "https://manapi.runasp.net/";
-     //public const string BaseUrl = "https://tlsapi.runasp.net/";
-     //public const string BaseUrl =  "https://midapi.tryasp.net/";
-     public const string BaseUrl =SharedLib.Fixed.SystemSettings.SelectedBaseUrl;
-#endif
+        //     //public const string BaseUrl = "https://manapi.runasp.net/";
+        //     //public const string BaseUrl = "https://tlsapi.runasp.net/";
+        //     //public const string BaseUrl =  "https://midapi.tryasp.net/";
+        //     public const string BaseUrl =SharedLib.Fixed.SystemSettings.SelectedBaseUrl;
+        //#endif
+        public static string BaseUrl = SharedLib.Fixed.SystemSettings.SelectedBaseUrl;
         public static class Auth
         {
                 //post ///register
@@ -93,7 +92,7 @@ namespace TLSClientSharedLib.Helpers
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             public const string MyCenter = PriorUrl + "/my-center";
-           
+           public  const string GetDaysOfWorks = PriorUrl + "/Get-Days-of-Works";
 
         }
         public static class Reports

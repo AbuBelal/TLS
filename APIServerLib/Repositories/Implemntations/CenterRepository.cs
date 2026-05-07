@@ -136,5 +136,11 @@ namespace APIServerLib.Repositories.Implemntations
                 return true;
             }
         }
+
+        public async Task<List<string?>> GetDaysofWorksAsync()
+        {
+            var DaysOfWorks = await _context.Centers.Select(c => c.DaysOfWeek).Distinct().ToListAsync();
+            return DaysOfWorks;
+        }
     }
 }

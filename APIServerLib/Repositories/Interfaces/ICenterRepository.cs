@@ -17,5 +17,6 @@ namespace APIServerLib.Repositories.Interfaces
         /// </summary>
         Task<GeneralResponse> UpdateByUserAsync(CenterUpsertDto dto, string userId);
         Task<GeneralResponse> Update(CenterUpsertDto dto);
+        Task<List<string?>> GetDaysofWorksAsync();
     }
 }
