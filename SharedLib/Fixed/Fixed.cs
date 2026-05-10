@@ -7,33 +7,9 @@ namespace SharedLib.Fixed
     public static class SystemSettings
     {
         public const string DebugBaseUrl = "https://localhost:7075";
-
-        //#region Test
-        //public const string TestBaseUrl = "https://tlsapi.runasp.net/";
-        //public const string TestAreaAr     = "الشمال - اختبار";
-        //public const string TestAreaEn     = "ForTest";
-        //#endregion
-
-        //#region North
-        //public const string NorthBaseUrl = "https://manapi.runasp.net/";
-        //public const string NorthAreaAr     = "الشمال";
-        //public const string NorthAreaEn     = "North";
-        //#endregion
-
-        //#region WestMiddle
-        //    public const string WestMiddleBaseUrl = "https://midapi.tryasp.net/";
-        //    public const string WestMiddleAreaAr  = "غرب الوسطى";
-        //    public const string WestMiddleAreaEn  = "WestMiddle";
-        //#endregion
-
-        //#region Selected
-        //public const string SelectedBaseUrl     =  WestMiddleBaseUrl   ;
-        //public const string SelectedAreaAr      =  WestMiddleAreaAr    ;
-        //public const string SelectedAreaEn = WestMiddleAreaEn;
-        //#endregion
-        public enum RegionType { Debug,Test, North, WestMiddle }
+        public enum RegionType { Debug,Test, North, WestMiddle, WestGaza }
         // حدد المنطقة هنا فقط
-        private const  RegionType CurrentRegion = RegionType.North;
+        private const  RegionType CurrentRegion = RegionType.WestMiddle;
 
         public static string SelectedBaseUrl => CurrentRegion switch
         {
@@ -41,6 +17,7 @@ namespace SharedLib.Fixed
             RegionType.North => "https://manapi.runasp.net/",
             RegionType.Test => "https://tlsapi.runasp.net/",
             RegionType.WestMiddle => "https://midapi.tryasp.net/",
+            RegionType.WestGaza => "https://wgazaapi.runasp.net/",
             _ =>DebugBaseUrl
         };
 
@@ -49,6 +26,7 @@ namespace SharedLib.Fixed
             RegionType.Debug => "التجريب",
             RegionType.North => "الشمال",
             RegionType.WestMiddle => "غرب الوسطى",
+            RegionType.WestGaza => "غرب غزة",
             RegionType.Test => "الشمال - اختبار",
             _ => "الشمال",
         };
@@ -57,6 +35,7 @@ namespace SharedLib.Fixed
             RegionType.Debug => "North",
             RegionType.North => "North",
             RegionType.WestMiddle => "WestMiddle",
+            RegionType.WestGaza => "WestGaza",
             RegionType.Test => "ForTest",
             _ => "North",
         };

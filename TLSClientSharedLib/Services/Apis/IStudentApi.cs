@@ -44,5 +44,8 @@ namespace TLSClientSharedLib.Services.Apis
         /// <summary>تصدير جميع طلاب المركز</summary>
         [Get(ApiUrls.Student.ExportAll)]
         Task<HttpResponseMessage> ExportAll();
+
+        [Post(ApiUrls.Student.GetStdInfoFromEmis)]
+        Task<StudentEmisDto> GetStdInfoFromEmis(StudentEmisRequest request);
     }
 }

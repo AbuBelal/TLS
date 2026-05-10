@@ -119,10 +119,10 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<GeneralResponse> UpdateStudentWithCenter(Student student , long centerid)
         {
             var Std = await _context.Students.Where(s => s.CivilId == student.CivilId /*|| s.Name.Trim() == student.Name.Trim()*/)
-               .AsNoTracking()
                 .Include(x => x.StdCenters).ThenInclude(x => x.Center)
                .Include(x => x.Level)
                .FirstOrDefaultAsync();
+            //var IsStdExist = await _context.Students.AnyAsync(s => s.CivilId == student.CivilId);
 
             if (centerid <= 0)
                 return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
@@ -130,8 +130,8 @@ namespace APIServerLib.Repositories.Implemntations
                 if (Std is not null)
                 {
                     await _context.Database.BeginTransactionAsync();
-
-                    _context.Students.Update(student);
+                   
+                    //_context.Students.Update(student);
                     //await _context.SaveChangesAsync(); 
 
                     var StdCenters = _context.StdCenters.Where(x => x.StudentId == student.Id && x.IsActive).ToList();
@@ -154,6 +154,20 @@ namespace APIServerLib.Repositories.Implemntations
                         };
                         _context.StdCenters.Add(stdCenter);
                     }
+                    else
+                    {
+                        Std.Name = student.Name;
+                        Std.EnName = student.EnName;
+                        Std.Mobile = student.Mobile;
+                        Std.LevelId = student.LevelId;
+                        Std.GenderId = student.GenderId;
+                        Std.SectionNo = student.SectionNo;
+                        Std.BirthDate = student.BirthDate;
+                        Std.IsUnrwa = student.IsUnrwa;
+                        Std.IsSpecialNeeds = student.IsSpecialNeeds;
+                        Std.SpecialNeeds = student.SpecialNeeds;
+                        Std.Comments = student.Comments;
+                    }
 
                     await _context.SaveChangesAsync();
                     await _context.Database.CommitTransactionAsync();
@@ -162,7 +176,7 @@ namespace APIServerLib.Repositories.Implemntations
                     return new GeneralResponse(true, "تم تعديل بيانات الطالب في المركز بنجاح.");
                 }
 
-            return new GeneralResponse(false, $"رقم الهوية أو الاسم موجود مسبقاً في مركز {Std.StdCenters?.OrderByDescending(x => x.FromDate).First().Center?.Name} لطالب اسمه {Std.Name} في الصف {Std.Level.Name} ", 0);
+            return new GeneralResponse(false, $" الطالب غير موجود", 0);
         }
 
         public async Task<PaginatedResponse<StudentDto>> GetPaginatedStudentsAsync(StudentFilterRequest request,long CenterId=0)

@@ -147,6 +147,10 @@ public partial class EmployeeForm : ComponentBase
     // ────────────────────────────────────────────────
     protected async Task SaveEmployee()
     {
+        employee.Name = employee.Name.Trim();
+        employee.EnName = employee.EnName.Trim();
+        employee.CivilId = employee.CivilId.Trim();
+
         var mapper = new EmployeeMapper();
         var employeeToSend = mapper.ToEmployeeUpsertDTO(employee);
         employeeToSend.CenterId = selectedCenterId;
@@ -200,7 +204,10 @@ public partial class EmployeeForm : ComponentBase
     }
     protected async Task HandleSubmit()
     {
-        
+        employee.Name = employee.Name.Trim();
+        employee.EnName = employee.EnName?.Trim();
+        employee.CivilId = employee.CivilId.Trim();
+        employee.EmpId = employee.EmpId.Trim();
         IsSaving = true;
         
         EmployeeDuplicateCheckRequest request = new EmployeeDuplicateCheckRequest

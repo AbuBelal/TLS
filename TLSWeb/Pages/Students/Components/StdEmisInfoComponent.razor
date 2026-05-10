@@ -1,0 +1,87 @@
+﻿@using TLSWeb.Components
+@* @page "/student-result" *@
+
+<div class="container mt-5">
+    @if (studentData == null)
+    {
+       <LoadingComponent/>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <!-- بطاقة رأس الصفحة -->
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden mb-4">
+                    <div class="card-header bg-primary text-white p-4 text-center">
+                        <h2 class="mb-0 fw-bold fs-6"> بيانات الطالب</h2>
+                        <p class="mb-0 opacity-75">العام الدراسي 2025 - 2026</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- القسم الأول: الحالة الدراسية -->
+                        @* <div class="alert @(studentData.ResultStatus.Contains("ناجح") ? "alert-success" : "alert-info") d-flex align-items-center mb-4 shadow-sm" role="alert">
+                            <i class="bi bi-mortarboard-fill fs-3 me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">النتيجة النهائية</h5>
+                                <p class="mb-0 fw-bold">@studentData.ResultStatus</p>
+                            </div>
+                        </div> *@
+
+                        <!-- شبكة البيانات الشخصية -->
+                        <div class="row g-4">
+                            <div class="col-sm-6">
+                                <label class="text-muted small">اسم الطالب</label>
+                                <div class="fw-bold fs-5 border-bottom pb-2">@studentData.FullName</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small">رقم الهوية</label>
+                                <div class="fw-bold fs-5 border-bottom pb-2">@studentData.IdentityNo</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small">المدرسة</label>
+                                <div class="fw-bold fs-6 border-bottom pb-2">@studentData.SchoolName</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="text-muted small">الصف</label>
+                                <div class="fw-bold fs-6 border-bottom pb-2">@studentData.Grade</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="text-muted small">الشعبة</label>
+                                <div class="fw-bold fs-6 border-bottom pb-2">@studentData.Section</div>
+                            </div>
+                        </div>
+
+                        <!-- قسم التواصل -->
+                        <div class="mt-5 pt-3 border-top">
+                            <h5 class="mb-4 text-secondary"><i class="bi bi-telephone-outbound me-2"></i>معلومات التواصل</h5>
+                            <div class="d-flex flex-wrap gap-3">
+
+                                <!-- زر الواتساب -->
+                               @*  @if (!string.IsNullOrEmpty(studentData.WhatsAppGroup))
+                                {
+                                    <a href="@studentData.WhatsAppGroup" target="_blank" class="btn btn-outline-success rounded-pill px-4 shadow-sm">
+                                        <i class="bi bi-whatsapp me-2"></i> مجموعة الواتساب
+                                    </a>
+                                } *@
+
+                                <!-- زر الاتصال -->
+                                <a href="tel:@studentData.Mobile" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+                                    <i class="bi bi-phone me-2"></i> @studentData.Mobile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                   @*  <div class="card-footer bg-light text-center py-3 text-muted small">
+                        رقم الطالب الموحد: @studentData.StudentId | تم الاستخراج من نظام EMIS
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public StudentEmisDto? studentData { get; set; }
+}

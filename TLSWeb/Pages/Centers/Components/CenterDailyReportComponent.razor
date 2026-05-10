@@ -161,7 +161,7 @@
             <span style="color:yellowgreen"> المتبقي من البسكويت : @Rest.ToString("F0") </span>
         }
 
-            @if (!ReadOnly)
+       @if (!ReadOnly)
         {
             <button class="btn btn-success btn-lg px-5 shadow-sm" @onclick="() => SaveCenter()" disabled="@(IsSaving)" >
                 @if (IsSaving)
@@ -199,6 +199,15 @@
     decimal Rest = 0;
     protected async override Task OnInitializedAsync()
     {
+        // var managers = await EmployeeApi.GetAllManagers();
+        // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
+
+        var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
+        var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);
+        Rest = TotalReceived - TotalDist;
+    }
+    override protected async Task OnParametersSetAsync()
+    {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         if (user.Identity!.IsAuthenticated)
@@ -207,9 +216,11 @@
             UserEmail = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
             UserRole = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value!;
         }
+
         string dayInEnglish = item.ReportDate.ToString("dddd");
         string dayInArabic = SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(dayInEnglish, dayInEnglish);
 
+       
         if (item.Center?.DaysOfWeek?.Contains(dayInArabic) ?? false)
         {
             // IsWorkingDay = true;
@@ -224,14 +235,6 @@
             ReadOnly = true;
         }
 
-
-
-        // var managers = await EmployeeApi.GetAllManagers();
-        // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
-
-        var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
-        var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);
-        Rest = TotalReceived - TotalDist;
     }
 
     private async Task SaveCenter()

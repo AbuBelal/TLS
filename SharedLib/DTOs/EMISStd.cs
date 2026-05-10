@@ -17,4 +17,23 @@ namespace SharedLib.DTOs
         public string Grade { get; set; }
         public string Section { get; set; }
     }
+
+    public class StudentEmisRequest
+    {
+        public string IdentityNo { get; set; }
+        public string BirthYear { get; set; }
+    }
+
+    public class StudentEmisDto
+    {
+        public string StudentId { get; set; }
+        public string IdentityNo { get; set; }
+        public string FullName { get; set; }
+        public string ResultStatus { get; set; }
+        public string SchoolName { get; set; }
+        public string Grade { get; set; }
+        public string Section { get; set; }
+        public string Mobile { get; set; }
+        public string WhatsAppGroup { get; set; }
+    }
 }

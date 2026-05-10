@@ -4,6 +4,7 @@
 // ╚══════════════════════════════════════════════════════════════╝
 
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using SharedLib.Entities;
 
 namespace APIServerLib.Services;
@@ -199,7 +200,7 @@ public static class StudentExportService
 
         // ── إعداد اتجاه RTL للورقة ─────────────────────────────
         ws.RightToLeft = true;
-        int totalCols = 12;
+        int totalCols = 14;
         // ══════════════════════════════════════════════════════
         //  الصف الأول: رؤوس الأعمدة
         // ══════════════════════════════════════════════════════
@@ -217,7 +218,9 @@ public static class StudentExportService
             ("رقم الجوال",   13),
             ("هل انروا؟",       8),
             ("هل ذوي اح تياجات خاصة؟", 8),
-            ("ملاحظات", 25)
+            ("ملاحظات", 25),
+            ("الشعبة", 5),
+            ("تاريخ الإضافة", 15)
         };
 
         for (int c = 0; c < headers.Length; c++)
@@ -268,11 +271,12 @@ public static class StudentExportService
 
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = student.Gender?.Name ?? "";
-
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            ws.Cell(row, c++).Value = student.BirthDate?.ToString("dd/MM/yyyy");
 
+            //ws.Cell(row, c++).Style.NumberFormat.Format = "dd-MM-yyyy";
+            ws.Cell(row, c++).Value =student.BirthDate?.ToDateTime(TimeOnly.MinValue);//?.ToString("dd-MM-yyyy");
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
             ws.Cell(row, c++).Value = student.Level?.Name ?? "";
 
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
@@ -285,7 +289,14 @@ public static class StudentExportService
             ws.Cell(row, c++).Value = student.IsSpecialNeeds ? "نعم" : "";
 
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            ws.Cell(row, c++).Value = student.Comments ?? ""; 
+            ws.Cell(row, c++).Value = student.Comments ?? "";
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.SectionNo ?? 1;
+
+            //ws.Cell(row, c++).Style.NumberFormat.Format = "dd-MM-yyyy";
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value = student.StdCenters.FirstOrDefault(x => x.IsActive)?.FromDate.ToDateTime(TimeOnly.MinValue);//?.ToString("dd-MM-yyyy");
 
             // تنسيق الصف كاملاً
             var rowRange = ws.Range(row, 1, row, totalCols);

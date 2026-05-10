@@ -1,4 +1,5 @@
 ﻿@using TLSWeb.Components
+@using TLSWeb.Pages.Students.Components
 @attribute [Route(PagesUris.StudentsPages.Add)]
 @attribute [Route(PagesUris.StudentsPages.Edit + "/{Id:long}")]
 
@@ -27,7 +28,7 @@
                     @* رقم الهوية والموبايل *@
                     <div class="col-md-6">
                         <label class="form-label">رقم الهوية</label>
-                        <InputText @bind-Value="student.CivilId" class="form-control" />
+                        <InputText @bind-Value="student.CivilId" class="form-control" @onblur="GetStdInfoFromEmis" />
                         <ValidationMessage For="@(() => student.CivilId)" />
                     </div>
                     <div class="col-md-6">
@@ -65,7 +66,7 @@
 
                     <div class="col-md-2">
                         <label class="form-label">تاريخ الميلاد</label>
-                        <InputDate TValue="DateOnly?" @bind-Value="student.BirthDate" class="form-control" />
+                        <InputDate TValue="DateOnly?" @bind-Value="student.BirthDate" class="form-control" @onblur="GetStdInfoFromEmis" />
                     </div>
 
                     <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin" Context="student">
@@ -186,7 +187,19 @@ Icon="bi-exclamation-triangle" />
         </div>
     </div>
 </div>
-
+@if(isEmisInfoLoading)
+{
+    <div class="d-flex justify-content-center align-items-center my-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <span class="ms-3 text-primary fw-bold">جاري جلب بيانات الطالب من نظام إيميس...</span>
+    </div>
+}
+else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
+{
+    <StdEmisInfoComponent studentData="StdEmisInfo" />
+}
 
 @code {
     [Parameter] public long Id { get; set; }
@@ -198,6 +211,8 @@ Icon="bi-exclamation-triangle" />
     private long? selectedCenterId;                  // ← جديد
     bool isDialogOpen = false;
     string dialogMessage = "هذا الطالب غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
+    StudentEmisDto StdEmisInfo;
+    bool isEmisInfoLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,6 +224,7 @@ Icon="bi-exclamation-triangle" />
         centers = await CenterApi.GetAll();          // ← جديد
         selectedCenterId = student.StdCenters?.FirstOrDefault(x => x.IsActive)?.CenterId;
         isLoading = false;
+        await GetStdInfoFromEmis();
     }
     private async Task TranslateName()
     {
@@ -222,6 +238,19 @@ Icon="bi-exclamation-triangle" />
     }
     private async Task HandleSubmit()
     {
+        student.Name = student.Name.Trim();
+        student.EnName = student.EnName?.Trim();
+        student.CivilId = student.CivilId.Trim();
+        if (StdEmisInfo is not null && StdEmisInfo.StudentId is not null) 
+        {
+            var emisgradeid =levels.FirstOrDefault(l => l.Name == StdEmisInfo.Grade)?.Id??0;
+            if(emisgradeid != student.LevelId)
+            {
+                // student.LevelId = emisgradeid;
+                MudSnackbar.Add("يرجى التأكد من الصف الدراسي !", Severity.Warning);
+                return;
+            }
+        }
         isLoading = true;
         if (Id != 0)
         {
@@ -285,5 +314,22 @@ Icon="bi-exclamation-triangle" />
         isDialogOpen = false;
         student = await StudentApi.GetById(Id);
         HandleSubmit(); 
+    }
+
+    private async Task GetStdInfoFromEmis()
+    {
+        isEmisInfoLoading = true;
+        if (student is not null)
+        {
+            string IdentityNo = student.CivilId;
+            string BirthYear = student.BirthDate is not null ? student.BirthDate.Value.Year.ToString():"";
+
+            StdEmisInfo = await StudentApi.GetStdInfoFromEmis(new StudentEmisRequest
+                {
+                IdentityNo = IdentityNo,
+                BirthYear = BirthYear
+                });
+        }
+        isEmisInfoLoading = false;
     }
 }

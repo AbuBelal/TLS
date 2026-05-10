@@ -82,6 +82,7 @@ namespace TLSClientSharedLib.Helpers
             public const string paginated = PriorUrl + "/paginated";
             public const string ExportFiltered = PriorUrl + "/export/filtered";
             public const string ExportAll = PriorUrl + "/export/all";
+            public const string GetStdInfoFromEmis = "/api/Emis/fetch-Std-Info";
         }
         public static class Center
         {

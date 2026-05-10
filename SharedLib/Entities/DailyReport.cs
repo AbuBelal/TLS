@@ -151,6 +151,6 @@ namespace SharedLib.Entities
         public int? AttMaleTotal => AttMale01 + AttMale02 + AttMale03 + AttMale04 + AttMale05 + AttMale06 + AttMale07 + AttMale08 + AttMale09;
         [NotMapped]
         public int? AttFemaleTotal => AttFemale01 + AttFemale02 + AttFemale03 + AttFemale04 + AttFemale05 + AttFemale06 + AttFemale07 + AttFemale08 + AttFemale09;
-
+       
     }
 }
