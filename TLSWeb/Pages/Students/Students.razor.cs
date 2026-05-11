@@ -220,6 +220,7 @@ public partial class Students : ComponentBase
         SearchText = searchText,
         Gender = selectedGender,
         Level = selectedLevel,
+        Center=selectedCenter
     };
     private async Task ExportFiltered()
     {

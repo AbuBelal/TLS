@@ -159,6 +159,7 @@ namespace APIServer.Controllers
         public async Task<IActionResult> ExportFiltered([FromQuery] StudentFilterRequest request)
         {
             var centerId = await CurrentCenterId();
+           
             //if (centerId == 0) return BadRequest("لا يوجد مركز مرتبط بحسابك.");
 
             // جلب اسم المركز لعنوان الملف
@@ -170,7 +171,7 @@ namespace APIServer.Controllers
             // توصيف عنوان الورقة حسب الفلاتر المطبقة
             var sheetTitle = BuildSheetTitle(request);
 
-            var bytes = StudentExportService.GenerateExcel(students, sheetTitle, centerName);
+            var bytes = StudentExportService.GenerateExcelForAdmin(students, sheetTitle, centerName);
             var fileName = $"طلاب_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
             await _auditLogService.LogAsync("Read", "Student", "", $"تصدير الطلاب حسب التصفية: {fileName}");
             return File(bytes,
@@ -205,7 +206,7 @@ namespace APIServer.Controllers
 
         private async Task<string> GetCenterNameAsync(long centerId)
         {
-            if(centerId == 0)   return "بدون_مركز";
+            if(centerId <= 0)   return "الطلاب مفلتر";
             // نستخدم الـ DbContext مباشرةً عبر ICenterRepository
             // أو عبر StudentRepository — الأبسط هنا استخدام UserRepository
             try

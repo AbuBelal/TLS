@@ -1,4 +1,5 @@
 ﻿@using TLSWeb.Components
+@inject IJSRuntime JSRuntime
 @* @page "/student-result" *@
 
 <div class="container mt-5">
@@ -68,6 +69,11 @@
                                 <a href="tel:@studentData.Mobile" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
                                     <i class="bi bi-phone me-2"></i> @studentData.Mobile
                                 </a>
+                                <button class="btn btn-outline-secondary rounded-circle shadow-sm"
+                                        @onclick='() => JSRuntime.InvokeVoidAsync("copyToClipboard", studentData.Mobile)'
+                                        title="نسخ الرقم">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -183,13 +183,13 @@ namespace APIServerLib.Repositories.Implemntations
         {
             // 1. بناء الاستعلام الأساسي مع Include
             var query = _context.Students
-                .Where(x=> CenterId==0?true: x.StdCenters.FirstOrDefault(z=>z.IsActive).CenterId == CenterId)
+                .Where(x=> CenterId==0? true: x.StdCenters.FirstOrDefault(z=>z.IsActive).CenterId == CenterId)
                 .Include(s => s.Gender)
                 .Include(s => s.Level)
                 //.Include(x => x.StdCenters).ThenInclude(x => x.Center)
                 .AsNoTracking()
                 .AsQueryable();
-
+           
             // 2. تطبيق الفلاتر
             // البحث النصي
             if (!string.IsNullOrWhiteSpace(request.SearchText))
@@ -223,8 +223,23 @@ namespace APIServerLib.Repositories.Implemntations
             // فلتر المركز
             if (!string.IsNullOrWhiteSpace(request.Center))
             {
-                query = query.Where(s =>
-                    s.Level != null && s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
+                switch (request.Center)
+                {
+                    case "-2":
+                        //query = query.Where(x=>x.StdCenters.Count(c=>c.IsActive)<0);
+                        break;
+                    case "-1":
+                        query = query.Where(x => x.StdCenters.Count(c => c.IsActive) > 0);
+                        break;
+                    case "0":
+                        query = query.Where(x => x.StdCenters.Count(c => c.IsActive) <= 0);
+                        break;
+                    default:
+                        query = query.Where(s => s.StdCenters.FirstOrDefault(z => z.IsActive).Center.Name == request.Center);
+                        break;
+                }
+                //query = query.Where(s =>
+                //    s.StdCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault().Center.Name == request.Center);
             }
 
             // فلتر تاريخ الإضافة
@@ -277,18 +292,36 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<List<Student>> GetFilteredForExportAsync(
         StudentFilterRequest request, long centerId)
         {
-            IQueryable<Student> query;
+            IQueryable<Student> query = _context.Students
+                 .OrderBy(s => s.StdCenters
+                     .FirstOrDefault(z => z.IsActive)!.CenterId)
+                    .ThenBy(s => s.Level.SortOrder)
+                .Include(s => s.StdCenters).ThenInclude(sc => sc.Center).AsQueryable();
             if (centerId == 0)
             {
-                 query = _context.Students
-                    .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
+                switch (request.Center)
+                {
+                    case "-2":
+                        //query = query.Where(x=>x.StdCenters.Count(c=>c.IsActive)<0);
+                        break;
+                    case "-1":
+                        query = query.Where(x => x.StdCenters.Count(c => c.IsActive) > 0);
+                        break;
+                    case "0":
+                        query = query.Where(x => x.StdCenters.Count(c => c.IsActive) <= 0);
+                        break;
+                    default:
+                        query = query.Where(s => s.StdCenters.FirstOrDefault(z => z.IsActive).Center.Name == request.Center);
+                        break;
+                }
+                query = query
+                    
                     .Include(s => s.Gender)
                     .Include(s => s.Level)
                     .AsNoTracking()
-                    .OrderBy(s => s.StdCenters
-                        .OrderByDescending(sc => sc.FromDate)
-                        .FirstOrDefault()!.CenterId)
-                    .ThenBy(s=>s.Level.SortOrder)
+                    //.OrderBy(s => s.StdCenters
+                    // .FirstOrDefault(z => z.IsActive)!.CenterId)
+                    //.ThenBy(s=>s.Level.SortOrder)
                     .AsQueryable();
             }
             else
@@ -300,10 +333,10 @@ namespace APIServerLib.Repositories.Implemntations
                     .Include(s => s.Gender)
                     .Include(s => s.Level)
                     .AsNoTracking()
-                    .OrderBy(s => s.StdCenters
-                        .OrderByDescending(sc => sc.FromDate)
-                        .FirstOrDefault()!.CenterId)
-                    .ThenBy(s => s.Level.SortOrder)
+                    //.OrderBy(s => s.StdCenters
+                    //    .OrderByDescending(sc => sc.FromDate)
+                    //    .FirstOrDefault()!.CenterId)
+                    //.ThenBy(s => s.Level.SortOrder)
                     .AsQueryable();
             }
 
@@ -327,7 +360,7 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(s =>
                     s.StdCenters.Any(sc => sc.FromDate >= request.FromDate.Value));
 
-            return await query.OrderBy(s => s.Name).ToListAsync();
+            return await query/*.OrderBy(s => s.Name)*/.ToListAsync();
         }
 
         public async Task<List<Student>> GetAllByCenterAsync(long centerId)

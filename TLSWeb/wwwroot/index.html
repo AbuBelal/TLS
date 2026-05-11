@@ -23,8 +23,6 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="TLSWeb.styles.css" rel="stylesheet" />
     <link href="manifest.webmanifest" rel="manifest" />
-    <!--<link href="wwwroot/manifest.webmanifest" rel="manifest" />
-    <link rel="manifest" href="/assets/manifest.webmanifest">-->
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
     <!--begin-->
@@ -410,31 +408,22 @@
             finally {
                 // تحميل Blazor بعد عرض الذكر (نجاح أو فشل)
                 //loadBlazor();
-                
+
 
                 setTimeout(() => {
                     Blazor.start();
                 }, 2000);
             }
         }
-
-        // تأخير تحميل Blazor حتى يتم جلب الدعاء وعرضه
-        //function loadBlazor() {
-        //    const script = document.createElement('script');
-        //    script.src = '_framework/blazor.webassembly#[.{fingerprint}].js';
-        //    script.onload = () => {
-        //        // تحميل MudBlazor وتسجيل service worker بعد Blazor
-        //        const mudScript = document.createElement('script');
-        //        mudScript.src = '_content/MudBlazor/MudBlazor.min.js?v=1';
-        //        document.body.appendChild(mudScript);
-
-        //        navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
-        //    };
-        //    document.body.appendChild(script);
-        //}
-
         fetchDua();
     </script>
+    <script>window.copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text).then(() => {
+            //alert("تم نسخ الرقم: " + text);
+        }).catch(err => {
+            console.error('خطأ في النسخ: ', err);
+        });
+    }</script>
 </body>
 
 </html>
