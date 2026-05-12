@@ -1,11 +1,12 @@
 
 using APIServerLib.Data;
 using APIServerLib.ProgramSettings;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.Entities;
-using System.Text.Json.Serialization;
 using SharedLib.Fixed;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +20,18 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     // This ignores circular references (common in complex models)
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
-
+//builder.Services.AddDataProtection()
+//    .PersistKeysToFileSystem(new DirectoryInfo(@"\\path-to-your-keys-folder\"));
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    // تجعل النظام يتحقق من المستخدم كل 8 ساعات مثلاً بدلاً من الدقائق
+    options.ValidationInterval = TimeSpan.FromHours(8);
+});
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.HttpOnly = true;
     // تحديد مدة انتهاء صلاحية الكوكي (مثلاً 30 يوم)
-    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.ExpireTimeSpan = TimeSpan.FromDays(8);
 
     // تفعيل خاصية "Sliding Expiration" لإعادة تمديد الوقت طالما المستخدم نشط
     options.SlidingExpiration = true;

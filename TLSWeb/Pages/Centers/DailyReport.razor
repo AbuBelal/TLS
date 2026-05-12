@@ -108,7 +108,7 @@ else
         </AuthorizeView>
         @foreach (var item in DailyReportSrchRs)
         {
-            <CenterDailyReportComponent item="@item"  ManagerName="@Managers.FirstOrDefault(m => m.EmpCenters?.FirstOrDefault().CenterId== item.CenterId)?.Name"></CenterDailyReportComponent>
+            <CenterDailyReportComponent item="@item"  ManagerName="@Managers.FirstOrDefault(m => m.EmpCenters?.FirstOrDefault(c=>c.IsActive).CenterId== item.CenterId)?.Name"></CenterDailyReportComponent>
         }
 
       @*   <div class="text-center mt-5 mb-5">
@@ -179,7 +179,7 @@ else
     private async Task OnSearchChanged()
     {
         DailyReportSrchRs = DailyReports.Where(x => x.Center.Name.ToLower().Contains(searchText.ToLower()) 
-        // ||x.Center.CenterCode.ToLower().Contains(searchText.ToLower()) ||
+         //||x..CenterCode.ToLower().Contains(searchText.ToLower()) ||
         // x.Center.EnName.Contains(searchText)
         ).ToList();
         if (ShowActiveCenters)

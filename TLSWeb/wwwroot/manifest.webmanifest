@@ -1,6 +1,6 @@
 {
-  "name": "TLSWeb",
-  "short_name": "TLSWeb",
+  "name": "إدارة المساحات التعليمية المؤقتة",
+  "short_name": "T.L.S.",
   "id": "./",
   "start_url": "./",
   "display": "standalone",

@@ -159,7 +159,19 @@
                                     }
                                 </td>
                                 <td><code class="bg-light text-dark px-1 rounded small">@(log.IpAddress ?? "-")</code></td>
-                                <td class="small" dir="ltr">@log.Timestamp.ToLocalTime().ToString("yyyy/MM/dd>>HH:mm")</td>
+                                <td class="small" dir="ltr">@* @log.Timestamp.ToLocalTime().ToString("yyyy/MM/dd - HH:mm") *@
+                                    <div style="direction: ltr; text-align: left;">
+                                        <span style="display: inline-block; direction: ltr;">
+                                            @log.Timestamp.ToLocalTime().ToString("yyyy/MM/dd", System.Globalization.CultureInfo.InvariantCulture)
+                                        </span>
+
+                                        <span style="margin: 0 1px; color: #888; display: inline-block;">-</span>
+
+                                        <span style="display: inline-block; direction: ltr;">
+                                            @log.Timestamp.ToLocalTime().ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)
+                                        </span>
+                                    </div>
+                                </td>
                             </tr>
                         }
                     </tbody>

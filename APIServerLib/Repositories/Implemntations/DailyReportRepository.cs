@@ -220,6 +220,7 @@ namespace APIServerLib.Repositories.Implemntations
 
                 dly.CenterId = Center.Id;
                 dly.Center = Center;
+                
             }
 
             return dly;

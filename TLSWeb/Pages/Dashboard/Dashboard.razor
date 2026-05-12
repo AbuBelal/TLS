@@ -1,4 +1,5 @@
-﻿@using TLSWeb.Pages.Reports
+﻿@using System.Globalization
+@using TLSWeb.Pages.Reports
 <div class="container-fluid py-3 px-4" dir="rtl">
 
     @if (IsLoading)
@@ -184,7 +185,7 @@
                         <div class="col text-center d-flex flex-column justify-content-end align-items-center h-100">
                             <small class="text-muted mb-1">@level.Count</small>
                             <div class="rounded-top @level.ColorClass w-100"
-                                 style="height:@(level.Percent * 1.4)px;min-height:8px;transition:height .4s">
+                                 style="height:@((level.Percent * 1.4).ToString(CultureInfo.InvariantCulture)) px;min-height:8px;transition:height .4s">
                             </div>
                             <small class="mt-1 fw-semibold">@level.Label</small>
                         </div>

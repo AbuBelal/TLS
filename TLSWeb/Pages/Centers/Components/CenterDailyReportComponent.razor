@@ -202,9 +202,7 @@
         // var managers = await EmployeeApi.GetAllManagers();
         // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
 
-        var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
-        var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);
-        Rest = TotalReceived - TotalDist;
+       
     }
     override protected async Task OnParametersSetAsync()
     {
@@ -235,6 +233,9 @@
             ReadOnly = true;
         }
 
+        var TotalReceived = await InComeApi.GetBuildingTotal(item.Center?.BuildingCode);
+        var TotalDist = await DailyReportApi.GetBuildingTotalDist(item.Center?.BuildingCode);
+        Rest = TotalReceived - TotalDist;
     }
 
     private async Task SaveCenter()

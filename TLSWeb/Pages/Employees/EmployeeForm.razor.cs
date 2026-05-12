@@ -148,7 +148,7 @@ public partial class EmployeeForm : ComponentBase
     protected async Task SaveEmployee()
     {
         employee.Name = employee.Name.Trim();
-        employee.EnName = employee.EnName.Trim();
+        employee.EnName = employee.EnName?.Trim();
         employee.CivilId = employee.CivilId.Trim();
 
         var mapper = new EmployeeMapper();

@@ -32,7 +32,7 @@ namespace SharedLib.Fixed
         };
         public static string SelectedAreaEn => CurrentRegion switch
         {
-            RegionType.Debug => "North",
+            RegionType.Debug => "ForDebug",
             RegionType.North => "North",
             RegionType.WestMiddle => "WestMiddle",
             RegionType.WestGaza => "WestGaza",

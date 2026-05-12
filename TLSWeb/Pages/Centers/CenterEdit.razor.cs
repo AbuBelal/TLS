@@ -149,8 +149,26 @@ public partial class CenterEdit : ComponentBase
                 MudSnackbar.Add(result.Message, Severity.Error);
             }
         }
-        catch (Exception ex)
+        catch (ApiException ex)
         {
+            if (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                // قراءة محتوى الخطأ كـ نص (String)
+                var errorContent = ex.Content;
+
+                // أو قراءته وتحويله تلقائياً إلى كائن (Object) إذا كنت تعرف الهيكل المرسل
+                var validationErrors = await ex.GetContentAsAsync<Dictionary<string, string[]>>();
+
+                if (validationErrors != null && validationErrors.ContainsKey("errors"))
+                {
+                    // هنا يمكنك الوصول لرسالة خطأ كلمة المرور تحديداً
+                    // ملاحظة: ASP.NET Core يضع الأخطاء عادة داخل مفتاح "errors"
+                    foreach (var error in validationErrors)
+                    {
+                        Console.WriteLine($"Field: {error.Key}, Error: {string.Join(", ", error.Value)}");
+                    }
+                }
+            }
             MudSnackbar.Add($"فشل الحفظ: {ex.Message}", Severity.Error);
         }
         finally
