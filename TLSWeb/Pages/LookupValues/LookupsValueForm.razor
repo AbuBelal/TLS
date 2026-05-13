@@ -11,26 +11,32 @@
     <ValidationSummary />
 
     <div class="row">
+        <!-- النوع (ValueType) -->
+        <div class="col-md-12 mb-3">
+            @* <label>النوع (مثال: Gender, Job)</label>
+            <InputText class="form-control" @bind-Value="lookup.ValueType" /> *@
+
+            <label>النوع (مثال: Gender, Job)</label>
+            <InputSelect class="form-control" @bind-Value="lookup.ValueType">
+                <option value="">-- اختر النوع --</option>
+                @foreach (var item in lookupValues)
+                {
+                    <option value="@item">@item</option>
+                }
+            </InputSelect>
+        </div>
+
         <!-- الاسم (موروث من BaseEntity) -->
         <div class="col-md-6 mb-3">
             <label>الاسم (مطلوب)</label>
             <InputText class="form-control" @bind-Value="lookup.Name" />
             <ValidationMessage For="@(() => lookup.Name)" />
         </div>
-
-        <!-- النوع (ValueType) -->
+        <!-- الاسم (موروث من BaseEntity) -->
         <div class="col-md-6 mb-3">
-            @* <label>النوع (مثال: Gender, Job)</label>
-            <InputText class="form-control" @bind-Value="lookup.ValueType" /> *@
-
-                <label>النوع (مثال: Gender, Job)</label>
-                <InputSelect class="form-control" @bind-Value="lookup.ValueType">
-                    <option value="">-- اختر النوع --</option>
-                @foreach (var item in lookupValues)
-                    {
-                        <option value="@item">@item</option>
-                    }
-                </InputSelect>
+            <label>الاسم بالانجليزية (مطلوب)</label>
+            <InputText class="form-control" @bind-Value="lookup.EnName" />
+            <ValidationMessage For="@(() => lookup.EnName)" />
         </div>
 
         <!-- الترتيب -->

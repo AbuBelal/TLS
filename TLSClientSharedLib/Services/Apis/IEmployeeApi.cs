@@ -47,6 +47,8 @@ namespace TLSClientSharedLib.Services.Apis
         /// <summary>تصدير الموظفين المفلترين (POST لأن الفلاتر في الـ body)</summary>
         [Post(ApiUrls.Employee.ExportFiltered)]
         Task<HttpResponseMessage> ExportFiltered([Body] EmployeeFilterRequest request);
+        [Post(ApiUrls.Employee.ExportFilteredAr)]
+        Task<HttpResponseMessage> ExportFilteredAr([Body] EmployeeFilterRequest request);
 
         /// <summary>تصدير جميع موظفي المركز</summary>
         [Get(ApiUrls.Employee.ExportAll)]

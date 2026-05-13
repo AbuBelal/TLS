@@ -204,7 +204,7 @@ public partial class Employees : ComponentBase
         {
             var response = await EmployeeApi.ExportFiltered(BuildRequest());
             if (response.IsSuccessStatusCode)
-                await ExcelDownloader.DownloadFromResponse(response, "موظفون_مفلتر.xlsx");
+                await ExcelDownloader.DownloadFromResponse(response, "موظفون_مفلتر_باللغة_الانجليزية.xlsx");
             else
                 MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
         }
@@ -218,7 +218,30 @@ public partial class Employees : ComponentBase
             StateHasChanged();
         }
     }
+    private async Task ExportFilteredAr()
+    {
+        if (isExportingFiltered) return;
+        isExportingFiltered = true;
+        showExportMenu = false;
 
+        try
+        {
+            var response = await EmployeeApi.ExportFilteredAr(BuildRequest());
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "موظفون_مفلتر_باللغة_العربية.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExportingFiltered = false;
+            StateHasChanged();
+        }
+    }
     /// <summary>تصدير جميع موظفي المركز بدون فلاتر</summary>
     private async Task ExportAll()
     {

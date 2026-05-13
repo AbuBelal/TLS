@@ -15,7 +15,8 @@ namespace TLSWeb.Pages.Centers;
 public partial class CenterEdit : ComponentBase
 {
     [Parameter] public Center? center { get; set; }
-    [Parameter] public string BackgroundColor { get; set; } = "#fff";
+    [Parameter] public string BKColor { get; set; } = "#ffffff";
+    //[Parameter] public string BackgroundColor { get; set; } = "#fff";
     List<LookupValue> WHoures=new List<LookupValue>();
     bool IsAdmin=false;
     // ── State ──────────────────────────────────────────────────

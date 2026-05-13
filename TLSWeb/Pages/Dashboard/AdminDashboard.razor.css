@@ -1,0 +1,26 @@
+﻿/* للهواتف والشاشات الصغيرة: تفعيل التمرير العرضي */
+@media (max-width: 767px) {
+    .custom-chart-container {
+        overflow-x: auto;
+        display: flex; /* لضمان بقاء العناصر بجانب بعضها */
+    }
+}
+
+/* للشاشات الكبيرة (Desktop): إلغاء شريط التمرير ومنع التمرير */
+@media (min-width: 768px) {
+    .custom-chart-container {
+        overflow-x: hidden;
+        flex-wrap: wrap; /* السماح للأعمدة بأخذ مساحتها الطبيعية أو التوزع */
+        justify-content: center; /* اختياري: لتوسيط الأعمدة في الشاشة الكبيرة */
+    }
+}
+
+/* تحسين شكل شريط التمرير في الهواتف (اختياري) */
+.custom-chart-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.custom-chart-container::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 10px;
+}

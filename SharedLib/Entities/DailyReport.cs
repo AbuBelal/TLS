@@ -91,6 +91,7 @@ namespace SharedLib.Entities
         public int? Disabilities { get; set; } = 0;
         public int? WFPBiscDist { get; set; } = 0;
         public int? WFPBiscLost { get; set; } = 0;
+        public int? RoomsNo { get; set; } = 0;
 
         [NotMapped]
         public int? IsNotUNRWA => AttTotal - (IsUNRWA ?? 0);

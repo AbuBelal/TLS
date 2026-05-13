@@ -10,5 +10,6 @@ namespace SharedLib.Entities
         public string ValueType { get; set; } = string.Empty; //Type(Gender, Job, Specialization)
         public int? SortOrder { get; set; } = 0;
         public bool IsActive { get; set; } = true;
+        public string? EnName { get; set; } = string.Empty;
     }
 }

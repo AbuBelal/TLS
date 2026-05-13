@@ -217,7 +217,7 @@ namespace APIServerLib.Repositories.Implemntations
                     properties.First(p => p.Name == $"RegFemale0{L + 1}")?.SetValue(dly, levelFemales[levelName]);
                     L++;
                 }
-
+                dly.RoomsNo = Center.Rooms + Center.Tarpaulins + Center.OtherSpaces;
                 dly.CenterId = Center.Id;
                 dly.Center = Center;
                 

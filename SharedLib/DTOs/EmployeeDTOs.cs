@@ -24,9 +24,14 @@ namespace SharedLib.DTOs
         public string? CivilId { get; set; }
         public string? Mobile { get; set; }
         public string? GenderName { get; set; }
-        public string? JobName { get; set; }
+         public string? GenderEnName { get; set; }
+        public string? JobName { get; set; } 
+        public string? JobEnName { get; set; }
+        public string? CenterCode { get; set; }
         public string? CenterName { get; set; }
-        public string? SpecializationName { get; set; }
+        public string? CenterEnName { get; set; }
+        public string? SpecializationName { get; set; } 
+        public string? SpecializationEnName { get; set; }
         public DateOnly? AddedDate { get; set; }  // ← جديد
     }
 

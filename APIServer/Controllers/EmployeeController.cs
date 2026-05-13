@@ -185,6 +185,26 @@ namespace APIServer.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);
         }
+        [HttpPost("export/filteredAr")]
+        public async Task<IActionResult> ExportFilteredAr([FromBody] EmployeeFilterRequest request)
+        {
+
+            var centerId = await CurrentCenterId();
+            //if (centerId == 0) return BadRequest("لا يوجد مركز مرتبط بحسابك.");
+
+            var centerName = await GetCenterNameAsync(centerId);
+            var employees = await _employeeRepository.GetFilteredForExportAsync(request, centerId);
+            var sheetTitle = BuildSheetTitle(request);
+
+            var bytes = EmployeeExportService.GenerateExcelAr(employees, sheetTitle, centerName);
+            var fileName = $"موظفون_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+            
+            await _auditLogService.LogAsync("Read", "Employee", "", $"تصدير الموظفين حسب التصفية: {fileName}");
+
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
 
         /// <summary>
         /// GET /api/Employee/export/all

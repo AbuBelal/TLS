@@ -61,6 +61,7 @@ namespace TLSClientSharedLib.Helpers
             public const string EmployeesCenterCount = PriorUrl + "/EmployeeCenterCount/{id}";
             public const string Paginated = PriorUrl + "/paginated";
             public const string ExportFiltered = PriorUrl + "/export/filtered";   
+            public const string ExportFilteredAr = PriorUrl + "/export/filteredAr";   
             public const string ExportAll = PriorUrl + "/export/all";         
             public const string Managers = PriorUrl + "/Managers";         
             public const string CenterManager = PriorUrl + "/CenterManager";         

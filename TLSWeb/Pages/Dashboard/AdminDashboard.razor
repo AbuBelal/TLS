@@ -144,7 +144,93 @@
         </div>
 
         @* ══ توزيع الجنس + مخطط المستويات ══ *@
+        @* ══ توزيع الجنس + مخطط المستويات ══ *@
         <div class="row g-3 mb-4">
+
+            @* توزيع الطلاب حسب الجنس *@
+            <div class="col-12 col-md-5">
+                @* أضفنا col-12 لضمان أخذ العرض كاملاً على الهاتف *@
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom fw-semibold">
+                        <i class="bi bi-pie-chart me-2 text-primary"></i>توزيع الطلاب حسب الجنس (كلي)
+                    </div>
+                    <div class="card-body">
+                        @{
+                            var t = Stats.TotalStudents;
+                            var mP = t == 0 ? 0 : (int)Math.Round((double)Stats.TotalMaleStudents / t * 100);
+                            var fP = t == 0 ? 0 : (int)Math.Round((double)Stats.TotalFemaleStudents / t * 100);
+                        }
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold">ذكور</span>
+                                <span class="text-muted small">@Stats.TotalMaleStudents طالب (@mP%)</span>
+                            </div>
+                            <div class="progress" style="height:12px;border-radius:6px">
+                                <div class="progress-bar bg-primary" style="width:@mP%;border-radius:6px"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold">إناث</span>
+                                <span class="text-muted small">@Stats.TotalFemaleStudents طالبة (@fP%)</span>
+                            </div>
+                            <div class="progress" style="height:12px;border-radius:6px">
+                                <div class="progress-bar bg-danger" style="width:@fP%;border-radius:6px"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex rounded-3 overflow-hidden mt-3" style="height:20px">
+                            @if (mP > 0)
+                            {
+                                <div class="d-flex align-items-center justify-content-center text-white small fw-semibold bg-primary"
+                                     style="width:@mP%">
+                                    @mP%
+                                </div>
+                            }
+                            @if (fP > 0)
+                            {
+                                <div class="d-flex align-items-center justify-content-center text-white small fw-semibold bg-danger"
+                                     style="width:@fP%">
+                                    @fP%
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* توزيع الطلاب حسب المستوى - الجزء الذي كان به المشكلة *@
+            <div class="col-12 col-md-7">
+                @* أضفنا col-12 لضمان النزول لسطر جديد في الهاتف *@
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom fw-semibold">
+                        <i class="bi bi-bar-chart me-2 text-primary"></i>توزيع الطلاب حسب المستوى (كلي)
+                    </div>
+                    <div class="card-body">
+                        @if (Stats.LevelDistribution.Any())
+                        {
+                            @* أضفنا flex-nowrap و overflow-auto لضمان عدم تداخل الأعمدة إذا كثر عدد المستويات *@
+                            <div class="row g-2 align-items-end flex-nowrap custom-chart-container" style="height:180px;">
+                                @foreach (var level in Stats.LevelDistribution)
+                                {
+                                    <div class="col text-center d-flex flex-column justify-content-end align-items-center h-100" style="min-width: 60px;">
+                                        <small class="text-muted mb-1" style="font-size: 0.65rem;">@level.Count</small>
+                                        <div class="rounded-top w-100 @level.ColorClass"
+                                             style="height:@( Math.Truncate(Math.Max(level.Percent * 1.4 * 4, 10)) )px; transition:height .9s; min-height: 5px;">
+                                        </div>
+                                        <small class="mt-1 fw-semibold text-truncate w-100" style="font-size:.65rem" title="@level.Label">@level.Label</small>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-4 small">لا توجد بيانات مستويات</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* <div class="row g-3 mb-4">
 
             <div class="col-md-5">
                 <div class="card border-0 shadow-sm h-100">
@@ -219,7 +305,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> *@
 
         @* ══ عنوان قسم المراكز ══ *@
         @* search *@

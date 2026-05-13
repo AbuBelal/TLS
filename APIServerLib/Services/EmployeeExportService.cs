@@ -9,10 +9,120 @@ namespace APIServerLib.Services;
 
 public static class EmployeeExportService
 {
-    public static byte[] GenerateExcel(
-        List<EmployeeListItemDto> employees,
-        string sheetTitle,
-        string centerName)
+    public static byte[] GenerateExcel(List<EmployeeListItemDto> employees,string sheetTitle,string centerName)
+    {
+        using var wb = new XLWorkbook();
+        var ws = wb.AddWorksheet("Staff");
+       // ws.RightToLeft = true;
+
+        const int totalCols = 9;
+
+        // ══ الصف1: رؤوس الأعمدة ══════════════════════════════
+        //EmpNo	EmpName	Gender	MobNo	ECNo	ECName	ECAREA	PostTitle	TLSRole
+        int headerRow = 1;
+        var headers = new (string Label, double Width)[]
+        {
+         ("EmpNo",             10),
+         ("EmpName",              20),
+         ("Gender",              10),
+         ("MobNo",              15),
+         ("ECNo",              10),
+         ("ECName",              20),
+         ("ECAREA",              15),
+         ("PostTitle",              10),
+         ("TLSRole",              10),
+        };
+
+        for (int c = 0; c < headers.Length; c++)
+        {
+            var cell = ws.Cell(headerRow, c + 1);
+            cell.Value = headers[c].Label;
+            cell.Style.Font.Bold      = true;
+            cell.Style.Font.FontSize  = 11;
+            cell.Style.Font.FontColor = XLColor.White;
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#00658E");
+            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            cell.Style.Alignment.Vertical   = XLAlignmentVerticalValues.Center;
+            cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            cell.Style.Border.OutsideBorderColor = XLColor.FromHtml("#005577");
+            ws.Column(c + 1).Width = headers[c].Width;
+        }
+        ws.Row(headerRow).Height = 22;
+
+        // ══ بيانات الموظفين ════════════════════════════════════
+        for (int i = 0; i < employees.Count; i++)
+        {
+            var emp = employees[i];
+            int row = headerRow + 1 + i;
+            bool isEven = i % 2 == 0;
+
+            var rowBg = isEven
+                ? XLColor.FromHtml("#FFFFFF")
+                : XLColor.FromHtml("#F0F8FF");
+
+            int col = 1;
+            ws.Cell(row, col).Value = emp.EmpId;
+            ws.Cell(row, ++col).Value = emp.EnName ?? "";
+            ws.Cell(row, ++col).Value = emp.GenderEnName ?? "";
+            ws.Cell(row, ++col).Value = emp.Mobile ?? "";
+            ws.Cell(row, ++col).Value = emp.CenterCode ?? "";
+            ws.Cell(row, ++col).Value = emp.CenterEnName ?? "";
+            ws.Cell(row, ++col).Value = "";
+            ws.Cell(row, ++col).Value = emp.SpecializationEnName ?? "";
+            ws.Cell(row, ++col).Value = emp.JobEnName ?? "";
+
+
+            var rowRange = ws.Range(row, 1, row, totalCols);
+            rowRange.Style.Fill.BackgroundColor = rowBg;
+            rowRange.Style.Font.FontSize  = 11;
+            rowRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            rowRange.Style.Border.OutsideBorderColor = XLColor.FromHtml("#DDDDDD");
+            rowRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            rowRange.Style.Border.InsideBorderColor = XLColor.FromHtml("#EEEEEE");
+
+            // توسيط الرقم والجنس
+            //ws.Cell(row, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            //ws.Cell(row, 6).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            // تلوين الجنس
+            //if (emp.GenderName == "ذكر")
+            //    ws.Cell(row, 6).Style.Font.FontColor = XLColor.FromHtml("#0D6EFD");
+           // else if (emp.GenderName == "أنثى")
+             //   ws.Cell(row, 6).Style.Font.FontColor = XLColor.FromHtml("#DC3545");
+        }
+
+        // ══ صف الإجماليات ══════════════════════════════════════
+        int totalRow = headerRow + employees.Count + 1;
+
+        /*ws.Range(totalRow, 1, totalRow, 5).Merge();
+        ws.Cell(totalRow, 1).Value = $"الإجمالي: {employees.Count} موظف";
+        ws.Cell(totalRow, 1).Style.Font.Bold = true;
+        ws.Cell(totalRow, 1).Style.Font.FontSize = 11;
+        ws.Cell(totalRow, 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F4FD");
+        ws.Cell(totalRow, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
+
+        var maleCount   = employees.Count(e => e.GenderName == "ذكر");
+        var femaleCount = employees.Count(e => e.GenderName == "أنثى");
+
+        ws.Range(totalRow, 6, totalRow, 8).Merge();
+        ws.Cell(totalRow, 6).Value = $"ذكور: {maleCount}  |  إناث: {femaleCount}";
+        ws.Cell(totalRow, 6).Style.Font.Bold = true;
+        ws.Cell(totalRow, 6).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F4FD");
+        ws.Cell(totalRow, 6).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        ws.Row(totalRow).Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+        ws.Row(totalRow).Style.Border.OutsideBorderColor = XLColor.FromHtml("#009EDB");
+        ws.Row(totalRow).Height = 20;*/
+
+        // ══ تجميد الرؤوس ═══════════════════════════════════════
+        ws.SheetView.FreezeRows(headerRow);
+
+        using var ms = new MemoryStream();
+        wb.SaveAs(ms);
+        return ms.ToArray();
+    }
+
+    public static byte[] GenerateExcelAr(List<EmployeeListItemDto> employees,string sheetTitle,string centerName)
     {
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("الموظفون");

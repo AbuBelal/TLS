@@ -1,17 +1,23 @@
 ﻿@attribute [Route(PagesUris.Admin.EditCenters)]
 @using Microsoft.AspNetCore.Authorization
+@using TLSWeb.Components
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
 
 <h3>تعديل بيانات المراكز</h3>
 @if (centers is null || centers.Count() == 0)
 {
-    <p>Loading .....</p>
+   <LoadingComponent>   </LoadingComponent>
 }
 else
 @foreach (var center in centers)
 {
-        string BackgroundColor = center.Id > 0 ? "white" : "#009EDB";
-    <CenterEdit Center="center"  BackgroundColor="@BackgroundColor"/>
+        string BackgroundColor = center.Id switch
+        {
+            0 => "#fcb6b6",                    // لون مخصص للصفر (الأزرق الحيوي)
+            long n when n % 2 != 0 => "#E6F7FF", // إذا كان فردي (باقي القسمة لا يساوي صفر)
+            _ => "#F8FAFC"
+        };
+    <CenterEdit Center="center"  BKColor="@BackgroundColor"/>
     <br />
     @* <span style="text-align: center;">ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ</span> *@
     <br />

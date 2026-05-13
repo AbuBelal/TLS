@@ -332,11 +332,6 @@ namespace APIServerLib.Repositories.Implemntations
             return R;
         }
 
-        // ╔══════════════════════════════════════════════════════════════╗
-        // ║  APIServerLib/Repositories/Implemntations/EmployeeRepository ║
-        // ║  أضف هاتين الدالتين في نهاية الـ class الموجود              ║
-        // ╚══════════════════════════════════════════════════════════════╝
-
         public async Task<List<EmployeeListItemDto>> GetFilteredForExportAsync(
             EmployeeFilterRequest request, long centerId)
         {
@@ -400,12 +395,17 @@ namespace APIServerLib.Repositories.Implemntations
                     EmpId = e.EmpId,
                     CivilId = e.CivilId,
                     Mobile = e.Mobile,
+                    CenterCode=e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.CenterCode,
                     GenderName = e.Gender != null ? e.Gender.Name : null,
+                    GenderEnName = e.Gender != null ? e.Gender.EnName : null,
                     JobName = e.Job != null ? e.Job.Name : null,
+                    JobEnName = e.Job != null ? e.Job.EnName : null,
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
+                    SpecializationEnName = e.Specialization != null ? e.Specialization.EnName : null,
                     CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
+                    CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,  // ← جديد
                     AddedDate = e.EmpCenters.FirstOrDefault(x => x.IsActive).FromDate,  // ← جديد
-                })
+                }).OrderBy(e => e.CenterCode).ThenBy(e=>e.JobEnName)
                 .ToListAsync();
         }
 

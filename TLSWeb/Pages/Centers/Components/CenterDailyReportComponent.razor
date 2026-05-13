@@ -106,6 +106,10 @@
             <div class="row g-2 align-items-center">
 
                 <div class="col compact-field">
+                    <label class="compact-label"> الغرف الصفية</label>
+                    <InputNumber @bind-Value="item.RoomsNo" class="form-control form-control-xs border-danger shadow-sm" disabled="@ReadOnly" />
+                </div>
+                <div class="col compact-field">
                     <label class="compact-label"> لاجىء حاضر</label>
                     <InputNumber @bind-Value="item.IsUNRWA" class="form-control form-control-xs border-danger shadow-sm" disabled="@ReadOnly" />
                 </div>
@@ -117,7 +121,8 @@
 
                 <div class="col-md-1 compact-field">
                     <label class="compact-label">إعاقة</label>
-                    <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.Disabilities" disabled />
+                    <InputNumber @bind-Value="item.Disabilities" class="form-control form-control-xs border-primary shadow-sm" disabled="@ReadOnly" />
+                    @* <input type="number" class="form-control form-control-xs bg-white shadow-sm" value="@item.Disabilities" disabled="@ReadOnly" /> *@
                 </div>
 
                 <div class="col compact-field">
