@@ -158,7 +158,8 @@ else
         DailyReports = null;
         StateHasChanged();
         DailyReports = await DailyReportApi.GetDailyReportForDate(SelectedDate);
-        DailyReportSrchRs = DailyReports;
+        await OnSearchChanged();
+        // DailyReportSrchRs = DailyReports;
     }
     private async void ExportToExcel(MouseEventArgs args)
     {
@@ -178,7 +179,9 @@ else
     }
     private async Task OnSearchChanged()
     {
-        DailyReportSrchRs = DailyReports.Where(x => x.Center.Name.ToLower().Contains(searchText.ToLower()) 
+        DailyReportSrchRs = DailyReports;
+        if(!string.IsNullOrEmpty(searchText))
+         DailyReportSrchRs = DailyReports.Where(x => x.Center.Name.ToLower().Contains(searchText.ToLower()) 
          //||x..CenterCode.ToLower().Contains(searchText.ToLower()) ||
         // x.Center.EnName.Contains(searchText)
         ).ToList();

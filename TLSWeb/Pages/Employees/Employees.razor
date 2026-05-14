@@ -130,7 +130,9 @@
                     <div class="col-md-2">
                         <label class="form-label fw-semibold text-muted small">المركز</label>
                         <select class="form-select" @bind="selectedCenter" @bind:after="OnFilterChangedAsync">
-                            <option value="">الكل</option>
+                            <option value="-2">— الكل —</option>
+                            <option value="-1">— المسجلون في مراكز —</option>
+                            <option value="0">— الغير مسجلون في مراكز —</option>
                             @foreach (var center in CenterOptions)
                             {
                                 <option value="@center">@center</option>

@@ -124,8 +124,19 @@ namespace APIServer.Controllers
             
         }
 
-        [HttpPut]
+        [HttpPut("Update")]
         public async Task<ActionResult<GeneralResponse>> Update(EmployeeUpsertDto employee)
+        {
+            //if (employee.CenterId is null || employee.CenterId <= 0)
+            //    employee.CenterId = await CurrentCenterId();
+
+            var mapper = new EmployeeMapper();
+            var response = await _employeeRepository.Update(mapper.ToEntity(employee));
+            await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {employee.Name}");
+            return Ok(response);
+        }
+        [HttpPut("UpdateWithCenter")]
+        public async Task<ActionResult<GeneralResponse>> UpdateWithCenter(EmployeeUpsertDto employee)
         {
             if (employee.CenterId is null || employee.CenterId <= 0)
                 employee.CenterId = await CurrentCenterId();

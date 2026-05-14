@@ -1,0 +1,352 @@
+﻿/* ═══════════════════════════════════════════════════════════
+       صفحة الهبوط — مساحات التعليم المؤقتة
+       ═══════════════════════════════════════════════════════════ */
+.landing-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 30%, #f5f0ff 70%, #fff8f0 100%);
+    font-family: 'Tajawal', sans-serif;
+    direction: rtl;
+    overflow-x: hidden;
+}
+
+/* ── الهيدر ── */
+.landing-header {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,158,219,0.1);
+    padding: 1rem 2rem;
+}
+
+.brand-text {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #009EDB;
+}
+
+.brand-sub {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ── القسم الرئيسي (Hero + Login) ── */
+.hero-section {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+}
+
+/* ── الجانب التعريفي ── */
+.hero-content {
+    padding: 3rem 2rem 3rem 4rem;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,158,219,0.08);
+    border: 1px solid rgba(0,158,219,0.2);
+    color: #009EDB;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 800;
+    font-size: 2.8rem;
+    line-height: 1.3;
+    color: #1a2332;
+    margin-bottom: 1rem;
+}
+
+    .hero-title span {
+        background: linear-gradient(135deg, #009EDB, #00658e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: #4b5563;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+}
+
+/* ── بطاقات المميزات ── */
+.feature-card {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0,158,219,0.08);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,158,219,0.12);
+        border-color: rgba(0,158,219,0.2);
+    }
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.feature-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1a2332;
+    margin-bottom: 0.35rem;
+}
+
+.feature-desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+/* ── العبارة الختامية ── */
+.hero-motto {
+    margin-top: 2rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(0,158,219,0.06), rgba(0,101,142,0.06));
+    border-radius: 12px;
+    border-right: 4px solid #009EDB;
+}
+
+    .hero-motto p {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #00658e;
+        margin: 0;
+    }
+
+/* ── جانب تسجيل الدخول ── */
+.login-side {
+    /* background: linear-gradient(160deg, #009EDB 40%, #00658e 40%, #004c6c 20%); */
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+    .login-side::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(255,255,255,0.03) 0%, transparent 50%);
+        animation: float 20s ease-in-out infinite;
+    }
+
+@@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(2%, -2%) rotate(1deg);
+    }
+
+    66% {
+        transform: translate(-1%, 1%) rotate(-0.5deg);
+    }
+}
+
+.login-card {
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+}
+
+.login-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #009EDB, #00658e);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+}
+
+    .login-icon i {
+        color: white;
+        font-size: 1.5rem;
+    }
+
+.login-title {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #1a2332;
+    text-align: center;
+    margin-bottom: 0.35rem;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+/* ── حقول الإدخال ── */
+.form-floating-custom {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+    .form-floating-custom input {
+        width: 100%;
+        padding: 1rem 1rem 0.5rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        background: #f9fafb;
+        transition: all 0.2s ease;
+        direction: ltr;
+        text-align: left;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+    }
+
+        .form-floating-custom input:focus {
+            outline: none;
+            border-color: #009EDB;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0,158,219,0.1);
+        }
+
+    .form-floating-custom label {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        pointer-events: none;
+        background: transparent;
+        padding: 0 0.25rem;
+    }
+
+    .form-floating-custom input:focus + label,
+    .form-floating-custom input:not(:placeholder-shown) + label {
+        top: 0;
+        font-size: 0.75rem;
+        color: #009EDB;
+        background: white;
+    }
+
+/* ── زر الدخول ── */
+.btn-login {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #009EDB, #00658e);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Tajawal', sans-serif;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .btn-login:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,158,219,0.35);
+    }
+
+    .btn-login:disabled {
+        background: linear-gradient(135deg, #7dc8e8, #5ba8c8);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+/* ── الفوتر ── */
+.landing-footer {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(0,158,219,0.08);
+    padding: 1rem 2rem;
+    text-align: center;
+}
+
+    .landing-footer p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+/* ── استجابة الجوال ── */
+@@media (max-width: 991.98px) {
+    .hero-content {
+        padding: 2rem 1.5rem;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-motto {
+        text-align: center;
+        border-right: none;
+        border-bottom: 4px solid #009EDB;
+    }
+
+    .login-side {
+        min-height: auto;
+        padding: 2rem 1.5rem 3rem;
+    }
+
+    .login-card {
+        max-width: 100%;
+    }
+}
+
+@@media (max-width: 575.98px) {
+    .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .feature-card {
+        padding: 1rem;
+    }
+}
+

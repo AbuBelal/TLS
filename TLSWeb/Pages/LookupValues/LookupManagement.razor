@@ -20,6 +20,7 @@
     <thead>
         <tr>
             <th>الاسم</th>
+            <th>الاسم بالانجليزية</th>
             <th>النوع (Type)</th>
             <th>الترتيب</th>
             <th>نشط</th>
@@ -31,6 +32,7 @@
         {
             <tr>
                 <td>@item.Name</td>
+                <td>@item.EnName</td>
                 <td>@item.ValueType</td>
                 <td>@item.SortOrder</td>
                 <td>@(item.IsActive == true ? "نعم" : "لا")</td>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Refit;
 using SharedLib.DTOs;
 using System.Net;
 using System.Net.Http;
@@ -96,15 +97,19 @@ public class CookieAuthenticationStateProvider(IHttpClientFactory httpClientFact
                 return new AuthResult { Succeeded = true };
             }
         }
-        catch
+        catch(ApiException ex)
         {
-            //Logging
+            return new AuthResult
+            {
+                Succeeded = false,
+                ErrorList = new string[] { ex.Content ?? "حدث خطأ غير متوقع أثناء محاولة تسجيل الدخول. الرجاء المحاولة لاحقاً." }
+            };
         }
 
         return new AuthResult
         {
             Succeeded = false,
-            ErrorList = ["Invalid email or password"]
+            ErrorList = ["كلمة المرور أو البريد الإلكتروني غير صحيحين"]
         };
     }
 

@@ -21,6 +21,7 @@ namespace TLSWeb.Helpers
             builder.Services.AddTransient<CookieHandler>();
 
             builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<TranslationService>();
 
             builder.Services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>();
 

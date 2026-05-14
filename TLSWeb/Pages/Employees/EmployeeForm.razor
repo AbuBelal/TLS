@@ -30,7 +30,8 @@
                         <label class="form-label">الاسم الكامل (بالعربي)</label>
                         <InputText @bind-Value="employee.Name"
                                    class="form-control"
-                                   placeholder="أدخل الاسم رباعي" />
+                                   placeholder="أدخل الاسم رباعي" 
+                                   @onblur="TranslateToEng"/>
                         <ValidationMessage For="@(() => employee.Name)" class="text-danger" />
                     </div>
 
@@ -360,3 +361,34 @@ Icon="bi-exclamation-triangle" />
 
 
 
+@code {
+    private async Task TranslateToEng()
+    {
+        string arabicName = employee.Name;
+        string EnglishName = employee.EnName;
+        if (!string.IsNullOrWhiteSpace(arabicName) && string.IsNullOrWhiteSpace(EnglishName))
+        {
+            //var translationService = new TranslationService(new HttpClient());
+            // isLoading = true;
+            try
+            {
+                EnglishName = await Translationservice.TranslateNameAsync(arabicName);
+                if (!string.IsNullOrEmpty(EnglishName))
+                {
+                    employee.EnName = EnglishName;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                EnglishName = "حدث خطأ أثناء الاتصال بالخدمة.";
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                // isLoading = false;
+            }
+        }
+
+    }
+}

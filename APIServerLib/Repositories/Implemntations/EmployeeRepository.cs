@@ -82,16 +82,16 @@ namespace APIServerLib.Repositories.Implemntations
             var emp = await _context.Employees.Where(x => x.EmpId == item.EmpId && x.CivilId == item.CivilId)
                 .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
                 .FirstOrDefaultAsync();
-
-            if (item.CenterId is null || item.CenterId <= 0 )
-                return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
-            else
+            //old code
+            //if (item.CenterId is null || item.CenterId <= 0 )
+            //    return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
+            //else
             
                 if (emp is not null)
                 {
                     var EmpCenters = _context.EmpCenters.Where(x => x.EmployeeId == emp.Id && x.IsActive).ToList();
                     await _context.Database.BeginTransactionAsync();
-                    if (EmpCenters.FirstOrDefault()?.CenterId == item.CenterId)
+                    if (item.CenterId==0 || EmpCenters.FirstOrDefault()?.CenterId == item.CenterId)
                     {
                         emp.Name = item.Name;
                         emp.EnName = item.EnName;
@@ -238,13 +238,32 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(e => e.Job != null && e.Job.Name == request.Job);
             }
 
+            // فلتر المركز
+            //if (!string.IsNullOrWhiteSpace(request.Center))
+            //{
+            //    query = query.Where(e => e.EmpCenters != null && e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name == request.Center);
+            //}
             if (!string.IsNullOrWhiteSpace(request.Center))
             {
-                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name == request.Center);
+                switch (request.Center)
+                {
+                    case "-2":
+                        //query = query.Where(x=>x.StdCenters.Count(c=>c.IsActive)<0);
+                        break;
+                    case "-1":
+                        query = query.Where(x => x.EmpCenters.Count(c => c.IsActive) > 0);
+                        break;
+                    case "0":
+                        query = query.Where(x => x.EmpCenters.Count(c => c.IsActive) <= 0);
+                        break;
+                    default:
+                        query = query.Where(s => s.EmpCenters.FirstOrDefault(z => z.IsActive).Center.Name == request.Center);
+                        break;
+                }
             }
 
-            // فلتر تاريخ الإضافة
-            if (request.FromDate.HasValue)
+                // فلتر تاريخ الإضافة
+                if (request.FromDate.HasValue)
             {
                 query = query.Where(e =>
                     e.EmpCenters.Any(ec => ec.FromDate >= request.FromDate.Value));
@@ -378,10 +397,28 @@ namespace APIServerLib.Repositories.Implemntations
             if (!string.IsNullOrWhiteSpace(request.Job))
                 query = query.Where(e => e.Job != null && e.Job.Name == request.Job);
 
+            // فلتر المركز
+            //if (!string.IsNullOrWhiteSpace(request.Center))
+            //    query = query.Where(e => e.EmpCenters != null && e.EmpCenters.FirstOrDefault(x=>x.IsActive).Center.Name == request.Center);
             if (!string.IsNullOrWhiteSpace(request.Center))
-                query = query.Where(e => e.EmpCenters != null && e.EmpCenters.FirstOrDefault(x=>x.IsActive).Center.Name == request.Center);
-
-            if (request.FromDate.HasValue)
+            {
+                switch (request.Center)
+                {
+                    case "-2":
+                        //query = query.Where(x=>x.StdCenters.Count(c=>c.IsActive)<0);
+                        break;
+                    case "-1":
+                        query = query.Where(x => x.EmpCenters.Count(c => c.IsActive) > 0);
+                        break;
+                    case "0":
+                        query = query.Where(x => x.EmpCenters.Count(c => c.IsActive) <= 0);
+                        break;
+                    default:
+                        query = query.Where(s => s.EmpCenters.FirstOrDefault(z => z.IsActive).Center.Name == request.Center);
+                        break;
+                }
+            }
+                if (request.FromDate.HasValue)
                 query = query.Where(e =>
                     e.EmpCenters.Any(ec => ec.FromDate >= request.FromDate.Value));
 
@@ -405,7 +442,8 @@ namespace APIServerLib.Repositories.Implemntations
                     CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
                     CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,  // ← جديد
                     AddedDate = e.EmpCenters.FirstOrDefault(x => x.IsActive).FromDate,  // ← جديد
-                }).OrderBy(e => e.CenterCode).ThenBy(e=>e.JobEnName)
+                })
+                .OrderBy(e => e.CenterCode).ThenBy(e=>e.JobEnName)
                 .ToListAsync();
         }
 

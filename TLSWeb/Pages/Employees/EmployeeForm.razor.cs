@@ -4,6 +4,7 @@ using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Fixed;
 using SharedLib.Mappers;
+using SharedLib.Responses;
 using TLSWeb.Helpers;
 
 namespace TLSWeb.Pages.Employees;
@@ -29,7 +30,7 @@ public partial class EmployeeForm : ComponentBase
     protected bool IsDuplicate = false;
     protected string DuplicateMessage = string.Empty;
     private List<Center> centers = new();          // ← جديد
-    private long? selectedCenterId;
+    private long? selectedCenterId=0;
     bool isDialogOpen = false;
     string dialogMessage = "هذا الموظف غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
     // ────────────────────────────────────────────────
@@ -57,7 +58,7 @@ public partial class EmployeeForm : ComponentBase
         jobs = await LookupValueApi.GetByValueType(LookupTypes.Job) ?? new();
         specializations = await LookupValueApi.GetByValueType(LookupTypes.Specialization) ?? new();
         centers = await CenterApi.GetAll() ?? new();
-        selectedCenterId=employee.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault()?.CenterId;
+        selectedCenterId=employee.EmpCenters.FirstOrDefault(c=>c.IsActive)?.CenterId;
     }
 
     // ────────────────────────────────────────────────
@@ -158,7 +159,15 @@ public partial class EmployeeForm : ComponentBase
         {
             if (IsEditMode)
             {
-                var response = await EmployeeApi.Update(employeeToSend);
+                long newCenter = employeeToSend.CenterId??0;
+                var ee = employee.EmpCenters.FirstOrDefault(c => c.IsActive);
+                long oldCenter = ee is null ?0 : ee.CenterId;
+
+                GeneralResponse response;
+                if(oldCenter==newCenter && newCenter!=0)
+                  response = await EmployeeApi.Update(employeeToSend);
+                else
+                  response = await EmployeeApi.UpdateWithCeneter(employeeToSend);
 
                 if (response.Success)
                 {
