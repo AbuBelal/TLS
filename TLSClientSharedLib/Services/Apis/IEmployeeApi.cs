@@ -32,6 +32,9 @@ namespace TLSClientSharedLib.Services.Apis
         [Put(ApiUrls.Employee.Update)]
         Task<GeneralResponse> Update([Body] EmployeeUpsertDto employee);
 
+        [Put(ApiUrls.Employee.RegisterEmpInCenter)]
+        Task<GeneralResponse> RegisterEmpInCenter([Body] EmployeeUpsertDto employee);
+
         [Put(ApiUrls.Employee.UpdateWithCeneter)]
         Task<GeneralResponse> UpdateWithCeneter([Body] EmployeeUpsertDto employee);
 

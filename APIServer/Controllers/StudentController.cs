@@ -1,5 +1,6 @@
 using APIServerLib.Repositories.Interfaces;
 using Azure;
+using DocumentFormat.OpenXml.Vml.Office;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -107,14 +108,33 @@ namespace APIServer.Controllers
         [HttpPut]
         public async Task<ActionResult<GeneralResponse>> Update(StdWithCenterId student)
         {
+            StudentMapper stdmapper = new StudentMapper();
             if (student.CenterId <= 0)
             {
                 student.CenterId = await CurrentCenterId();
                 //return await Insert(student.Student);
             }
+            var std = await _studentRepository.GetById(student.Student.Id);
+            var oldValues = stdmapper.ToStudentDTO(std);
+            await FillStudentData(oldValues, std);
+
             var response = await _studentRepository.UpdateStudentWithCenter(student.Student , student.CenterId);
-            await _auditLogService.LogAsync("Update", "Student", student.Student.Id.ToString(), $"تم تعديل طالب: {student.Student.Name}");
+            if (response.Success)
+            {
+                std = await _studentRepository.GetById(student.Student.Id);
+                var NewValues =stdmapper.ToStudentDTO( std);
+                await FillStudentData(NewValues, std);
+                var Changes = AuditLogHelper.CompareObjects<StudentDto>(oldValues, NewValues);
+                await _auditLogService.LogAsync("Update", "Student", student.Student.Id.ToString(), $"تم تعديل طالب: {Changes}");// student.Student.Name}");
+            }
             return Ok(response);
+        }
+
+        private async Task FillStudentData(StudentDto Dto ,Student student) 
+        {
+            Dto.CenterName = student?.StdCenters?.FirstOrDefault(x => x.IsActive)?.Center?.Name;
+            Dto.GenderName = student?.Gender?.Name;
+            Dto.LevelName = student?.Level?.Name;
         }
 
         [HttpDelete("{id}")]

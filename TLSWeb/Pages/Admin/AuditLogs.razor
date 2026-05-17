@@ -1,4 +1,5 @@
-﻿@attribute [Route(PagesUris.AuditLogPages.Manage)]
+﻿@using TLSWeb.Components
+@attribute [Route(PagesUris.AuditLogPages.Manage)]
 
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
@@ -148,15 +149,41 @@
                                 </td>
                                 <td>@log.EntityType</td>
                                 <td><code class="bg-light text-dark px-2 py-1 rounded">@(log.EntityId ?? "-")</code></td>
-                                <td>
-                                    @if (!string.IsNullOrWhiteSpace(log.Details) && log.Details.Length > 80)
+                                    <td style="max-width: 300px; min-width: 200px; cursor: pointer;"
+                                        title="انقر نقراً مزدوجاً لعرض التفاصيل كاملة"
+                                        @ondblclick="() => OpenDetails(log.Details)">
+                                        @if (!string.IsNullOrWhiteSpace(log.Details))
+                                        {
+                                        <div class="pe-2 custom-scrollbar"
+                                                 style="direction: rtl; text-align: right; max-height: 80px; overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; word-break: break-word; font-size: 0.85rem;">
+                                                @log.Details
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    
+                                   @*  @if (!string.IsNullOrWhiteSpace(log.Details))
+                                    {
+                                        <!-- الحاوية تدعم الآن RTL بالكامل مع شريط تمرير ذكي -->
+                                        <div class="pe-2 custom-scrollbar"
+                                             style="direction: rtl; text-align: right; max-height: 80px; overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; word-break: break-word; font-size: 0.85rem;">
+                                            @log.Details
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    } *@
+                                   @*  @if (!string.IsNullOrWhiteSpace(log.Details) && log.Details.Length > 80)
                                     {
                                         <span title="@log.Details">@log.Details.Substring(0, 80)...</span>
                                     }
                                     else
                                     {
                                         @log.Details
-                                    }
+                                    } *@
                                 </td>
                                 <td><code class="bg-light text-dark px-1 rounded small">@(log.IpAddress ?? "-")</code></td>
                                 <td class="small" dir="ltr">@* @log.Timestamp.ToLocalTime().ToString("yyyy/MM/dd - HH:mm") *@
@@ -226,3 +253,8 @@
         }
     }
 </div>
+
+<DetailsDialog IsOpen="isDetailsOpen" 
+               Title="التفاصيل الكاملة للتعديل" 
+               Message="@selectedDetails" 
+               OnClose="CloseDetails" />

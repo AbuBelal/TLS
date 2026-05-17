@@ -127,21 +127,75 @@ namespace APIServer.Controllers
         [HttpPut("Update")]
         public async Task<ActionResult<GeneralResponse>> Update(EmployeeUpsertDto employee)
         {
-            //if (employee.CenterId is null || employee.CenterId <= 0)
-            //    employee.CenterId = await CurrentCenterId();
-
             var mapper = new EmployeeMapper();
+
+            var oldValues = await _employeeRepository.GetById(employee.Id);
+            var oldvaluesDto = mapper.ToEmployeeUpsertDTO(oldValues);
+            await FillEmpData(oldvaluesDto, oldValues);
+            oldvaluesDto.CenterId = oldValues?.EmpCenters?.FirstOrDefault(c => c.IsActive)?.CenterId;
             var response = await _employeeRepository.Update(mapper.ToEntity(employee));
-            await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {employee.Name}");
+            if (response.Success)
+            {
+                var NewValues =await _employeeRepository.GetById(employee.Id);
+                await FillEmpData(employee, NewValues);
+                var Changes = AuditLogHelper.CompareObjects<EmployeeUpsertDto>(oldvaluesDto, employee);
+                await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {Changes}");
+            }
             return Ok(response);
+        }
+
+        private async Task FillEmpData(EmployeeUpsertDto Dto , Employee employee) 
+        {
+            Dto.CenterName = employee.EmpCenters.FirstOrDefault(x => x.IsActive)?.Center.Name;
+            Dto.GenderName = employee.Gender?.Name;
+            Dto.JobName = employee.Job?.Name;
+            Dto.SpecializationName = employee.Specialization?.Name;
         }
         [HttpPut("UpdateWithCenter")]
         public async Task<ActionResult<GeneralResponse>> UpdateWithCenter(EmployeeUpsertDto employee)
         {
             if (employee.CenterId is null || employee.CenterId <= 0)
                 employee.CenterId = await CurrentCenterId();
+
+            var oldValues = await _employeeRepository.GetById(employee.Id);
+            EmployeeMapper mapper = new EmployeeMapper();
+            EmployeeUpsertDto oldvaluesDto = oldValues is null?null: mapper.ToEmployeeUpsertDTO(oldValues);
+            await FillEmpData(oldvaluesDto, oldValues);
+
             var response = await _employeeRepository.UpdateWithCenter(employee);
-            await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {employee.Name}");
+            if (response.Success)
+            {
+                var NewValues = await _employeeRepository.GetById(employee.Id);
+                await FillEmpData(employee, NewValues);
+                var Changes = AuditLogHelper.CompareObjects<EmployeeUpsertDto>(oldvaluesDto, employee);
+                await _auditLogService.LogAsync("Update", "Employee", employee.Id.ToString(), $"تم تعديل موظف: {Changes}");
+            }
+            return Ok(response);
+        }
+
+        [HttpPut("RegisterEmpInCenter")]
+        public async Task<ActionResult<GeneralResponse>> RegisterEmpInCenter(EmployeeUpsertDto employee)
+        {
+            if (employee.CenterId is null || employee.CenterId <= 0)
+            {
+                employee.CenterId = await CurrentCenterId();
+                if (employee.CenterId is null || employee.CenterId <= 0) 
+                {
+                    return new GeneralResponse(false, "يرجى تحديد المركز !");
+                }
+            }
+
+            var oldValues = await _employeeRepository.GetById(employee.Id);
+            EmployeeMapper mapper = new EmployeeMapper();
+            EmployeeUpsertDto oldvaluesDto = oldValues is null ? null : mapper.ToEmployeeUpsertDTO(oldValues);
+            oldvaluesDto?.CenterId = oldValues is null ? 0 : oldValues?.EmpCenters?.FirstOrDefault(c => c.IsActive)?.CenterId;
+
+            var response = await _employeeRepository.RegisterEmpInCenter(employee);
+            if (response.Success)
+            {
+                var Changes = AuditLogHelper.CompareObjects<EmployeeUpsertDto>(oldvaluesDto, employee);
+                await _auditLogService.LogAsync("Update", "Register Employee", employee.Id.ToString(), $"تم تعديل موظف: {Changes}");
+            }
             return Ok(response);
         }
 

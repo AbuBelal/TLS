@@ -251,6 +251,7 @@ namespace APIServerLib.Repositories.Implemntations
                 existingReport.Disabilities = dailyreport.Disabilities;
                 existingReport.WFPBiscDist = dailyreport.WFPBiscDist;
                 existingReport.WFPBiscLost = dailyreport.WFPBiscLost;
+                existingReport.RoomsNo = dailyreport.RoomsNo;
 
                 //_context.DailyReports.Update(dailyreport);
                 await _context.SaveChangesAsync();

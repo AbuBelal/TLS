@@ -62,96 +62,10 @@ public partial class EmployeeForm : ComponentBase
     }
 
     // ────────────────────────────────────────────────
-    //  Duplicate Check
-    // ────────────────────────────────────────────────
-    protected async Task CheckDuplicateAsync()
-    {
-        //تجاهل الفحص إذا كان حقل الهوية فارغاً
-        if (string.IsNullOrWhiteSpace(employee.CivilId) || string.IsNullOrWhiteSpace(employee.EmpId))
-        {
-            IsDuplicate = true;
-            //ResetDuplicateState();
-            DuplicateMessage = "يرجى كتابة رقم الهوية أو رقم الوظيفة   .";
-            return;
-        }
-
-        if (IsEditMode)
-        {
-            EmployeeDuplicateCheckRequest request = new EmployeeDuplicateCheckRequest
-            {
-                EmpId = employee.EmpId,
-                CivilId = employee.CivilId,
-                ExcludeEmployeeId = Id
-                
-            };
-            var IsEmpIdDublicate =  await EmployeeApi.IsEmpIdDuplicate(request) ;
-            var IsCivilIdDublicate = await EmployeeApi.IsCivilIdDuplicate(request) ;
-            if (IsEmpIdDublicate.Id>0)
-            {
-                IsDuplicate = true;
-                DuplicateMessage = $"رقم الوظيفة مكرر مع الموظف: {IsEmpIdDublicate.Name}";
-                return;
-            }
-            else
-                if (IsCivilIdDublicate.Id>0)
-                {
-                    IsDuplicate = true;
-                    DuplicateMessage = $"رقم الهوية مكرر مع الموظف: {IsCivilIdDublicate.Name}";
-                    return;
-                }
-            ResetDuplicateState() ;
-            return;
-        }
-
-        IsCheckingDuplicate = true;
-        StateHasChanged();
-
-        try
-        {
-
-            var result = await EmployeeApi.GetByEmpId(employee.EmpId);
-            if (result is not null)
-            {
-                IsDuplicate = true;
-                DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الوظيفة مسبقاً باسم: {result.Name}";
-                return;
-            }
-            else
-                ResetDuplicateState();
-
-
-            result = await EmployeeApi.GetByCivilId(employee.CivilId);
-
-            if (result is not null)
-            {
-                IsDuplicate = true;
-                DuplicateMessage = $"هذا الموظف مسجل بنفس رقم الهوية مسبقاً باسم: {result.Name}";
-            }
-
-        }
-        catch
-        {
-            ResetDuplicateState();
-            //IsCheckingDuplicate = false;
-            //DuplicateMessage = string.Empty;// "لا يوجد تكرار ، يمكنك الاستمرار .";
-            //StateHasChanged();
-        }
-        finally
-        {
-            IsCheckingDuplicate = false;
-            StateHasChanged();
-        }
-    }
-
-    // ────────────────────────────────────────────────
     //  Submit
     // ────────────────────────────────────────────────
     protected async Task SaveEmployee()
     {
-        employee.Name = employee.Name.Trim();
-        employee.EnName = employee.EnName?.Trim();
-        employee.CivilId = employee.CivilId.Trim();
-
         var mapper = new EmployeeMapper();
         var employeeToSend = mapper.ToEmployeeUpsertDTO(employee);
         employeeToSend.CenterId = selectedCenterId;
@@ -164,10 +78,10 @@ public partial class EmployeeForm : ComponentBase
                 long oldCenter = ee is null ?0 : ee.CenterId;
 
                 GeneralResponse response;
-                if(oldCenter==newCenter && newCenter!=0)
-                  response = await EmployeeApi.Update(employeeToSend);
+                if (oldCenter == newCenter)
+                    response = await EmployeeApi.Update(employeeToSend);
                 else
-                  response = await EmployeeApi.UpdateWithCeneter(employeeToSend);
+                    response = await EmployeeApi.UpdateWithCeneter(employeeToSend);
 
                 if (response.Success)
                 {
@@ -226,37 +140,16 @@ public partial class EmployeeForm : ComponentBase
             ExcludeEmployeeId = Id
         };
 
-        //var IsCivilIdDublicate = await EmployeeApi.IsCivilIdDuplicate(request);
-        //if (IsCivilIdDublicate?.Id > 0)
-        //{
-        //    IsDuplicate = true;
-        //    DuplicateMessage = $"رقم الهوية مكرر مع الموظف: {IsCivilIdDublicate.Name}";
-        //    IsSaving = false;
-        //    MudSnackbar.Add(DuplicateMessage, Severity.Error);
-        //    return;
-        //}
-        //else
-        //{
-        //    var IsEmpIdDublicate = await EmployeeApi.IsEmpIdDuplicate(request);
-        //    if (IsEmpIdDublicate?.Id > 0)
-        //    {
-        //        IsDuplicate = true;
-        //        DuplicateMessage = $"رقم الوظيفة مكرر مع الموظف: {IsEmpIdDublicate.Name}";
-        //        IsSaving = false;
-        //        MudSnackbar.Add(DuplicateMessage, Severity.Error);
-        //        return;
-        //    }
-        //}
-
         var IsDublicate = await EmployeeApi.IsEmployeeDuplicate(request);
         if (IsDublicate?.Id > 0)
         {
+            employee.Id = IsDublicate.Id;
             IsDuplicate = true;
-            if (IsDublicate.EmpId == employee.EmpId && IsDublicate.CivilId == employee.CivilId)
+            if (IsDublicate.EmpId == employee.EmpId || IsDublicate.CivilId == employee.CivilId)
             {
                 if (IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive) != null)
                 {
-                    DuplicateMessage = $"رقم الوظيفة ورقم الهوية مكرران مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
+                    DuplicateMessage = $"رقم الوظيفة أو رقم الهوية أو الإثنين مكرران مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
                 }
                 else
                 {
@@ -267,80 +160,13 @@ public partial class EmployeeForm : ComponentBase
                     return;
                 }
             }
-            else if (IsDublicate.EmpId == employee.EmpId)
-                DuplicateMessage = $"رقم الوظيفة مكرر مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
-            else if (IsDublicate.CivilId == employee.CivilId)
-                DuplicateMessage = $"رقم الهوية مكرر مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
            
-            
             IsSaving = false;
             MudSnackbar.Add(DuplicateMessage, Severity.Error);
             return;
         }
         else
-        SaveEmployee();
-        //IsSaving = true;
-        ////حماية مزدوجة: تحقق من التكرار قبل الحفظ
-        //await CheckDuplicateAsync();
-        //if (IsDuplicate)
-        //{ 
-        //    MudSnackbar.Add(DuplicateMessage, Severity.Error); 
-        //    IsSaving = false;
-        //    return; 
-        //}
-
-        //IsSaving = true;
-
-        //var mapper = new EmployeeMapper();
-        //var employeeToSend = mapper.ToEmployeeUpsertDTO(employee);
-
-        //try
-        //{
-        //    if (IsEditMode)
-        //    {
-        //        var response = await EmployeeApi.Update(employeeToSend);
-
-        //        if (response.Success)
-        //        {
-        //            MudSnackbar.Add(response.Message, Severity.Success);
-        //            NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
-        //        }
-        //        else
-        //        {
-        //            MudSnackbar.Add(response.Message, Severity.Error);
-        //        }
-        //    }
-        //    else
-        //    {
-
-        //        var employee = mapper.ToEntity(employeeToSend);
-        //        var employeeWithCenter = new EmployeeWithCenter
-        //        {
-        //            Employee = employee,
-        //            CenterId = selectedCenterId ?? 0 // تأكد من تعيين مركز افتراضي إذا لم يتم الاختيار
-        //        };
-        //        var response = await EmployeeApi.AddWithCenter(employeeWithCenter);
-
-        //        if (response.Success)
-        //        {
-        //            MudSnackbar.Add(response.Message, Severity.Success);
-        //            NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
-        //        }
-        //        else
-        //        {
-        //            MudSnackbar.Add(response.Message, Severity.Error);
-        //        }
-        //    }
-        //}
-        //catch (Exception ex)
-        //{
-        //    MudSnackbar.Add($"حدث خطأ غير متوقع: {ex.Message}", Severity.Error);
-        //}
-        //finally
-        //{
-        //    IsSaving = false;
-        //}
-        //IsSaving = false;
+        await SaveEmployee();
     }
 
     // ────────────────────────────────────────────────
@@ -365,8 +191,49 @@ public partial class EmployeeForm : ComponentBase
     private async void ConfirmDialog()
     {
         IsSaving = false;
+        //IsEditMode = true;
+        var mapper = new EmployeeMapper();
+        var employeeToSend = mapper.ToEmployeeUpsertDTO(employee);
+        employeeToSend.CenterId = selectedCenterId;
+        var response = await EmployeeApi.RegisterEmpInCenter(employeeToSend);
+
         isDialogOpen = false;
-        IsEditMode = true;
-        SaveEmployee();
+        if (response.Success)
+        {
+            MudSnackbar.Add("تم تسجيل الموظف في المركز", Severity.Success);
+            NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
+        }
+        else
+            MudSnackbar.Add(response.Message, Severity.Error);
+    }
+
+    private async Task TranslateToEng()
+    {
+        string arabicName = employee.Name;
+        string EnglishName = employee.EnName;
+        if (!string.IsNullOrWhiteSpace(arabicName) && string.IsNullOrWhiteSpace(EnglishName))
+        {
+            //var translationService = new TranslationService(new HttpClient());
+            // isLoading = true;
+            try
+            {
+                EnglishName = await Translationservice.TranslateNameAsync(arabicName);
+                if (!string.IsNullOrEmpty(EnglishName))
+                {
+                    employee.EnName = EnglishName;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                EnglishName = "حدث خطأ أثناء الاتصال بالخدمة.";
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                // isLoading = false;
+            }
+        }
+
     }
 }

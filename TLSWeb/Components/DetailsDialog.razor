@@ -1,0 +1,53 @@
+﻿@if (IsOpen)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" style="direction: rtl;">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <!-- الهيدر بلون مريح ومناسب للعرض وليس للتحذير -->
+                <div class="modal-header bg-dark text-white py-3">
+                    <h5 class="modal-title fs-6">
+                        <i class="bi @Icon me-2 text-info"></i>@Title
+                    </h5>
+                    <button class="btn-close btn-close-white" @onclick="Close"></button>
+                </div>
+
+                <!-- محتوى التفاصيل مع دعم السكرول الطولي وتنسيق النصوص -->
+                <div class="modal-body p-4 text-end" style="max-height: 65vh; overflow-y: auto;">
+                    @if (!string.IsNullOrWhiteSpace(Message))
+                    {
+                        <div class="p-3 bg-light rounded border border-secondary-subtle lh-lg text-secondary"
+                             style="white-space: pre-wrap; word-break: break-word; font-family: 'Courier New', Courier, monospace; font-size: 0.95rem;">
+                            @Message
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center my-3">لا توجد تفاصيل إضافية لعرضها.</p>
+                    }
+                </div>
+
+                <!-- الفوتر يحتوي فقط على زر الإغلاق -->
+                <div class="modal-footer bg-light py-2">
+                    <button class="btn btn-secondary px-4 btn-sm" @onclick="Close">
+                        <i class="bi bi-x-lg me-1"></i> إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string Title { get; set; } = "تفاصيل السجل";
+    [Parameter] public string Message { get; set; }
+    [Parameter] public string Icon { get; set; } = "bi-file-earmark-text";
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Close()
+    {
+        IsOpen = false;
+        await OnClose.InvokeAsync(null);
+    }
+}

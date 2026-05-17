@@ -24,27 +24,27 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<Employee> GetById(long id)
         {
-            return await _context.Employees.Where(x => x.Id == id).Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
+            var emp = await _context.Employees.AsNoTracking().Where(x => x.Id == id)
+                .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
+                .Include(x=>x.Job)
+                .Include(x=>x.Gender)
+                .Include(x=>x.Specialization)
+                .FirstOrDefaultAsync();
+            return emp;
         }
 
         public async Task<GeneralResponse> Insert(Employee item)
         {
             _context.Employees.Add(item);
             await _context.SaveChangesAsync();
-            return new GeneralResponse(true, "Employee added successfully.", item.Id);
+            return new GeneralResponse(true, "تم تعديل بيانات الموظف.", item.Id);
         }
 
         public async Task<GeneralResponse> AddEmployeeWithCenter(Employee employee, long centerid)
         {
-            var emp = await _context.Employees.Where(s => s.EmpId == employee.EmpId && s.CivilId==employee.CivilId)
-               .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
-               .Include(x => x.Specialization)
-               .FirstOrDefaultAsync();
-
             if (centerid <= 0)
                 return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
             else
-                if (emp is null)
                 {
                     await _context.Database.BeginTransactionAsync();
                     _context.Employees.Add(employee);
@@ -62,10 +62,6 @@ namespace APIServerLib.Repositories.Implemntations
 
                     return new GeneralResponse(true, "تم إضافة الموظف للمركز بنجاح.");
                 }
-            if (emp.EmpCenters is null || emp.EmpCenters.Count() == 0)
-                return new GeneralResponse(false, $"رقم الهوية أو رقم الموظف موجود مسبقاً في مركز ", 0);
-            else
-                return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً لموظف اسمه {emp.Name} في التخصص {emp.Specialization?.Name} ، وغير مسجل في أي مركز ، هل تريد إضافته في مركزكم ؟ ", 0);
         }
 
         public async Task<GeneralResponse> Update(Employee item)
@@ -74,99 +70,33 @@ namespace APIServerLib.Repositories.Implemntations
             /////// تحديث بيانات الموظف
             _context.Employees.Update(item);
             await _context.SaveChangesAsync();
-            return new GeneralResponse(true, "Employee updated successfully.");
+            return new GeneralResponse(true, "تم تعديل بيانات الموظف بنجاح.");
         }
 
         public async Task<GeneralResponse> UpdateWithCenter(EmployeeUpsertDto item)
         {
-            var emp = await _context.Employees.Where(x => x.EmpId == item.EmpId && x.CivilId == item.CivilId)
-                .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
-                .FirstOrDefaultAsync();
-            //old code
-            //if (item.CenterId is null || item.CenterId <= 0 )
-            //    return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
-            //else
-            
-                if (emp is not null)
-                {
-                    var EmpCenters = _context.EmpCenters.Where(x => x.EmployeeId == emp.Id && x.IsActive).ToList();
-                    await _context.Database.BeginTransactionAsync();
-                    if (item.CenterId==0 || EmpCenters.FirstOrDefault()?.CenterId == item.CenterId)
-                    {
-                        emp.Name = item.Name;
-                        emp.EnName = item.EnName;
-                        emp.Mobile = item.Mobile;
-                        emp.GenderId = item.GenderId;
-                        emp.JobId = item.JobId;
-                        emp.OrgJobId = item.OrgJobId;
-                        emp.SpecializationId = item.SpecializationId;
-                        emp.Address = item.Address;
-                        emp.BirthDate = item.BirthDate;
-                        emp.Comments = item.Comments;
-                        emp.OrgSchool = item.OrgSchool;
+            //Move Employee To another Center without any data update
+            await _context.Database.BeginTransactionAsync();
+            var EmpCenters = _context.EmpCenters.Where(x => x.EmployeeId == item.Id && x.IsActive).ToList();
+            EmpCenters.ForEach(x =>
+            {
+                x.ToDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+                x.IsActive = false;
+            });
 
-                    _context.Employees.Update(emp);
-                    }
-                    //await _context.SaveChangesAsync(); 
-                    else
-                    //if (EmpCenters.FirstOrDefault()?.CenterId != item.CenterId)
-                    {
-                        EmpCenters.ForEach(x =>
-                        {
-                            x.ToDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
-                            x.IsActive = false;
-                        });
+            var empCenter = new EmpCenter
+            {
+                EmployeeId = item.Id,
+                CenterId = item.CenterId ?? 0,
+                IsActive = true,
+                FromDate = DateOnly.FromDateTime(DateTime.Now)
+            };
+            _context.EmpCenters.Add(empCenter);
+            await _context.SaveChangesAsync();
+            await _context.Database.CommitTransactionAsync();
 
-                        await _context.SaveChangesAsync();
-
-                        var empCenter = new EmpCenter
-                        {
-                            EmployeeId = emp.Id,
-                            CenterId = item.CenterId ?? 0,
-                            IsActive = true,
-                            FromDate = DateOnly.FromDateTime(DateTime.Now)
-                        };
-                        _context.EmpCenters.Add(empCenter);
-
-                    }
-
-                    await _context.SaveChangesAsync();
-                    await _context.Database.CommitTransactionAsync();
-
-
-                    return new GeneralResponse(true, "تم تعديل بيانات الموظف في المركز بنجاح.");
-                }
-
-                return new GeneralResponse(false, $"رقم الهوية أو الاسم موجود مسبقاً في مركز {emp.EmpCenters?.OrderByDescending(x => x.FromDate).First().Center?.Name} لموظف اسمه {emp.Name} في التخصص {emp.Specialization?.Name} ", 0);
-
-                //    var employeeToSave = (new EmployeeMapper()).ToEntity(item);
-
-                ////var managers = await GetAllManagers();
-                ////long EmpCurCenterId = managers.FirstOrDefault(x => x.EmpId == item.EmpId)?.EmpCenters.OrderByDescending(ec => ec.FromDate).FirstOrDefault()?.CenterId ?? 0;
-                //long EmpCurCenterId = _context.Employees
-                //    .AsNoTracking()
-                //    .Where(x => x.EmpId == item.EmpId)
-                //    .Include(x => x.EmpCenters)
-                //    .FirstOrDefault()?
-                //    .EmpCenters.OrderByDescending(ec => ec.FromDate)
-                //    .FirstOrDefault()?
-                //    .CenterId ?? 0;
-
-                //await _context.Database.BeginTransactionAsync();
-                //if (EmpCurCenterId != 0 && EmpCurCenterId != item.CenterId)
-                //{
-                //    _context.EmpCenters.Where(x => x.EmployeeId == item.Id).OrderByDescending(x => x.FromDate).FirstOrDefault()?.ToDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
-                //    // تم تغيير مركز الموظف، قم بتحديث EmpCenters
-                //   _context.EmpCenters.Add(new EmpCenter() { FromDate=DateOnly.FromDateTime(DateTime.Now),EmployeeId = employeeToSave.Id, CenterId = item.CenterId ?? 0});
-                //}
-
-                ///////// تحديث بيانات الموظف
-                //_context.Employees.Update(employeeToSave);
-                //await _context.SaveChangesAsync();
-
-                //await _context.Database.CommitTransactionAsync();
-                //return new GeneralResponse(true, "تم تحديث بيانات الموظف.");
-            }
+            return new GeneralResponse(true, "تم نقل الموظف إلى المركز بنجاح.");
+        }
 
         public async Task<GeneralResponse> DeleteById(long id)
         {
@@ -206,7 +136,7 @@ namespace APIServerLib.Repositories.Implemntations
             //}
             //else
             //{
-            query = _context.Employees
+            query = _context.Employees.AsNoTracking()
                .Where(e => CenterId == 0 ? true : e.EmpCenters.FirstOrDefault(x => x.IsActive).CenterId == CenterId)
                .AsNoTracking()
                .OrderBy(e => e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name)
@@ -331,7 +261,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<EmployeeUpsertDto?> GetByCivilId(string CivilId)
         {
-            var E = await _context.Employees.Where(x => x.CivilId == CivilId)
+            var E = await _context.Employees.AsNoTracking().Where(x => x.CivilId == CivilId)
                 .Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
             if (E is null) return null;
 
@@ -342,7 +272,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<EmployeeUpsertDto?> GetByEmpId(string EmpId)
         {
-            var E = await _context.Employees.Where(x => x.EmpId == EmpId)
+            var E = await _context.Employees.AsNoTracking().Where(x => x.EmpId == EmpId)
                 .Include(x => x.EmpCenters).ThenInclude(x => x.Center).FirstOrDefaultAsync();
             if (E is null) return null;
 
@@ -357,7 +287,7 @@ namespace APIServerLib.Repositories.Implemntations
             IQueryable<Employee> query;
             if (centerId == 0)
             {
-                query = _context.Employees
+                query = _context.Employees.AsNoTracking()
                     .Include(s => s.EmpCenters).ThenInclude(sc => sc.Center)
                 .AsNoTracking()
                 .Include(e => e.Gender)
@@ -529,6 +459,35 @@ namespace APIServerLib.Repositories.Implemntations
         {
             return await _context.Employees.Include(e => e.EmpCenters.Where(c=>c.IsActive)).ThenInclude(ec => ec.Center)
                 .FirstOrDefaultAsync(e => (e.EmpId == request.EmpId || e.CivilId == request.CivilId) && e.Id != request.ExcludeEmployeeId);
+        }
+
+        public async Task<GeneralResponse> RegisterEmpInCenter(EmployeeUpsertDto item)
+        {
+            var EmpCenters = _context.EmpCenters.Where(x => x.EmployeeId == item.Id && x.IsActive).ToList();
+            
+            await _context.Database.BeginTransactionAsync();
+            EmpCenters.ForEach(x =>
+            {
+                x.ToDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+                x.IsActive = false;
+            });
+
+            //await _context.SaveChangesAsync();
+
+            var empCenter = new EmpCenter
+            {
+                EmployeeId = item.Id,
+                CenterId = item.CenterId ?? 0,
+                IsActive = true,
+                FromDate = DateOnly.FromDateTime(DateTime.Now)
+            };
+            _context.EmpCenters.Add(empCenter);
+
+            //await _context.SaveChangesAsync();
+            await _context.Database.CommitTransactionAsync();
+
+
+            return new GeneralResponse(true, "تم تعديل بيانات الموظف في المركز بنجاح.");
         }
     }
 }

@@ -6,6 +6,10 @@ namespace TLSWeb.Pages.Admin;
 
 public partial class AuditLogs : ComponentBase
 {
+    // متغيرات التحكم في نافذة التفاصيل الجديدة
+    private bool isDetailsOpen = false;
+    private string selectedDetails = "";
+
     private List<AuditLogDto> auditLogs = [];
     private bool isLoading = true;
 
@@ -87,5 +91,21 @@ public partial class AuditLogs : ComponentBase
         if (endPage - startPage < maxVisible - 1)
             startPage = Math.Max(1, endPage - maxVisible + 1);
         return Enumerable.Range(startPage, endPage - startPage + 1);
+    }
+
+    // دالة لفتح النافذة وتمرير نص التفاصيل إليها
+    private void OpenDetails(string details)
+    {
+        if (string.IsNullOrWhiteSpace(details)) return; // تفادي فتح نافذة فارغة إذا لم تكن هناك تفاصيل
+
+        selectedDetails = details;
+        isDetailsOpen = true;
+    }
+
+    // دالة لإغلاق النافذة وتفريغ المتغير
+    private void CloseDetails()
+    {
+        isDetailsOpen = false;
+        selectedDetails = "";
     }
 }

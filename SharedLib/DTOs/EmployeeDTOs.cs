@@ -58,10 +58,13 @@ namespace SharedLib.DTOs
         public string? Address { get; set; }
         public DateOnly? BirthDate { get; set; }
         public long? GenderId { get; set; }
+        public string? GenderName { get; set; }
         public long? JobId { get; set; }
+        public string? JobName { get; set; }
         public long? OrgJobId { get; set; }
         public string? OrgSchool { get; set; }
         public long? SpecializationId { get; set; }
+        public string? SpecializationName { get; set; }
         public string? Comments { get; set; }
         public string? CenterName { get; set; }
         public long? CenterId { get; set; }

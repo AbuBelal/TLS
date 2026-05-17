@@ -13,16 +13,6 @@
         <div class="card-body">
             <EditForm Model="@employee" OnSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
-
-                @* رسالة التكرار *@
-                @* @if (!string.IsNullOrWhiteSpace(DuplicateMessage))
-                {
-                    <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                        <span>@DuplicateMessage</span>
-                    </div>
-                } *@
-
                 <div class="row g-3">
 
                     @* الاسم بالعربي والإنجليزي *@
@@ -358,37 +348,3 @@ Icon="bi-exclamation-triangle" />
         NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
     }
 } *@
-
-
-
-@code {
-    private async Task TranslateToEng()
-    {
-        string arabicName = employee.Name;
-        string EnglishName = employee.EnName;
-        if (!string.IsNullOrWhiteSpace(arabicName) && string.IsNullOrWhiteSpace(EnglishName))
-        {
-            //var translationService = new TranslationService(new HttpClient());
-            // isLoading = true;
-            try
-            {
-                EnglishName = await Translationservice.TranslateNameAsync(arabicName);
-                if (!string.IsNullOrEmpty(EnglishName))
-                {
-                    employee.EnName = EnglishName;
-                    StateHasChanged();
-                }
-            }
-            catch (Exception ex)
-            {
-                EnglishName = "حدث خطأ أثناء الاتصال بالخدمة.";
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                // isLoading = false;
-            }
-        }
-
-    }
-}

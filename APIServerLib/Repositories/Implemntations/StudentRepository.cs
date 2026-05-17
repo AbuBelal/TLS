@@ -21,6 +21,7 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<List<Student>> GetAll()
         {
                 var students = await _context.Students
+                    .AsNoTracking()
                     .Include(x => x.Level)
                     .Include(x => x.Gender)
                     .Include(x => x.StdCenters.FirstOrDefault(z=>z.IsActive)).ThenInclude(x => x.Center)
@@ -31,7 +32,10 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<Student> GetById(long id)
         {
-            var student = await _context.Students.Where(s=>s.Id == id).Include(s=>s.StdCenters).ThenInclude(c=>c.Center).FirstOrDefaultAsync();
+            var student = await _context.Students.AsNoTracking().Where(s=>s.Id == id)
+                .Include(s=>s.StdCenters).ThenInclude(c=>c.Center)
+                .Include(g=>g.Gender)
+                .Include(l=>l.Level).FirstOrDefaultAsync();
             return student;
         }
 
@@ -73,7 +77,7 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<int> GetCenterStudentsCountAsync(long CenterId)
         {
             //var count =await _context.Students.Where(s => s.StdCenters.Any(sc => sc.CenterId == CenteId && sc.ToDate == null)).CountAsync();
-            var count =await _context.Students.Where(s => s.StdCenters.First(x=>x.IsActive).CenterId== CenterId).CountAsync();
+            var count =await _context.Students.AsNoTracking().Where(s => s.StdCenters.First(x=>x.IsActive).CenterId== CenterId).CountAsync();
             return count;
         }
 
@@ -118,7 +122,9 @@ namespace APIServerLib.Repositories.Implemntations
         }
         public async Task<GeneralResponse> UpdateStudentWithCenter(Student student , long centerid)
         {
-            var Std = await _context.Students.Where(s => s.CivilId == student.CivilId /*|| s.Name.Trim() == student.Name.Trim()*/)
+            var oldStd= await _context.Students.FindAsync(student.Id);
+
+            var DubStd = await _context.Students.Where(s => s.CivilId == student.CivilId && s.Id != student.Id)
                 .Include(x => x.StdCenters).ThenInclude(x => x.Center)
                .Include(x => x.Level)
                .FirstOrDefaultAsync();
@@ -126,8 +132,12 @@ namespace APIServerLib.Repositories.Implemntations
 
             if (centerid <= 0)
                 return new GeneralResponse(false, " يرجى تحديد المركز !", 0);
+            else if (DubStd is not null)
+            {
+                return new GeneralResponse(false, $"رقم الهوية موجود مسبقاً في مركز {DubStd.StdCenters.FirstOrDefault(x=>x.IsActive)?.Center?.Name} لطالب اسمه {DubStd.Name} في الصف {DubStd.Level?.Name} ", DubStd.Id);
+            }
             else
-                if (Std is not null)
+                if (oldStd is not null)
                 {
                     await _context.Database.BeginTransactionAsync();
                    
@@ -156,17 +166,17 @@ namespace APIServerLib.Repositories.Implemntations
                     }
                     else
                     {
-                        Std.Name = student.Name;
-                        Std.EnName = student.EnName;
-                        Std.Mobile = student.Mobile;
-                        Std.LevelId = student.LevelId;
-                        Std.GenderId = student.GenderId;
-                        Std.SectionNo = student.SectionNo;
-                        Std.BirthDate = student.BirthDate;
-                        Std.IsUnrwa = student.IsUnrwa;
-                        Std.IsSpecialNeeds = student.IsSpecialNeeds;
-                        Std.SpecialNeeds = student.SpecialNeeds;
-                        Std.Comments = student.Comments;
+                        oldStd.Name = student.Name;
+                        oldStd.EnName = student.EnName;
+                        oldStd.Mobile = student.Mobile;
+                        oldStd.LevelId = student.LevelId;
+                        oldStd.GenderId = student.GenderId;
+                        oldStd.SectionNo = student.SectionNo;
+                        oldStd.BirthDate = student.BirthDate;
+                        oldStd.IsUnrwa = student.IsUnrwa;
+                        oldStd.IsSpecialNeeds = student.IsSpecialNeeds;
+                        oldStd.SpecialNeeds = student.SpecialNeeds;
+                        oldStd.Comments = student.Comments;
                     }
 
                     await _context.SaveChangesAsync();
@@ -183,11 +193,11 @@ namespace APIServerLib.Repositories.Implemntations
         {
             // 1. بناء الاستعلام الأساسي مع Include
             var query = _context.Students
+                .AsNoTracking()
                 .Where(x=> CenterId==0? true: x.StdCenters.FirstOrDefault(z=>z.IsActive).CenterId == CenterId)
                 .Include(s => s.Gender)
                 .Include(s => s.Level)
                 //.Include(x => x.StdCenters).ThenInclude(x => x.Center)
-                .AsNoTracking()
                 .AsQueryable();
            
             // 2. تطبيق الفلاتر
@@ -368,10 +378,10 @@ namespace APIServerLib.Repositories.Implemntations
             if (centerId == 0)
             {
                 return await _context.Students
+                     .AsNoTracking()
                     .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
                      .Include(s => s.Gender)
                      .Include(s => s.Level)
-                     .AsNoTracking()
                      .OrderBy(s => s.StdCenters
                      .FirstOrDefault(z=>z.IsActive)!.CenterId)
                      .ThenBy(s => s.Level.SortOrder)

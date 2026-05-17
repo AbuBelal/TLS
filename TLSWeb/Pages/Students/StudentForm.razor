@@ -265,7 +265,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
                 NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
             }
             else
-                MudSnackbar.Add(response.Message, Severity.Success);
+                MudSnackbar.Add(response.Message, Severity.Warning);
         }
         else
         {
