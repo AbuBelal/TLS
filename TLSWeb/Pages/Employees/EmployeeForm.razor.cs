@@ -24,6 +24,8 @@ public partial class EmployeeForm : ComponentBase
     protected List<LookupValue> genders = new();
     protected List<LookupValue> jobs = new();
     protected List<LookupValue> specializations = new();
+    protected List<LookupValue> AdrGovs = new();
+    protected List<LookupValue> AdrAreas = new();
 
     protected bool IsSaving = false;
     protected bool IsCheckingDuplicate = false;
@@ -31,6 +33,8 @@ public partial class EmployeeForm : ComponentBase
     protected string DuplicateMessage = string.Empty;
     private List<Center> centers = new();          // ← جديد
     private long? selectedCenterId=0;
+    private long? selectedAdrGovId=0;
+    private long? selectedAdrAreaId=0;
     bool isDialogOpen = false;
     string dialogMessage = "هذا الموظف غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
     // ────────────────────────────────────────────────
@@ -57,8 +61,13 @@ public partial class EmployeeForm : ComponentBase
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         jobs = await LookupValueApi.GetByValueType(LookupTypes.Job) ?? new();
         specializations = await LookupValueApi.GetByValueType(LookupTypes.Specialization) ?? new();
+        AdrGovs = await LookupValueApi.GetByValueType(LookupTypes.Governate) ?? new();
+        AdrAreas = await LookupValueApi.GetByValueType(LookupTypes.Area) ?? new();
         centers = await CenterApi.GetAll() ?? new();
         selectedCenterId=employee.EmpCenters.FirstOrDefault(c=>c.IsActive)?.CenterId;
+        selectedAdrGovId = employee.AdrGovId;
+        selectedAdrAreaId = employee.AdrAreaId;
+
     }
 
     // ────────────────────────────────────────────────

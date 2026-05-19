@@ -78,6 +78,7 @@
                     </div>
 
                     @* المنسدلات (Lookups) *@
+                    <div class="row mt-2">
                     <div class="col-md-3">
                         <label class="form-label">الجنس</label>
                         <InputSelect @bind-Value="employee.GenderId" class="form-select">
@@ -127,13 +128,49 @@
 
                         </div>
                     </AuthorizeView>
+                    </div>
+                    <div class="row mt-2">
+
+                        <div class="col-md-3">
+                            <label class="form-label">المحافظة</label>
+                            <InputSelect @bind-Value="employee.AdrGovId" class="form-select">
+                                <option value="">-- اختر المحافظة --</option>
+                                @foreach (var c in AdrGovs)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => selectedAdrGovId)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">المنطقة</label>
+                            <InputSelect @bind-Value="employee.AdrAreaId" class="form-select">
+                                <option value="">-- اختر المنطقة --</option>
+                                @foreach (var c in AdrAreas)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => selectedAdrAreaId)" />
+                        </div>
+
+                        <div class="col-md-6">
+                            
+                                    <label class="form-label">تفاصيل العنوان</label>
+                                    <InputText @bind-Value="employee.Adr_Details"
+                                               class="form-control" />
+                        </div>
+                    </div>
 
                     @* ملاحظات *@
+                    <div class="row mt-2">
                     <div class="col-12">
                         <label class="form-label">ملاحظات</label>
                         <InputTextArea @bind-Value="employee.Comments"
                                        class="form-control"
                                        rows="3" />
+                    </div>
                     </div>
 
                     @* أزرار الإجراءات *@

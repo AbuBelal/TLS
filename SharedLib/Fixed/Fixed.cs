@@ -9,7 +9,7 @@ namespace SharedLib.Fixed
         public const string DebugBaseUrl = "https://localhost:7075";
         public enum RegionType { Debug,Test, North, WestMiddle, WestGaza }
         // حدد المنطقة هنا فقط
-        private const  RegionType CurrentRegion = RegionType.North;
+        private const  RegionType CurrentRegion = RegionType.Debug;
 
         public static string SelectedBaseUrl => CurrentRegion switch
         {
@@ -54,6 +54,8 @@ namespace SharedLib.Fixed
         public const string Level = "Level";
         public const string Job = "Job";
         public const string Specialization = "Specialization";
+        public const string Governate = "Governate";
+        public const string Area = "Area";
         public const string WHoures = "WHoures";
 
     }

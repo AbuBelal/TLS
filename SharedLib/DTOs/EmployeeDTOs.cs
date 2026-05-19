@@ -32,6 +32,10 @@ namespace SharedLib.DTOs
         public string? CenterEnName { get; set; }
         public string? SpecializationName { get; set; } 
         public string? SpecializationEnName { get; set; }
+        public DateOnly? BirthDate { get; set; }
+        public string? AdrGov { get; set; }
+        public string? AdrArea { get; set; }
+        public string? AdrDetails { get; set; }
         public DateOnly? AddedDate { get; set; }  // ← جديد
     }
 
@@ -68,6 +72,11 @@ namespace SharedLib.DTOs
         public string? Comments { get; set; }
         public string? CenterName { get; set; }
         public long? CenterId { get; set; }
+        public long? AdrGovId { get; set; }
+        public string? AdrGovName { get; set; }
+        public long? AdrAreaId { get; set; }
+        public string? AdrAreaName { get; set; }
+        public string? Adr_Details { get; set; }
     }
 
     public class EmployeeWithCenter

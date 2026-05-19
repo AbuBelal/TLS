@@ -370,7 +370,11 @@ namespace APIServerLib.Repositories.Implemntations
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
                     SpecializationEnName = e.Specialization != null ? e.Specialization.EnName : null,
                     CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
-                    CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,  // ← جديد
+                    CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,
+                    BirthDate = e.BirthDate,
+                    AdrGov = e.AdrGov != null ? e.AdrGov.Name : null,
+                    AdrArea = e.AdrArea != null ? e.AdrArea.Name : null,
+                    AdrDetails = e.Adr_Details,
                     AddedDate = e.EmpCenters.FirstOrDefault(x => x.IsActive).FromDate,  // ← جديد
                 })
                 .OrderBy(e => e.CenterCode).ThenBy(e=>e.JobEnName)

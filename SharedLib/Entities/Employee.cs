@@ -36,7 +36,13 @@ namespace SharedLib.Entities
         public long? SpecializationId { get; set; }
         [ForeignKey(nameof(SpecializationId))]
         public LookupValue? Specialization { get; set; }
-
+        public long? AdrGovId { get; set; }
+        [ForeignKey(nameof(AdrGovId))]
+        public LookupValue? AdrGov { get; set; }
+        public long? AdrAreaId { get; set; }
+        [ForeignKey(nameof(AdrAreaId))]
+        public LookupValue? AdrArea { get; set; }
+        public string? Adr_Details { get; set; }
         public ICollection<EmpCenter> EmpCenters { get; set; } = new List<EmpCenter>();
         // سنفترض هنا أنك ستستخدم نفس الـ Id الخاص بالمستخدم
         // أو يمكنك إضافة حقل منفصل
