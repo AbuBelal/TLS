@@ -147,7 +147,7 @@
                                 @bind:after="OnFilterChanged">
                             <option value="-2">— الكل —</option>
                             <option value="-1">— المسجلون في مراكز —</option>
-                            <option value="0">— الغير مسجلون في مراكز —</option>
+                            <option value="0">— غير المسجلون في مراكز —</option>
                             @foreach (var Center in CenterOptions)
                             {
                                 <option value="@Center">@Center</option>
@@ -282,18 +282,23 @@
                                     @* </span> *@
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary"
+                                     <div class="btn-group btn-group-sm">                                        
+                                         <a class="btn btn-outline-primary"
+                                           href="@($"{PagesUris.StudentsPages.Edit}/{student.Id}")">
+                                            <i class="bi bi-pencil-square me-1"></i>
+                                            تعديل
+                                        </a>
+                                       @*  <button class="btn btn-outline-primary"
                                                 @onclick="@(() => OpenEditModal(student.Id))">
                                             <i class="bi bi-pencil-square me-1"></i>
                                             تعديل
-                                        </button>
+                                        </button> *@
                                         <button class="btn btn-outline-danger"
                                                 @onclick="@(() => ConfirmDelete(student))">
                                             <i class="bi bi-trash3 me-1"></i>
                                             حذف
                                         </button>
-                                    </div>
+                                    </div> 
                                 </td>
                             </tr>
                         }

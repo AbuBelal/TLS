@@ -131,6 +131,7 @@ public partial class Students : ComponentBase
         selectedGender = string.Empty;
         selectedLevel = string.Empty;
         SelectedSection = 0;
+        selectedCenter = string.Empty;
         currentPage = 1;
         await LoadData();
     }

@@ -362,15 +362,15 @@ namespace APIServerLib.Repositories.Implemntations
                     EmpId = e.EmpId,
                     CivilId = e.CivilId,
                     Mobile = e.Mobile,
-                    CenterCode=e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.CenterCode,
+                    CenterCode= e.EmpCenters.FirstOrDefault(x => x.IsActive) == null ? "OLD-" + e.EmpCenters.OrderByDescending(c => c.FromDate).FirstOrDefault().Center.CenterCode : e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.CenterCode,
                     GenderName = e.Gender != null ? e.Gender.Name : null,
                     GenderEnName = e.Gender != null ? e.Gender.EnName : null,
                     JobName = e.Job != null ? e.Job.Name : null,
                     JobEnName = e.Job != null ? e.Job.EnName : null,
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
                     SpecializationEnName = e.Specialization != null ? e.Specialization.EnName : null,
-                    CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
-                    CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,
+                    CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive) == null ? "OLD-"+e.EmpCenters.OrderByDescending(c => c.FromDate).FirstOrDefault().Center.Name : e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
+                    CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive) == null ? "OLD-" + e.EmpCenters.OrderByDescending(c => c.FromDate).FirstOrDefault().Center.EnName : e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,
                     BirthDate = e.BirthDate,
                     AdrGov = e.AdrGov != null ? e.AdrGov.Name : null,
                     AdrArea = e.AdrArea != null ? e.AdrArea.Name : null,
@@ -401,10 +401,19 @@ namespace APIServerLib.Repositories.Implemntations
                    EmpId = e.EmpId,
                    CivilId = e.CivilId,
                    Mobile = e.Mobile,
+
                    GenderName = e.Gender != null ? e.Gender.Name : null,
+                   GenderEnName = e.Gender != null ? e.Gender.EnName : null,
+
                    JobName = e.Job != null ? e.Job.Name : null,
+                   JobEnName = e.Job != null ? e.Job.EnName : null,
+
                    SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
-                   CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name
+                   SpecializationEnName = e.Specialization != null ? e.Specialization.EnName : null,
+                   
+                   CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive) == null ? "OLD-" + e.EmpCenters.OrderByDescending(c => c.FromDate).FirstOrDefault().Center.Name : e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
+                   CenterEnName = e.EmpCenters.FirstOrDefault(x => x.IsActive) == null ? "OLD-" + e.EmpCenters.OrderByDescending(c => c.FromDate).FirstOrDefault().Center.EnName : e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.EnName,
+                   CenterCode = e.EmpCenters.FirstOrDefault(x => x.IsActive) == null ? "OLD-" + e.EmpCenters.OrderByDescending(c => c.FromDate).FirstOrDefault().Center.CenterCode : e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.CenterCode,
                })
                .ToListAsync();
             }

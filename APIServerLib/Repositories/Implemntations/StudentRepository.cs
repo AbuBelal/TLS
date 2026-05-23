@@ -321,11 +321,11 @@ namespace APIServerLib.Repositories.Implemntations
                         query = query.Where(x => x.StdCenters.Count(c => c.IsActive) <= 0);
                         break;
                     default:
-                        query = query.Where(s => s.StdCenters.FirstOrDefault(z => z.IsActive).Center.Name == request.Center);
+                        if(request.Center is not null)
+                          query = query.Where(s => s.StdCenters.FirstOrDefault(z => z.IsActive).Center.Name == request.Center);
                         break;
                 }
                 query = query
-                    
                     .Include(s => s.Gender)
                     .Include(s => s.Level)
                     .AsNoTracking()

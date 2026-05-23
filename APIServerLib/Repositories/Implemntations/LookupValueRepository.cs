@@ -43,18 +43,18 @@ namespace APIServerLib.Repositories.Implemntations
         {
             var lookupValue = await _context.LookupValues.FindAsync(id);
             if (lookupValue == null)
-                return new GeneralResponse(false, "LookupValue not found.", 0);
+                return new GeneralResponse(false, "لا يمكن إيجاد القيمة.", 0);
 
             _context.LookupValues.Remove(lookupValue);
             await _context.SaveChangesAsync();
-            return new GeneralResponse(true, "LookupValue deleted successfully.", id);
+            return new GeneralResponse(true, "تم حذف الثابت بنجاح.", id);
         }
 
         public async Task<List<LookupValue>> GetByLookupType(string ValueType)
         {
             if(string.IsNullOrEmpty(ValueType))
                 return new List<LookupValue>();
-            var R =  await _context.LookupValues.Where(_=>_.ValueType == ValueType).ToListAsync();
+            var R =  await _context.LookupValues.Where(_=>_.ValueType == ValueType).OrderBy(x => x.SortOrder).ToListAsync();
             return R;
         }
     }

@@ -16,6 +16,7 @@ namespace SharedLib.Mapper;
     public partial void UpdateEntity(InComeDto dto, InCome income);
 
     // Entity ➜ DTO (للقراءة)
+    [MapValue(nameof(InComeDto.BuildingCode), "")]
     public partial InComeDto ToInComeDto(InCome income);
 
 }

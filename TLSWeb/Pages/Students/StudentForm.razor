@@ -1,4 +1,5 @@
-﻿@using TLSWeb.Components
+﻿@using SharedLib.Helpers
+@using TLSWeb.Components
 @using TLSWeb.Pages.Students.Components
 @attribute [Route(PagesUris.StudentsPages.Add)]
 @attribute [Route(PagesUris.StudentsPages.Edit + "/{Id:long}")]
@@ -28,12 +29,45 @@
                     @* رقم الهوية والموبايل *@
                     <div class="col-md-6">
                         <label class="form-label">رقم الهوية</label>
-                        <InputText @bind-Value="student.CivilId" class="form-control" @onblur="GetStdInfoFromEmis" />
-                        <ValidationMessage For="@(() => student.CivilId)" />
+                        <div class="input-group">
+                            <InputText @bind-Value="student.CivilId" class="form-control" @onblur="GetStdInfoFromEmis" />
+                            <ValidationMessage For="@(() => student.CivilId)" />
+                            @if (IsCivilIdGood)
+                            {
+                                <span class="bg-white">
+                                    <i class="bi bi-check2-all" style="color: #198754; font-size: 1.25rem;"></i>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="bg-white">
+                                    <i class="bi bi-exclamation-triangle-fill" style="color: red; font-size: 1.25rem;"></i>
+                                </span>
+                            }
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">رقم الموبايل</label>
+                        <div class="input-group">
                         <InputText @bind-Value="student.Mobile" class="form-control" placeholder="059XXXXXXX" />
+                            <a href="@WhatsappNo01"
+                               class="btn btn-link p-0 text-decoration-none shadow-none m-2"
+                               target="_blank"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="+970">
+                                <i class="bi bi-whatsapp text-success" style="font-size: 1.3rem; vertical-align: middle;"></i>
+                            </a>
+
+                            <a href="@WhatsappNo02"
+                               class="btn btn-link p-0 text-decoration-none shadow-none m-2"
+                               target="_blank"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="+972">
+                                <i class="bi bi-whatsapp text-danger" style="font-size: 1.3rem; vertical-align: middle;"></i>
+                            </a>
+                        </div>
                     </div>
 
                     @* المنسدلات (Lookups) *@
@@ -209,21 +243,31 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
     private bool isLoading = false;
     private List<Center> centers = new();          // ← جديد
     private long? selectedCenterId;                  // ← جديد
+
+    string WhatsappNo01, WhatsappNo02;
+
     bool isDialogOpen = false;
     string dialogMessage = "هذا الطالب غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
     StudentEmisDto StdEmisInfo;
     bool isEmisInfoLoading = false;
-
+    bool IsCivilIdGood = false;
     protected override async Task OnInitializedAsync()
     {
         isLoading = false;
-        if (Id != 0) student = await StudentApi.GetById(Id);
+        if (Id != 0) 
+        { 
+            student = await StudentApi.GetById(Id); 
+            WhatsappNo01 = WhatsAppHelper.GetWhatsAppLink(student.Mobile);
+            WhatsappNo02 = WhatsAppHelper.GetWhatsAppLink(student.Mobile, "", "972");
+        }
+
         // جلب البيانات للمنسدلات من الـ API
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
         centers = await CenterApi.GetAll();          // ← جديد
         selectedCenterId = student.StdCenters?.FirstOrDefault(x => x.IsActive)?.CenterId;
         isLoading = false;
+
         await GetStdInfoFromEmis();
     }
     private async Task TranslateName()
@@ -319,6 +363,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
     private async Task GetStdInfoFromEmis()
     {
         isEmisInfoLoading = true;
+        CheckCivilId();
         if (student is not null)
         {
             string IdentityNo = student.CivilId;
@@ -331,5 +376,17 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
                 });
         }
         isEmisInfoLoading = false;
+    }
+
+    private void CheckCivilId()
+    {
+        if (!string.IsNullOrEmpty(student.CivilId) && Checks.CheckLuhnE9(student.CivilId))
+        {
+            IsCivilIdGood = true;
+        }
+        else if (!string.IsNullOrEmpty(student.CivilId))
+        {
+            IsCivilIdGood = false;
+        }
     }
 }

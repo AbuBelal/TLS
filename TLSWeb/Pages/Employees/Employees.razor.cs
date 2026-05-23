@@ -90,6 +90,7 @@ public partial class Employees : ComponentBase
         searchText = string.Empty;
         selectedGender = string.Empty;
         selectedJob = string.Empty;
+        selectedCenter = string.Empty;
         currentPage = 1;
         await LoadDataAsync();
     }

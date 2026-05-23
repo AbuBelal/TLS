@@ -3,6 +3,7 @@ using MudBlazor;
 using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Fixed;
+using SharedLib.Helpers;
 using SharedLib.Mappers;
 using SharedLib.Responses;
 using TLSWeb.Helpers;
@@ -27,6 +28,8 @@ public partial class EmployeeForm : ComponentBase
     protected List<LookupValue> AdrGovs = new();
     protected List<LookupValue> AdrAreas = new();
 
+    string WhatsappNo01, WhatsappNo02;
+
     protected bool IsSaving = false;
     protected bool IsCheckingDuplicate = false;
     protected bool IsDuplicate = false;
@@ -43,7 +46,7 @@ public partial class EmployeeForm : ComponentBase
     protected bool IsEditMode=false;
     protected string PageTitle => IsEditMode ? "تعديل بيانات موظف" : "إضافة موظف جديد";
     protected string SaveButtonText => IsEditMode ? "حفظ التعديل" : "حفظ الموظف";
-
+    bool IsCivilIdGood = false;
     // ────────────────────────────────────────────────
     //  Lifecycle
     // ────────────────────────────────────────────────
@@ -54,7 +57,10 @@ public partial class EmployeeForm : ComponentBase
         if (IsEditMode)
         {
             employee = await EmployeeApi.GetById(Id);
-
+            if(employee.CivilId is not null)
+             CheckCivilId();
+            WhatsappNo01 = WhatsAppHelper.GetWhatsAppLink(employee.Mobile);
+            WhatsappNo02 = WhatsAppHelper.GetWhatsAppLink(employee.Mobile, "", "972");
         }
 
         // جلب بيانات المنسدلات
@@ -244,5 +250,18 @@ public partial class EmployeeForm : ComponentBase
             }
         }
 
+    }
+
+
+    private void CheckCivilId()
+    {
+        if (!string.IsNullOrEmpty(employee.CivilId) && Checks.CheckLuhnE9(employee.CivilId))
+        {
+            IsCivilIdGood = true;
+        }
+        else if (!string.IsNullOrEmpty(employee.CivilId))
+        {
+            IsCivilIdGood = false;
+        }
     }
 }

@@ -8,11 +8,13 @@
             <i class="bi bi-cash-coin me-2 text-success"></i>
             إدارة الواردات
         </h3>
+         <AuthorizeView Roles="@Roles.Admin">
         <div class="d-flex gap-2" dir="rtl">
             <button class="btn btn-success shadow-sm" @onclick="OpenAddPage">
                 <i class="bi bi-plus-circle me-1"></i> إضافة وارد
             </button>
         </div>
+        </AuthorizeView>
     </div>
 
     @if (isLoading)
@@ -40,8 +42,8 @@
                     <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 fs-6">
                         <i class="bi bi-clipboard-data me-1"></i> عدد الوارد: <strong>@totalCount</strong>
                     </span>
-                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 fs-6">
-                        <i class="bi bi-wallet2 me-1"></i> الكمية الإجمالية: <strong>@totalAmount.ToString("N0")</strong> د.ع
+                    <span class="badge bg-info bg-opacity-10 text-success px-3 py-2 fs-6">
+                        <i class="bi bi-box-seam me-1"></i> الكمية الإجمالية: <strong>@totalAmount.ToString("N0")</strong>
                     </span>
                 </div>
             </div>
@@ -56,7 +58,9 @@
                             <th>التاريخ</th>
                             <th>المركز</th>
                             <th>المستلم</th>
+                             <AuthorizeView Roles="Admin">
                             <th style="width: 200px;" class="text-center">إجراءات</th>
+                             </AuthorizeView>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,6 +90,7 @@
                                 <td>@income.Date.ToString("dd/MM/yyyy")</td>
                                 <td>@income.CenterName</td>
                                 <td>@(string.IsNullOrEmpty(income.RecipientName) ? "-" : income.RecipientName)</td>
+                                <AuthorizeView Roles="Admin">
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
                                         <button class="btn btn-outline-primary" @onclick="@(() => OpenEditPage(income.Id))" title="تعديل">
@@ -96,6 +101,7 @@
                                         </button>
                                     </div>
                                 </td>
+                                </AuthorizeView>
                             </tr>
                         }
                     </tbody>
@@ -183,6 +189,121 @@
     </div>
 }
 
+<div class="financial-summary-container" dir="rtl">
+    <!-- بطاقة إجمالي الوارد -->
+    <div class="summary-card card-received">
+        <div class="card-icon">⬇️</div>
+        <div class="card-info">
+            <span class="card-title">إجمالي الوارد</span>
+            <h3 class="card-value">@TotalReceived</h3>
+        </div>
+    </div>
+
+    <!-- بطاقة إجمالي المصروف / الموزع -->
+    <div class="summary-card card-distributed">
+        <div class="card-icon">⬆️</div>
+        <div class="card-info">
+            <span class="card-title">إجمالي الموزع</span>
+            <h3 class="card-value">@TotalDist</h3>
+        </div>
+    </div>
+
+    <!-- بطاقة المتبقي / الفرق -->
+    <div class="summary-card card-balance">
+        <div class="card-icon">📊</div>
+        <div class="card-info">
+            <span class="card-title">الرصيد الحالي (الفرق)</span>
+            <!-- عملية حسابية مباشرة لطرح القيمتين في Blazor -->
+            <h3 class="card-value">@(TotalReceived - TotalDist)</h3>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* التنسيقات العامة للحاوية */
+    .financial-summary-container {
+        display: flex;
+        gap: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px 0;
+        flex-wrap: wrap; /* لجعل البطاقات تنزل لسطر جديد في الشاشات الصغيرة */
+    }
+
+    /* التنسيق الأساسي لكل بطاقة */
+    .summary-card {
+        flex: 1;
+        min-width: 250px;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #edf2f7;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    /* تنسيق الأيقونة الدائرية */
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .card-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 14px;
+        color: #718096;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .card-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    /* ألوان مخصصة لكل بطاقة حسب طبيعتها */
+    .card-received {
+        border-right: 5px solid #48bb78; /* أخضر للوارد */
+    }
+
+        .card-received .card-icon {
+            background-color: #f0fff4;
+        }
+
+    .card-distributed {
+        border-right: 5px solid #f56565; /* أحمر للمصروف */
+    }
+
+        .card-distributed .card-icon {
+            background-color: #fff5f5;
+        }
+
+    .card-balance {
+        border-right: 5px solid #4299e1; /* أزرق للرصيد والفرق */
+    }
+
+        .card-balance .card-icon {
+            background-color: #ebf8ff;
+        }
+</style>
 @code
 {
 
@@ -198,6 +319,10 @@
     private int totalCount = 0;
     private int totalPages = 0;
     private decimal totalAmount = 0;
+    private decimal TotalDist = 0;
+    private decimal TotalReceived = 0;
+
+
     protected override async Task OnInitializedAsync()
     {
         await LoadIncomesAsync();
@@ -205,14 +330,46 @@
 
     private async Task LoadIncomesAsync()
     {
+
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
         isLoading = true;
         try
         {
-            incomes = await InComeApi.GetAll();
-            totalCount = incomes.Count;
-            totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-            totalAmount = incomes.Sum(i => i.Qnty);
-            UpdatePagedIncomes();
+            // incomes = await InComeApi.GetAll();
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                // 3. الفحص هل يمتلك دور Admin؟
+                if (user.IsInRole("Admin"))
+                {
+                    // توجيهه إلى لوحة التحكم
+                    incomes = await InComeApi.GetAll();
+                    TotalReceived = await InComeApi.GetBuildingTotal(null);
+                    TotalDist = await DailyReportApi.GetBuildingTotalDist(null);
+                }
+                else
+                {
+                    // مستخدم عادي، توجيهه لصفحة العميل
+                    incomes = await InComeApi.GetByCenter(0);
+                    var BuildingCode = incomes.FirstOrDefault()?.BuildingCode;
+                    if (BuildingCode is not null)
+                    {
+
+                         TotalReceived = await InComeApi.GetBuildingTotal(BuildingCode);
+                         TotalDist = await DailyReportApi.GetBuildingTotalDist(BuildingCode);
+                        //var Rest = TotalReceived - TotalDist;
+                    }
+                }
+            }
+
+            if (incomes is not null)
+            {
+                totalCount = incomes.Count;
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+                totalAmount = incomes.Sum(i => i.Qnty);
+                UpdatePagedIncomes();
+            }
         }
         catch (Exception ex)
         {

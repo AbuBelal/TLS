@@ -115,7 +115,7 @@ app.MapIdentityApi<ApplicationUser>();
 //app.UseAuthorization();
 //app.UseCors("AllowSpecificOrigin");
 
-//app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

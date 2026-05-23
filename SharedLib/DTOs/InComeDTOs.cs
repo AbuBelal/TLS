@@ -14,6 +14,7 @@ namespace SharedLib.DTOs
         decimal Qnty,
         long CenterId,
         string? CenterName,
+        string? BuildingCode,
         string? RecipientName
     );
 

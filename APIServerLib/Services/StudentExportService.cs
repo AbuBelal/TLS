@@ -6,6 +6,7 @@
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using SharedLib.Entities;
+using SharedLib.Helpers;
 
 namespace APIServerLib.Services;
 
@@ -120,6 +121,12 @@ public static class StudentExportService
             rowRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
             rowRange.Style.Border.InsideBorderColor = XLColor.FromHtml("#EEEEEE");
 
+            if(Checks.CheckLuhnE9(student.CivilId??"0"))
+            {
+                ws.Cell(row, 5).Style.Font.FontColor = XLColor.Yellow;
+                ws.Cell(row, 5).Style.Fill.BackgroundColor = XLColor.Red;
+                ws.Cell(row, 5).Style.Font.Bold = true;
+            }
             // توسيط بعض الأعمدة
             ws.Cell(row, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, 6).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
@@ -253,16 +260,30 @@ public static class StudentExportService
                 ? XLColor.FromHtml("#FFFFFF")
                 : XLColor.FromHtml("#C0E6F5");
             var center = student.StdCenters.FirstOrDefault(x => x.IsActive)?.Center;
+            bool isRegistered = true;
+            if (center is null)
+            {
+                isRegistered = false;
+                center = student.StdCenters.OrderByDescending(x => x.FromDate).FirstOrDefault()?.Center;
+            }
             // قيم الخلايا
             int c = 1;
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = "";
-
+            
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = center?.CenterCode ?? "";
 
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = center?.Name ?? "";
+            if(!isRegistered)
+            {
+                ws.Cell(row, c-1).Style.Font.SetStrikethrough();
+                ws.Cell(row, c-2).Style.Font.SetStrikethrough();
+
+                ws.Cell(row, c-1).Style.Fill.BackgroundColor = XLColor.FromHtml("#CCCCCC");
+                ws.Cell(row, c-2).Style.Fill.BackgroundColor = XLColor.FromHtml("#CCCCCC");
+            }
 
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = student.CivilId ?? "";
@@ -307,24 +328,30 @@ public static class StudentExportService
             rowRange.Style.Border.OutsideBorderColor = XLColor.Black; //FromHtml("#DDDDDD");
             rowRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
             rowRange.Style.Border.InsideBorderColor = XLColor.Black;//FromHtml("#EEEEEE");
+
+            if (!Checks.CheckLuhnE9(student.CivilId ?? "0"))
+            {
+                ws.Cell(row, 4).Style.Font.FontColor = XLColor.Yellow;
+                ws.Cell(row, 4).Style.Fill.BackgroundColor = XLColor.Red;
+                ws.Cell(row, 4).Style.Font.Bold = true;
+            }
         }
+        //تنسيق شرطي
+        //var range = ws.Column(4).AsRange();
+        //range.AddConditionalFormat()
+        //     .WhenIsTrue("=COUNTIF($D:$D, D1) > 1")
+        //     .Fill.SetBackgroundColor(XLColor.RedPigment)      
+        //     .Font.SetFontColor(XLColor.White);   
 
-            //تنسيق شرطي
-            //var range = ws.Column(4).AsRange();
-            //range.AddConditionalFormat()
-            //     .WhenIsTrue("=COUNTIF($D:$D, D1) > 1")
-            //     .Fill.SetBackgroundColor(XLColor.RedPigment)      
-            //     .Font.SetFontColor(XLColor.White);   
-            
-            //range = ws.Column(5).AsRange();
-            //range.AddConditionalFormat()
-            //     .WhenIsTrue("=COUNTIF($E:$E, E1) > 1")
-            //     .Fill.SetBackgroundColor(XLColor.RedPigment)      
-            //     .Font.SetFontColor(XLColor.White);            
+        //range = ws.Column(5).AsRange();
+        //range.AddConditionalFormat()
+        //     .WhenIsTrue("=COUNTIF($E:$E, E1) > 1")
+        //     .Fill.SetBackgroundColor(XLColor.RedPigment)      
+        //     .Font.SetFontColor(XLColor.White);            
 
-            
-            //عمل تصفية
-            //ws.RangeUsed().SetAutoFilter();
+
+        //عمل تصفية
+        //ws.RangeUsed().SetAutoFilter();
         ws.SheetView.FreezeRows(headerRow);
 
         // ── تحويل إلى bytes ────────────────────────────────────

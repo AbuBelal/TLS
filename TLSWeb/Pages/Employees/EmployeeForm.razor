@@ -1,4 +1,5 @@
-﻿@using TLSWeb.Components
+﻿@using SharedLib.Helpers
+@using TLSWeb.Components
 @* @page "/employees/add"
 @page "/employees/edit/{Id:long}" *@
 @attribute [Route(PagesUris.EmployeesPages.Add)]
@@ -33,19 +34,29 @@
                     @* رقم الهوية *@
                     <div class="col-md-6">
                         <label class="form-label">رقم الهوية</label>
-                        <InputText @bind-Value="employee.CivilId"
-                                   class="form-control"
-                                    />
-                        <ValidationMessage For="@(() => employee.CivilId)" class="text-danger" />
-                        @if (IsCheckingDuplicate)
-                        {
-                            <small class="text-muted">
-                                <span class="spinner-border spinner-border-sm me-1"></span>
-                                جاري التحقق...
-                            </small>
-                        }
-                    </div>
 
+                        <!-- قمنا بإنشاء مجموعة إدخال لدمج الحقل مع الأيقونة -->
+                        <div class="input-group">
+                            <InputText @bind-Value="employee.CivilId" class="form-control" @onblur="CheckCivilId"/>
+
+                            <!-- الأيقونة داخل كلاس input-group-text لتظهر ملتصقة بالحقل -->
+                            @if (IsCivilIdGood)
+                            {
+                                <span class="bg-white">
+                                    <i class="bi bi-check2-all" style="color: #198754; font-size: 1.25rem;"></i>
+                                </span>
+                            }
+                            else 
+                            {
+                                <span class="bg-white">
+                                    <i class="bi bi-exclamation-triangle-fill" style="color: red; font-size: 1.25rem;"></i>
+                                </span>
+                            }
+                        </div>
+
+                        <ValidationMessage For="@(() => employee.CivilId)" class="text-danger" />
+                    </div>
+              
                     @* الرقم الوظيفي *@
                     <div class="col-md-6">
                         <label class="form-label">الرقم الوظيفي</label>
@@ -54,21 +65,35 @@
                                    />
 
                         <ValidationMessage For="@(() => employee.EmpId)" class="text-danger" />
-                        @if (IsCheckingDuplicate)
-                        {
-                            <small class="text-muted">
-                                <span class="spinner-border spinner-border-sm me-1"></span>
-                                جاري التحقق...
-                            </small>
-                        }
                     </div>
 
                     @* الجوال *@
                     <div class="col-md-6">
                         <label class="form-label">رقم الجوال</label>
-                        <InputText @bind-Value="employee.Mobile"
-                                   class="form-control"
-                                   placeholder="059XXXXXXX" />
+                        <div class="input-group">
+                            <InputText @bind-Value="employee.Mobile"
+                                       class="form-control"
+                                       placeholder="059XXXXXXX" />
+
+                            <a href="@WhatsappNo01"
+                               class="btn btn-link p-0 text-decoration-none shadow-none m-2"
+                               target="_blank"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="+970">
+                                <i class="bi bi-whatsapp text-success" style="font-size: 1.3rem; vertical-align: middle;"></i>
+                            </a>
+
+                            <a href="@WhatsappNo02"
+                               class="btn btn-link p-0 text-decoration-none shadow-none m-2"
+                               target="_blank"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="+972">
+                                <i class="bi bi-whatsapp text-danger" style="font-size: 1.3rem; vertical-align: middle;"></i>
+                            </a>
+
+                        </div>
                     </div>
 
                     @* تاريخ الميلاد *@

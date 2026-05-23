@@ -28,9 +28,18 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<IEnumerable<InCome>> GetByCenterIdAsync(long centerId)
         {
+            var building = (await _context.Centers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == centerId))?.BuildingCode;
+            var CentersIds = await _context.Centers
+                .AsNoTracking()
+                .Where(c => c.BuildingCode == building)
+                .Select(c => c.Id)
+                .ToListAsync();
+
             return await _context.InComes
                 .AsNoTracking()
-                .Where(i => i.CenterId == centerId)
+                .Where(i => CentersIds.Contains(i.CenterId))
                 .Include(i => i.Center)
                 .OrderByDescending(i => i.Date)
                 .ToListAsync();

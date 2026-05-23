@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharedLib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -22,6 +23,14 @@ namespace SharedLib.DTOs
         public string? EnName { get; set; }
         public string? EmpId { get; set; }
         public string? CivilId { get; set; }
+        public bool? IsCivilIdGood { 
+            get
+            {
+                return
+                Checks.CheckLuhnE9(CivilId??"0");
+
+            } 
+        }
         public string? Mobile { get; set; }
         public string? GenderName { get; set; }
          public string? GenderEnName { get; set; }

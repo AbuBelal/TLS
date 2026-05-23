@@ -23,14 +23,14 @@ public static class EmployeeExportService
         var headers = new (string Label, double Width)[]
         {
          ("EmpNo",             10),
-         ("EmpName",              20),
-         ("Gender",              10),
-         ("MobNo",              15),
+         ("EmpName",           20),
+         ("Gender",            10),
+         ("MobNo",             15),
          ("ECNo",              10),
          ("ECName",              20),
          ("ECAREA",              15),
-         ("PostTitle",              10),
-         ("TLSRole",              10),
+         ("PostTitle",           10),
+         ("TLSRole",             10),
         };
 
         for (int c = 0; c < headers.Length; c++)
@@ -48,7 +48,7 @@ public static class EmployeeExportService
             ws.Column(c + 1).Width = headers[c].Width;
         }
         ws.Row(headerRow).Height = 22;
-
+        bool IsNotReigInACenter = false;
         // ══ بيانات الموظفين ════════════════════════════════════
         for (int i = 0; i < employees.Count; i++)
         {
@@ -59,7 +59,16 @@ public static class EmployeeExportService
             var rowBg = isEven
                 ? XLColor.FromHtml("#FFFFFF")
                 : XLColor.FromHtml("#F0F8FF");
-
+            if (emp.CenterName.Substring(0, 4) == "OLD-")
+            {
+                IsNotReigInACenter = true;
+                emp.CenterEnName = emp.CenterEnName.Replace("OLD-", "");
+                emp.CenterCode = emp.CenterCode?.Replace("OLD-", "");
+                ws.Cell(row, 5).Style.Font.FontColor = XLColor.Red;
+                ws.Cell(row, 5).Style.Font.SetStrikethrough();
+                ws.Cell(row, 6).Style.Font.FontColor = XLColor.Red;
+                ws.Cell(row, 6).Style.Font.SetStrikethrough();
+            }
             int col = 1;
             ws.Cell(row, col).Value = emp.EmpId;
             ws.Cell(row, ++col).Value = emp.EnName ?? "";
@@ -301,14 +310,20 @@ public static class EmployeeExportService
             ws.Column(c + 1).Width = headers[c].Width;
         }
         ws.Row(headerRow).Height = 22;
-
+        bool IsNotReigInACenter = false;
         // ══ بيانات الموظفين ════════════════════════════════════
         for (int i = 0; i < employees.Count; i++)
         {
             var emp = employees[i];
             int row = headerRow + 1 + i;
             bool isEven = i % 2 == 0;
-
+            if (emp.CenterName.Substring(0, 4) == "OLD-")
+            {
+                IsNotReigInACenter = true;
+                emp.CenterName = emp.CenterName.Replace("OLD-", "");
+                ws.Cell(row, 2).Style.Font.FontColor = XLColor.Red;
+                ws.Cell(row, 2).Style.Font.SetStrikethrough();
+            }
             var rowBg = isEven
                 ? XLColor.FromHtml("#FFFFFF")
                 : XLColor.FromHtml("#F0F8FF");
@@ -327,6 +342,7 @@ public static class EmployeeExportService
             ws.Cell(row, c++).Value = emp.AdrGov ?? "";
             ws.Cell(row, c++).Value = emp.AdrArea ?? "";
             ws.Cell(row, c++).Value = emp.AdrDetails ?? "";
+            //ws.Cell(row, c++).Value = emp.IsCivilIdGood ?? false;
 
             var rowRange = ws.Range(row, 1, row, totalCols);
             rowRange.Style.Fill.BackgroundColor = rowBg;
@@ -336,6 +352,11 @@ public static class EmployeeExportService
             rowRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
             rowRange.Style.Border.InsideBorderColor = XLColor.FromHtml("#EEEEEE");
 
+            if(emp.IsCivilIdGood == false)
+            {
+                ws.Cell(row, 4).Style.Font.FontColor = XLColor.Yellow;
+                ws.Cell(row, 4).Style.Fill.BackgroundColor = XLColor.Red;
+            }
             //// توسيط الرقم والجنس
             //ws.Cell(row, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             //ws.Cell(row, 6).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;

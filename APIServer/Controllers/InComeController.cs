@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Responses;
+using System.Security.Claims;
 
 namespace APIServer.Controllers
 {
@@ -12,11 +13,40 @@ namespace APIServer.Controllers
     public class InComeController : ControllerBase
     {
         private readonly IInComeRepository _repository;
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IUserRepository _userRepository;
 
-        public InComeController(IInComeRepository repository)
+        public InComeController(IInComeRepository repository, IUserRepository userRepository, IEmployeeRepository employeeRepository)
         {
             _repository = repository;
+            _userRepository = userRepository;
+            _employeeRepository = employeeRepository;
         }
+
+
+        #region CurUser CurEmp Details
+        private async Task<ApplicationUser> CurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _userRepository.GetById(userId);
+        }
+        private async Task<Employee> CurrentEmployee()
+        {
+            var CurUser = await CurrentUser();
+            return await _employeeRepository.GetById(CurUser.EmployeeId ?? 0);
+        }
+        private async Task<long> CurrentCenterId()
+        {
+            var Employee = await CurrentEmployee();
+            return
+                Employee is null ? 0 :
+                Employee.EmpCenters
+                .OrderByDescending(ec => ec.FromDate)
+                .FirstOrDefault()?
+                .CenterId ?? 0;
+        }
+        #endregion
+
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<InComeDto>>> GetAll()
@@ -38,6 +68,8 @@ namespace APIServer.Controllers
         [HttpGet("by-center/{centerId:long}")]
         public async Task<ActionResult<IEnumerable<InComeDto>>> GetByCenter(long centerId)
         {
+            if (centerId == 0)
+                centerId = await CurrentCenterId();
             var items = await _repository.GetByCenterIdAsync(centerId);
             return Ok(items.Select(MapToDto));
         }
@@ -136,6 +168,7 @@ namespace APIServer.Controllers
             i.Qnty,
             i.CenterId,
             i.Center?.Name,
+            i.Center?.BuildingCode,
             i.RecipientName
         );
     }

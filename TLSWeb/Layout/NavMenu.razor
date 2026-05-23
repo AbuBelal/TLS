@@ -256,7 +256,7 @@
               </div>
             }
         </div>
-            <AuthorizeView Roles="@Roles.Admin">
+           
         @* income *@
         <div>
             <button class="@GroupBtnClass("InCome")"
@@ -275,13 +275,16 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                         <span>الوارد</span>
                     </a>
+                     <AuthorizeView Roles="@Roles.Admin">
                     <a href="@PagesUris.InComePages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                         <span>إضافة وارد</span>
                     </a>
+                    </AuthorizeView>
                 </div>
             }
         </div>
+        <AuthorizeView Roles="@Roles.Admin">
         <div>
             <button class="@GroupBtnClass("settings")"
                     @onclick='() => ToggleGroup("settings")'>

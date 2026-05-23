@@ -261,10 +261,24 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<decimal> GetBuildingTotalDistAsync(string? BuildingId = null)
         {
-            decimal totalDis =await _context.DailyReports.AsNoTracking()
-                .Where(dr => dr.Center.BuildingCode== BuildingId).SumAsync(dr => dr.WFPBiscDist)??0 * 1m;
-            decimal totalLost =await _context.DailyReports.AsNoTracking()
-                .Where(dr => dr.Center.BuildingCode== BuildingId).SumAsync(dr => dr.WFPBiscLost)??0 * 1m;
+          decimal totalDis = 0;
+          decimal totalLost = 0;
+            if (BuildingId is not null)
+            {
+                 totalDis = await _context.DailyReports.AsNoTracking()
+                    .Where(dr => dr.Center.BuildingCode == BuildingId).SumAsync(dr => dr.WFPBiscDist) ?? 0 * 1m;
+
+                 totalLost = await _context.DailyReports.AsNoTracking()
+                    .Where(dr => dr.Center.BuildingCode == BuildingId).SumAsync(dr => dr.WFPBiscLost) ?? 0 * 1m;
+            }
+            else
+            {
+                 totalDis = await _context.DailyReports.AsNoTracking()
+                   .SumAsync(dr => dr.WFPBiscDist) ?? 0 * 1m;
+
+                 totalLost = await _context.DailyReports.AsNoTracking()
+                    .SumAsync(dr => dr.WFPBiscLost) ?? 0 * 1m;
+            }
             return totalDis+totalLost;
         }
     }

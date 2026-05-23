@@ -10,49 +10,21 @@ using System.Security.Claims;
 
 namespace APIServer.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    //[ApiController]
+    //[Route("api/[controller]")]
     //[Authorize]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : MyBaseController
     {
+        //private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IStudentRepository _studentRepository;
-        private readonly IUserRepository _userRepository;
         private readonly AuditLogService _auditLogService;
 
-        public EmployeeController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService)
+        public EmployeeController(IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService) : base(EmployeeRepository, UserRepository)
         {
             _employeeRepository = EmployeeRepository;
-            _userRepository = UserRepository;
-            _employeeRepository = EmployeeRepository;
+            //_userRepository = UserRepository;
             _auditLogService = auditLogService;
         }
-
-        #region CurUser CurEmp Details
-        private async Task<ApplicationUser> CurrentUser()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await _userRepository.GetById(userId);
-        }
-        private async Task<Employee> CurrentEmployee()
-        {
-            var CurUser = await CurrentUser();
-            return await _employeeRepository.GetById(CurUser.EmployeeId ?? 0);
-        }
-        private async Task<long> CurrentCenterId()
-        {
-            var Employee = await CurrentEmployee();
-            return 
-                Employee is null ? 0 :
-                Employee.EmpCenters
-                .OrderByDescending(ec => ec.FromDate)
-                .FirstOrDefault()?
-                .CenterId ?? 0;
-        }
-        #endregion
-
-
-
 
         [HttpGet]
         //[AllowAnonymous]
