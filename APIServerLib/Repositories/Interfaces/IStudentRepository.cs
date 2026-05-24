@@ -23,5 +23,6 @@ namespace APIServerLib.Repositories.Interfaces
         /// جلب جميع طلاب المركز بدون فلاتر — للتصدير الكامل
         /// </summary>
         Task<List<Student>> GetAllByCenterAsync(long centerId);
+        Task<GeneralResponse> DeleteFromDBAsync(long studentId);
     }
 }

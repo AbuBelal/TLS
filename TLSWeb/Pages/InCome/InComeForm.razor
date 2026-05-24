@@ -1,5 +1,6 @@
 ﻿@* Pages/Incomes/InComeForm.razor *@
 @using SharedLib.Mapper
+@using TLSWeb.Components
 @attribute [Route(PagesUris.InComePages.Add)]
 @attribute [Route(PagesUris.InComePages.Edit + "/{Id:long}")]
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
@@ -153,6 +154,7 @@
         </div>
     </div>
 </div>
+<Calculator @bind-IsVisible="showCalculator" OnConfirm="OnCalculatorConfirm" />
 
 @code {
     [Parameter] public long Id { get; set; }

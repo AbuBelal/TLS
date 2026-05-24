@@ -159,6 +159,16 @@
                     </div>
                 </div>
             </EditForm>
+            <div class="mt-2">
+                <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin">
+                    <button type="button" class="btn btn-danger me-2" @onclick="DeleteFromDB">
+                        <i class="bi bi bi-trash me-1"></i>
+                        <span>
+                            حذف ملف الطالب نهائياً من قاعدة البيانات
+                        </span>
+                    </button>
+                </AuthorizeView>
+            </div>
         </div>
     </div>
 </div>
@@ -387,6 +397,16 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
         else if (!string.IsNullOrEmpty(student.CivilId))
         {
             IsCivilIdGood = false;
+        }
+    }
+
+    private async Task DeleteFromDB()
+    {
+        var response = await StudentApi.DeleteFromDB(student.Id);
+        if (response.Success)
+        {
+            NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
+            MudSnackbar.Add(response.Message, Severity.Success);
         }
     }
 }

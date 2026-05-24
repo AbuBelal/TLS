@@ -136,8 +136,15 @@ namespace APIServer.Controllers
             Dto.GenderName = student?.Gender?.Name;
             Dto.LevelName = student?.Level?.Name;
         }
-
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteFromDB/{id}")]
+        public async Task<ActionResult<GeneralResponse>> DeleteFromDB(long id)
+        {
+            var std = await _studentRepository.GetById(id);
+            var response = await _studentRepository.DeleteFromDBAsync(id);
+            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $" تم حذف طالب كلياً من قاعدة البيانات{std?.Name ?? "غير معروف"}");
+            return Ok(response);
+        }
+            [HttpDelete("{id}")]
         public async Task<ActionResult<GeneralResponse>> Delete(long id)
         {
             var std = await _studentRepository.GetById(id);

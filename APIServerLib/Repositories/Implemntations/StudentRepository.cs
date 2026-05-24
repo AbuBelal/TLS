@@ -1,5 +1,6 @@
 using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
@@ -404,6 +405,17 @@ namespace APIServerLib.Repositories.Implemntations
             }
 
              
+        }
+
+        public async Task<GeneralResponse> DeleteFromDBAsync(long studentId)
+        {
+            var student = await _context.Students.Include(x => x.StdCenters).Where(x => x.Id == studentId).FirstOrDefaultAsync();
+            if (student == null)
+                return new GeneralResponse(false, "الطالب غير موجود.", 0);
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+            return new GeneralResponse(true, "تم حذف الطالب نهائياً من قاعدة البيانات بنجاح.", studentId);
+
         }
     }
 }

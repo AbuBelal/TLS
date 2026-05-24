@@ -337,7 +337,7 @@ public static class EmployeeExportService
             ws.Cell(row, c++).Value = emp.Mobile ?? "";
             ws.Cell(row, c++).Value = emp.BirthDate?.ToString("yyyy-MM-dd") ?? "";
             ws.Cell(row, c++).Value = emp.GenderName ?? "";
-            ws.Cell(row, c++).Value = emp.JobName ?? "";
+            ws.Cell(row, c++).Value = emp.JobName is null ?"" : emp.JobName.Trim();
             ws.Cell(row, c++).Value = emp.SpecializationName ?? "";
             ws.Cell(row, c++).Value = emp.AdrGov ?? "";
             ws.Cell(row, c++).Value = emp.AdrArea ?? "";

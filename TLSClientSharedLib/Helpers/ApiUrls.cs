@@ -80,6 +80,7 @@ namespace TLSClientSharedLib.Helpers
             public const string AddWithCenter = PriorUrl+ "/AddWithCenter";
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
+            public const string DeleteFromDB = PriorUrl + "/DeleteFromDB/{id}";
             //   /api/Student/StudentCenterCount/{CenterId})
             public const string StudentsCenterCount = PriorUrl + "/StudentCenterCount/{id}";
             public const string paginated = PriorUrl + "/paginated";
