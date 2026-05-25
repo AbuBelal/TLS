@@ -4,7 +4,7 @@
     <div class="modal fade show d-block" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header @TitleColor text-white">
+                <div class="modal-header bg-@DialogType text-white">
                     <h5 class="modal-title">
                         <i class="bi bi-exclamation-triangle me-2"></i>@Title
                     </h5>
@@ -21,7 +21,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                    
-                    <button class="btn btn-success"
+                    <button class="btn btn-@DialogType"
                     @onclick="Confirmed"
                     disabled="@isDoing">
                         @if (isDoing)
@@ -54,13 +54,15 @@
     [Parameter]
     public string Title { get; set; }
     [Parameter]
-    public StudentDto studentToDelete { get; set; }
-    [Parameter]
     public EventCallback OnCancel { get; set; }
     [Parameter]
     public EventCallback OnConfirmed { get; set; }
     [Parameter]
     public string TitleColor { get; set; } = "bg-warning";
+
+    [Parameter]
+    public string DialogType { get; set; } = "warning";
+
     [Parameter]
     public string Icon { get; set; } = "bi-exclamation-triangle";
 

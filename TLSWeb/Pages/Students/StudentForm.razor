@@ -172,8 +172,13 @@
         </div>
     </div>
 </div>
+
 <DialogMsg IsOpen="@isDialogOpen" Title="تأكيد الإضافة" Message="@dialogMessage"   
-OnConfirmed="ConfirmDialog" OnCancel="CancelDialog" TitleColor="bg-warning"
+OnConfirmed="ConfirmDialog" OnCancel="CancelDialog" DialogType="warning"
+Icon="bi-exclamation-triangle" />
+
+<DialogMsg IsOpen="@isDeleteDialogOpen" Title="تأكيد الحذف" Message="@dialogMessage"   
+OnConfirmed="ConfirmDeleteDialog" OnCancel="CancelDeleteDialog" DialogType="danger"
 Icon="bi-exclamation-triangle" />
 
 
@@ -257,6 +262,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
     string WhatsappNo01, WhatsappNo02;
 
     bool isDialogOpen = false;
+    bool isDeleteDialogOpen = false;
     string dialogMessage = "هذا الطالب غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
     StudentEmisDto StdEmisInfo;
     bool isEmisInfoLoading = false;
@@ -402,11 +408,27 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
 
     private async Task DeleteFromDB()
     {
+        dialogMessage = $"هل أنت متأكد من حذف الطالب {student.Name} من قاعدة البيانات ؟";
+        isDeleteDialogOpen = true;
+        StateHasChanged();
+        return;
+    }
+
+    private void CancelDeleteDialog()
+    {
+        isDeleteDialogOpen = false;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDeleteDialog()
+    {
         var response = await StudentApi.DeleteFromDB(student.Id);
+        isDeleteDialogOpen = false;
         if (response.Success)
         {
             NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
             MudSnackbar.Add(response.Message, Severity.Success);
         }
+        else MudSnackbar.Add(response.Message, Severity.Error);
     }
 }

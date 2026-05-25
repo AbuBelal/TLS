@@ -27,5 +27,7 @@ namespace APIServerLib.Repositories.Interfaces
         Task<GeneralResponse> UpdateWithCenter(EmployeeUpsertDto item);
         Task<GeneralResponse> RegisterEmpInCenter(EmployeeUpsertDto item);
         Task<Employee?> IsEmployeeDuplicateAsync(EmployeeDuplicateCheckRequest request);
+        Task<GeneralResponse> DeleteFromDBAsync(long Id);
+
     }
 }

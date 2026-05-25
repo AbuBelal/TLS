@@ -59,6 +59,7 @@ namespace TLSClientSharedLib.Helpers
             public const string UpdateWithCeneter = PriorUrl+ "/UpdateWithCenter";
             public const string RegisterEmpInCenter = PriorUrl+ "/RegisterEmpInCenter";
             public const string DeleteById = PriorUrl + "/{id}";
+            public const string DeleteFromDB = PriorUrl + "/DeleteFromDB/{id}";
             //    /api/Employee/EmployeeCenterCount/{CenterId}
             public const string EmployeesCenterCount = PriorUrl + "/EmployeeCenterCount/{id}";
             public const string Paginated = PriorUrl + "/paginated";

@@ -1,6 +1,7 @@
 using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
 using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
 using SharedLib.Entities;
@@ -501,6 +502,18 @@ namespace APIServerLib.Repositories.Implemntations
 
 
             return new GeneralResponse(true, "تم تعديل بيانات الموظف في المركز بنجاح.");
+        }
+
+        public async Task<GeneralResponse> DeleteFromDBAsync(long Id)
+        {
+            var employee = await _context.Employees.Include(e => e.EmpCenters.Where(x => x.IsActive)).ThenInclude(x => x.Center).Where(x => x.Id == Id).FirstOrDefaultAsync();
+
+            if (employee == null)
+                return new GeneralResponse(false, "الموظف غير موجود.");
+
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync();
+            return new GeneralResponse(true, "تم حذف الموظف من قاعدة البيانات بنجاح.");
         }
     }
 }

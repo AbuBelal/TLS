@@ -22,15 +22,15 @@ public static class EmployeeExportService
         int headerRow = 1;
         var headers = new (string Label, double Width)[]
         {
-         ("EmpNo",             10),
-         ("EmpName",           20),
+         ("Emp No",             10),
+         ("Emp Name",           20),
          ("Gender",            10),
-         ("MobNo",             15),
-         ("ECNo",              10),
-         ("ECName",              20),
-         ("ECAREA",              15),
-         ("PostTitle",           10),
-         ("TLSRole",             10),
+         ("Mob No",             15),
+         ("EC No.",              10),
+         ("EC Name.",              20),
+         ("EC AREA",              15),
+         ("Post Title",           10),
+         ("TLS Role",             10),
         };
 
         for (int c = 0; c < headers.Length; c++)

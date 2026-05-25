@@ -39,6 +39,7 @@ public partial class EmployeeForm : ComponentBase
     private long? selectedAdrGovId=0;
     private long? selectedAdrAreaId=0;
     bool isDialogOpen = false;
+    bool isoDeleteDialogOpen = false;
     string dialogMessage = "هذا الموظف غير مسجل في أي مركز، هل تريد إضافته في مركزكم ؟";
     // ────────────────────────────────────────────────
     //  Computed
@@ -221,6 +222,28 @@ public partial class EmployeeForm : ComponentBase
         else
             MudSnackbar.Add(response.Message, Severity.Error);
     }
+    private async void ConfirmDeleteDialog()
+    {
+        if (employee.Id != 0)
+        {
+            var response = await EmployeeApi.DeleteFromDB(employee.Id);
+            isoDeleteDialogOpen = false;
+            if (response.Success)
+            {
+                MudSnackbar.Add("تم حذف الموظف من قاعدة البيانات", Severity.Success);
+                NavManager.NavigateTo(PagesUris.EmployeesPages.Manage);
+            }
+            else
+            {
+                MudSnackbar.Add(response.Message, Severity.Error);
+            }
+        }
+    }
+    private void CancelDeleteDialog()
+    {
+        isoDeleteDialogOpen = false;
+        StateHasChanged();
+    }
 
     private async Task TranslateToEng()
     {
@@ -263,5 +286,12 @@ public partial class EmployeeForm : ComponentBase
         {
             IsCivilIdGood = false;
         }
+    }
+    private async Task DeleteFromDB()
+    {
+        dialogMessage = $"هل أنت متأكد من حذف الموظف { employee.Name} من قاعدة البيانات ؟";
+        isoDeleteDialogOpen = true;
+        StateHasChanged();
+        return;
     }
 }
