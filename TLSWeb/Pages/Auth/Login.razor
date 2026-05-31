@@ -1,4 +1,4 @@
-﻿@page "/login"
+@page "/login"
 
 @inject IAccountManagement AccountManagement
 @inject NavigationManager Navigation
@@ -90,14 +90,26 @@
                             </div>
                         </div>
 
+                        <!-- ── العبارة الختامية والاتصال ── -->
                         @* ── العبارة الختامية ── *@
                         <div class="hero-motto">
-                            <p>
-                                <span class="material-symbols-outlined align-middle me-1" style="font-size:20px">verified</span>
-                                نتابع، نوثّق، نُحسن — لأن التعليم لا يتوقف
-                            </p>
-                            <p style="font-size:10px"> أي إقتراحات يمكنكم التواصل معي من خلال الإيميل <a href="mailto:moh_nema@yahoo.com"> moh_nema@yahoo.com</a> </p>
-                            <p style="font-size:10px"> محمد خميس أبو نعمة</p>
+                            <div class="motto-main">
+                                <span class="material-symbols-outlined">verified</span>
+                                <span>نتابع، نوثّق، نُحسن — لأن التعليم لا يتوقف</span>
+                            </div>
+
+                            <div class="motto-divider"></div>
+
+                            <div class="motto-contact">
+                                <div class="motto-author">
+                                    <span class="material-symbols-outlined">person</span>
+                                    <span>محمد خميس أبو نعمة</span>
+                                </div>
+                                <a href="mailto:moh_nema@yahoo.com" class="motto-email">
+                                    <span class="material-symbols-outlined">mail</span>
+                                    <span>moh_nema@yahoo.com</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

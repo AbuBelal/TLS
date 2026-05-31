@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
        صفحة الهبوط — مساحات التعليم المؤقتة
        ═══════════════════════════════════════════════════════════ */
 .landing-page {
@@ -121,21 +121,35 @@
     line-height: 1.6;
 }
 
-/* ── العبارة الختامية ── */
-.hero-motto {
-    margin-top: 2rem;
-    padding: 1rem 1.5rem;
-    background: linear-gradient(135deg, rgba(0,158,219,0.06), rgba(0,101,142,0.06));
-    border-radius: 12px;
-    border-right: 4px solid #009EDB;
+/* ── العبارة الختامية والاتصال ── */
+.motto-container {
+    position: relative;
+    overflow: hidden;
+    margin-top: 2.5rem;
+    padding: 1.75rem 2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.4) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px -15px rgba(0, 158, 219, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-    .hero-motto p {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #00658e;
-        margin: 0;
-    }
+.motto-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 50px -12px rgba(0, 158, 219, 0.12);
+    border-color: rgba(0, 158, 219, 0.15);
+}
+
+.motto-glow {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(0, 158, 219, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
 
 /* ── جانب تسجيل الدخول ── */
 .login-side {
@@ -324,10 +338,20 @@
         margin-right: auto;
     }
 
-    .hero-motto {
+    .motto-container {
+        padding: 1.5rem 1.25rem;
+        margin-top: 2rem;
+    }
+
+    .motto-footer-row {
+        justify-content: center;
         text-align: center;
-        border-right: none;
-        border-bottom: 4px solid #009EDB;
+        gap: 1.2rem;
+    }
+
+    .motto-dev-info, .motto-feedback {
+        justify-content: center;
+        width: 100%;
     }
 
     .login-side {
@@ -349,4 +373,88 @@
         padding: 1rem;
     }
 }
+
+
+
+
+
+
+.hero-motto {
+    margin-top: 1.5rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(0,158,219,0.08), rgba(0,101,142,0.05));
+    border: 1px solid rgba(0,158,219,0.2);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.motto-main {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #009EDB;
+}
+
+    .motto-main .material-symbols-outlined {
+        font-size: 22px;
+        color: #10b981;
+        flex-shrink: 0;
+    }
+
+.motto-divider {
+    height: 1px;
+    background: linear-gradient(to left, transparent, rgba(0,158,219,0.25), transparent);
+}
+
+.motto-contact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.motto-author {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+    .motto-author .material-symbols-outlined {
+        font-size: 17px;
+        color: #8b5cf6;
+    }
+
+.motto-email {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: #009EDB;
+    text-decoration: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(0,158,219,0.08);
+    border: 1px solid rgba(0,158,219,0.2);
+    transition: all 0.2s ease;
+    direction: ltr;
+}
+
+    .motto-email:hover {
+        background: rgba(0,158,219,0.15);
+        border-color: rgba(0,158,219,0.4);
+        color: #007aab;
+        transform: translateY(-1px);
+    }
+
+    .motto-email .material-symbols-outlined {
+        font-size: 16px;
+    }
 

@@ -8,7 +8,7 @@ namespace APIServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = Roles.Admin)]
+    //[Authorize(Roles = Roles.Admin)]
     public class AuditLogController : ControllerBase
     {
         private readonly IAuditLogRepository _auditLogRepository;
