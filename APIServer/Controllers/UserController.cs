@@ -22,16 +22,19 @@ namespace APIServer.Controllers
         private readonly IUserRepository _userRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly AuditLogService _auditLogService;
 
         public UserController(IUserRepository userRepository, 
             UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, 
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             AuditLogService auditLogService)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _auditLogService = auditLogService;
         }
 
@@ -134,10 +137,14 @@ namespace APIServer.Controllers
                     // Handle role updates separately
                     var currentRoles = await _userManager.GetRolesAsync(user);
                     var newRoles = Profile.Role; // From your view model
-
-                    // Remove roles not in the new list
+                    //check if role is exist
                     await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
+                    var roleExist = await _roleManager.RoleExistsAsync(Profile.Role);
+                    if (!roleExist)
+                    {
+                       await _roleManager.CreateAsync(new IdentityRole(Profile.Role));
+                    }
+                    // Remove roles not in th♫e new list
                     currentRoles.Clear();
                     currentRoles.Add(Profile.Role);
                     await _userManager.AddToRolesAsync(user, currentRoles);

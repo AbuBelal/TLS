@@ -1,0 +1,291 @@
+﻿@* @page "/backup" *@
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+
+<PageTitle>النسخ الاحتياطي</PageTitle>
+<script>
+    window.downloadFileFromBytes = (fileName, base64, mimeType) => {
+        const link = document.createElement('a');
+        link.href = `data:${mimeType};base64,${base64}`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+</script>
+<div class="backup-page" dir="rtl">
+
+    @* ══ Header ══ *@
+    <div class="page-header">
+        <div class="d-flex align-items-center gap-2">
+            <span class="material-symbols-outlined text-primary">database</span>
+            <div>
+                <h4 class="mb-0">النسخ الاحتياطي لقاعدة البيانات</h4>
+                <small class="text-muted">إنشاء وإدارة النسخ الاحتياطية</small>
+            </div>
+        </div>
+    </div>
+
+    @* ══ Stats ══ *@
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <span class="material-symbols-outlined">calendar_today</span>
+                <div class="stat-value">@(lastBackup?.CreatedAt.ToString("HH:mm") ?? "—")</div>
+                <div class="stat-label">آخر نسخة اليوم</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <span class="material-symbols-outlined">folder_copy</span>
+                <div class="stat-value">@backupHistory.Count</div>
+                <div class="stat-label">إجمالي النسخ</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <span class="material-symbols-outlined">storage</span>
+                <div class="stat-value">@dbSizeMB MB</div>
+                <div class="stat-label">حجم قاعدة البيانات</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <span class="material-symbols-outlined">save</span>
+                <div class="stat-value">@totalBackupSizeGB GB</div>
+                <div class="stat-label">مساحة النسخ المستخدمة</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+
+        @* ══ Settings Card ══ *@
+        <div class="col-lg-6">
+            <div class="backup-card h-100">
+                <div class="backup-card-title">
+                    <span class="material-symbols-outlined">settings</span>
+                    إعدادات النسخة الاحتياطية
+                </div>
+
+                <EditForm Model="model" OnValidSubmit="StartBackupAsync">
+                    <DataAnnotationsValidator />
+
+                    <div class="form-group">
+                        <label>اسم النسخة الاحتياطية</label>
+                        <InputText @bind-Value="model.BackupName" class="form-control" dir="ltr" />
+                        <ValidationMessage For="() => model.BackupName" class="text-danger small" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>نوع النسخة</label>
+                        <InputSelect @bind-Value="model.BackupType" class="form-select">
+                            <option value="Full">نسخة كاملة (Full Backup)</option>
+                            <option value="Differential">نسخة تفاضلية (Differential)</option>
+                            <option value="TransactionLog">سجل المعاملات (Transaction Log)</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-group">
+                        <label>صيغة الملف</label>
+                        <InputSelect @bind-Value="model.Format" class="form-select">
+                            <option value="bak">.bak — SQL Server Backup</option>
+                            <option value="zip">.zip — مضغوط</option>
+                            <option value="sql">.sql — نص SQL</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-group">
+                        <label>مسار الحفظ على السيرفر</label>
+                        <InputText @bind-Value="model.SavePath" class="form-control" dir="ltr" />
+                    </div>
+
+                    <hr />
+
+                    <div class="options-group">
+                        <label class="option-label">
+                            <InputCheckbox @bind-Value="model.Compress" />
+                            <span>ضغط النسخة الاحتياطية</span>
+                        </label>
+                        <label class="option-label">
+                            <InputCheckbox @bind-Value="model.Encrypt" />
+                            <span>تشفير النسخة (AES-256)</span>
+                        </label>
+                        <label class="option-label">
+                            <InputCheckbox @bind-Value="model.VerifyAfter" />
+                            <span>التحقق من سلامة النسخة بعد الإنشاء</span>
+                        </label>
+                        <label class="option-label">
+                            <InputCheckbox @bind-Value="model.NotifyOnComplete" />
+                            <span>إرسال إشعار عند الانتهاء</span>
+                        </label>
+                    </div>
+
+                    @* Progress *@
+                    @* بعد — ضع هذا بدلاً منه *@
+                    @if (isRunning)
+                    {
+                        <div class="progress-section mt-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-muted">جاري إنشاء النسخة الاحتياطية...</small>
+                            </div>
+                            <div class="progress" style="height:8px;border-radius:100px">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated w-100"></div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                @onclick="ResetForm" disabled="@isRunning">
+                            <span class="material-symbols-outlined" style="font-size:16px">close</span>
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled="@isRunning">
+                            @if (isRunning)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>جاري التنفيذ...</span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined" style="font-size:16px">upload</span>
+                                <span>بدء النسخ الاحتياطي</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+
+        @* ══ Tables to Include ══ *@
+        <div class="col-lg-6">
+            <div class="backup-card h-100">
+                <div class="backup-card-title">
+                    <span class="material-symbols-outlined">table_chart</span>
+                    محتوى النسخة
+                </div>
+
+                <div class="alert-info-box">
+                    <span class="material-symbols-outlined">info</span>
+                    <span>سيتم تضمين كافة الجداول والبيانات والإجراءات المخزنة تلقائياً</span>
+                </div>
+
+                <div class="form-group">
+                    <label>قاعدة البيانات</label>
+                    <select class="form-select" @bind="model.DatabaseName">
+                        @foreach (var db in availableDatabases)
+                        {
+                            <option value="@db.Name">@db.DisplayName</option>
+                        }
+                    </select>
+                </div>
+
+                <label class="text-muted small mb-2 d-block">الجداول المشمولة</label>
+                <div class="row g-2">
+                    @foreach (var table in availableTables)
+                    {
+                        <div class="col-6">
+                            <label class="option-label">
+                                <input type="checkbox" @bind="table.IsSelected" />
+                                <span>@table.DisplayName</span>
+                                <small class="text-muted ms-1">(@table.RowCount)</small>
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @* ══ History Table ══ *@
+    <div class="backup-card mt-3">
+        <div class="backup-card-title">
+            <span class="material-symbols-outlined">history</span>
+            سجل النسخ الاحتياطية السابقة
+        </div>
+
+        @if (isLoadingHistory)
+        {
+            <div class="text-center py-4">
+                <span class="spinner-border spinner-border-sm text-primary"></span>
+                <span class="ms-2 text-muted">تحميل السجل...</span>
+            </div>
+        }
+        else if (!backupHistory.Any())
+        {
+            <div class="text-center py-4 text-muted">
+                <span class="material-symbols-outlined d-block mb-2" style="font-size:40px">folder_off</span>
+                لا توجد نسخ احتياطية سابقة
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>اسم النسخة</th>
+                            <th>التاريخ والوقت</th>
+                            <th>النوع</th>
+                            <th>الحجم</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var backup in backupHistory)
+                        {
+                            <tr>
+                                <td class="fw-medium" dir="ltr">@backup.FileName</td>
+                                <td>@backup.CreatedAt.ToString("dd/MM/yyyy — hh:mm tt")</td>
+                                <td><span class="badge bg-light text-dark border">@backup.BackupType</span></td>
+                                <td>@backup.SizeMB MB</td>
+                                <td>
+                                    @if (backup.Status == BackupStatus.Success)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">
+                                            <span class="material-symbols-outlined" style="font-size:13px">check_circle</span>
+                                            ناجحة
+                                        </span>
+                                    }
+                                    else if (backup.Status == BackupStatus.Failed)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <span class="material-symbols-outlined" style="font-size:13px">error</span>
+                                            فاشلة
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">
+                                            <span class="material-symbols-outlined" style="font-size:13px">warning</span>
+                                            تحقق فاشل
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        @if (backup.Status == BackupStatus.Success)
+                                        {
+                                            <button class="btn btn-sm btn-outline-success"
+                                                    @onclick="() => DownloadBackupAsync(backup)">
+                                                <span class="material-symbols-outlined" style="font-size:14px">download</span>
+                                                تحميل
+                                            </button>
+                                        }
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                @onclick="() => DeleteBackupAsync(backup)">
+                                            <span class="material-symbols-outlined" style="font-size:14px">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+</div>

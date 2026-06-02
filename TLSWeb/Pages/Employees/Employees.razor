@@ -126,7 +126,7 @@
                     </select>
                 </div>
 
-                <AuthorizeView Roles=@SharedLib.Fixed.Roles.Admin>
+                <AuthorizeView Roles=@AppRoles.Admin>
                     <div class="col-md-2">
                         <label class="form-label fw-semibold text-muted small">المركز</label>
                         <select class="form-select" @bind="selectedCenter" @bind:after="OnFilterChangedAsync">

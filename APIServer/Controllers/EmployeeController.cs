@@ -10,16 +10,40 @@ using System.Security.Claims;
 
 namespace APIServer.Controllers
 {
-    //[ApiController]
-    //[Route("api/[controller]")]
-    //[Authorize]
-    public class EmployeeController : MyBaseController
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    public class EmployeeController : ControllerBase//: MyBaseController
     {
         //private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly AuditLogService _auditLogService;
+        private readonly IUserRepository _userRepository;
 
-        public EmployeeController(IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService) : base(EmployeeRepository, UserRepository)
+        #region CurUser CurEmp Details
+        private async Task<ApplicationUser> CurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _userRepository.GetById(userId);
+        }
+        private async Task<Employee> CurrentEmployee()
+        {
+            var CurUser = await CurrentUser();
+            return await _employeeRepository.GetById(CurUser.EmployeeId ?? 0);
+        }
+        private async Task<long> CurrentCenterId()
+        {
+            var Employee = await CurrentEmployee();
+            return
+                Employee is null ? 0 :
+                Employee.EmpCenters
+                .OrderByDescending(ec => ec.FromDate)
+                .FirstOrDefault()?
+                .CenterId ?? 0;
+        }
+        #endregion
+
+        public EmployeeController(IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService) //: base(EmployeeRepository, UserRepository)
         {
             _employeeRepository = EmployeeRepository;
             //_userRepository = UserRepository;
@@ -27,7 +51,7 @@ namespace APIServer.Controllers
         }
 
         [HttpGet]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Employee>>> GetAll()
         {
             var result = await _employeeRepository.GetAll();

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using Refit;
 using SharedLib.DTOs;
+using SharedLib.Fixed;
 using System.Security.Claims;
 using TLSClientSharedLib.Services.Apis;
 
@@ -43,7 +44,7 @@ public partial class ResetPassword : ComponentBase
         var user  = auth.User;
 
         CurrentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-        IsAdmin       = user.IsInRole(SharedLib.Fixed.Roles.Admin);
+        IsAdmin       = user.IsInRole(AppRoles.Admin);
 
         if (IsAdmin)
         {

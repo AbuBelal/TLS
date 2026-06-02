@@ -24,6 +24,8 @@ namespace APIServerLib.ProgramSettings
             builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 
             builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            builder.Services.AddScoped<IBackupService, BackupService>();
+
             builder.Services.AddScoped<AuditLogService>();
             builder.Services.AddHttpContextAccessor();
 

@@ -168,6 +168,7 @@ namespace APIServerLib.Repositories.Implemntations
                     else
                     {
                         oldStd.Name = student.Name;
+                        oldStd.CivilId = student.CivilId;
                         oldStd.EnName = student.EnName;
                         oldStd.Mobile = student.Mobile;
                         oldStd.LevelId = student.LevelId;

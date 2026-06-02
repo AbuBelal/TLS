@@ -41,11 +41,16 @@ namespace SharedLib.Fixed
         };
 
     }
-    public static class Roles
+    public static class AppRoles
     {
         public const string Admin = "Admin";
         public const string User = "User";
-        public const string Viewer = "Viewer";
+        public const string UserViewer = "User_Viewer";
+        public const string AdminViewer = "Admin_Viewer";
+        public static List<string> GetRoles()
+        {
+            return new List<string> { Admin, User, UserViewer, AdminViewer };
+        }
 
     }
     public static class LookupTypes

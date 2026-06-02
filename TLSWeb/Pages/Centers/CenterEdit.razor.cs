@@ -7,6 +7,7 @@ using MudBlazor;
 using Refit;
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using SharedLib.Responses;
 using TLSClientSharedLib.Services.Apis;
 
@@ -39,7 +40,7 @@ public partial class CenterEdit : ComponentBase
         if (user.Identity!.IsAuthenticated)
         {
             var roles = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value!;
-            IsAdmin = roles == SharedLib.Fixed.Roles.Admin;
+            IsAdmin = roles == AppRoles.Admin;
         }
 
         try

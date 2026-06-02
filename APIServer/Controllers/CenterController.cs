@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using SharedLib.Responses;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
@@ -66,7 +67,7 @@ namespace APIServer.Controllers
         }
 
         [HttpGet("my-center")]
-        [Authorize(Roles = $"{SharedLib.Fixed.Roles.User},{SharedLib.Fixed.Roles.User}")]
+        [Authorize(Roles = $"{AppRoles.User},{AppRoles.User}")]
         public async Task<ActionResult<Center>> GetMyCenter()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -85,7 +86,7 @@ namespace APIServer.Controllers
         /// يعدّل بيانات المركز — لمدير المركز فقط، مع التحقق من الملكية
         /// </summary>
         [HttpPut("my-center")]
-        [Authorize(Roles = SharedLib.Fixed.Roles.User)]
+        [Authorize(Roles = AppRoles.User)]
         public async Task<ActionResult<GeneralResponse>> UpdateMyCenter([FromBody] CenterUpsertDto dto)
         {
             if (!ModelState.IsValid)

@@ -6,6 +6,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using SharedLib.Responses;
 using System;
 using System.Collections.Generic;
@@ -98,7 +99,7 @@ namespace APIServerLib.Repositories.Implemntations
             // جلب المستويات مرتبة
 
 
-            if (userrole == SharedLib.Fixed.Roles.Admin)
+            if (userrole == AppRoles.Admin)
             {
                 foreach (var center in Centers)
                 {
@@ -144,7 +145,7 @@ namespace APIServerLib.Repositories.Implemntations
             //// جلب المستويات مرتبة
             
 
-            //if (userrole == SharedLib.Fixed.Roles.Admin)
+            //if (userrole == AppRoles.Admin)
             //{
             //    foreach (var center in Centers)
             //    {

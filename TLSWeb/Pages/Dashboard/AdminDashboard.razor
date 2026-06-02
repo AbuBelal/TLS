@@ -1,13 +1,8 @@
 @using TLSWeb.Pages.Reports
-@* ╔══════════════════════════════════════════════════════════════╗ *@
-@* ║  TLSWeb/Pages/Dashboard/AdminDashboard.razor  (v2)           ║ *@
-@* ║  متوافق مع تصميم النظام — Bootstrap + text-primary           ║ *@
-@* ╚══════════════════════════════════════════════════════════════╝ *@
 
-@* @page "/admin-dashboard" *@
 @attribute [Route(PagesUris.Admin.DashBoard)]
-@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
-@* [Authorize(Roles = "Admin")] *@
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = AppRoles.Admin+ "," + AppRoles.AdminViewer)]
+
 <div class="container-fluid px-4" dir="rtl">
 
     @if (IsLoading)

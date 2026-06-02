@@ -2,6 +2,7 @@
 using MudBlazor;
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using TLSWeb.Helpers;
 
 namespace TLSWeb.Pages.Accounts;
@@ -49,7 +50,7 @@ public partial class AccountForm : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         // تحميل الصلاحيات والموظفين
-        AvailableRoles = await RolesApi.GetAll() ?? new List<string>();
+        AvailableRoles = AppRoles.GetRoles(); //await RolesApi.GetAll() ?? new List<string>();
         AllEmployees = await EmployeeApi.GetAll() ?? new List<Employee>();
 
         if (IsEditMode)

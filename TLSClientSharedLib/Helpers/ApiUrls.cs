@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 
 namespace TLSClientSharedLib.Helpers
 {
@@ -210,6 +211,18 @@ namespace TLSClientSharedLib.Helpers
             public const string PriorUrl = "/api/Attendance";
             public const string GetAttendancesAvg = PriorUrl + "/get-attendancesAvg";
             public const string GetAttendancesAllCentersAvg = PriorUrl + "/get-attendances-all-centersAvg";
+        }
+
+        public static class Backup
+        {
+            private const string Base = "/api/backup";
+
+            public const string GetDatabases = Base+"/databases";
+            public const string GetHistory = Base +"/history";
+            public const string GetDbSize = Base +"/dbsize/{dbName}";
+            public const string Create = Base + "/create";
+            public const string Download = Base + "/download/{id}";
+            public const string Delete = Base + "/{id}";
         }
     }
 }

@@ -103,7 +103,7 @@
                         <InputDate TValue="DateOnly?" @bind-Value="student.BirthDate" class="form-control" @onblur="GetStdInfoFromEmis" />
                     </div>
 
-                    <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin" Context="student">
+                    <AuthorizeView Roles="@AppRoles.Admin" Context="student">
                         <div class="col-md-4">
                             <label class="form-label">المركز</label>
                             <InputSelect @bind-Value="selectedCenterId" class="form-select">
@@ -160,7 +160,7 @@
                 </div>
             </EditForm>
             <div class="mt-2">
-                <AuthorizeView Roles="@SharedLib.Fixed.Roles.Admin">
+                <AuthorizeView Roles="@AppRoles.Admin">
                     <button type="button" class="btn btn-danger me-2" @onclick="DeleteFromDB">
                         <i class="bi bi bi-trash me-1"></i>
                         <span>
@@ -322,6 +322,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
             var response = await StudentApi.Update(studentToSave);
             if (response.Success)
             {
+                MudSnackbar.Add(response.Message, Severity.Warning);
                 NavManager.NavigateTo(PagesUris.StudentsPages.Manage);
             }
             else

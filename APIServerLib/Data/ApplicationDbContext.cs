@@ -23,6 +23,7 @@ namespace APIServerLib.Data
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<DailyReport> DailyReports { get; set; }
         public DbSet<InCome> InComes { get; set; }
+        public DbSet<BackupRecord> BackupRecords { get; set; }
 
 
 
