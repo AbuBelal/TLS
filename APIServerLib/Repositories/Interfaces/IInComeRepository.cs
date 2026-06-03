@@ -17,5 +17,7 @@ namespace APIServerLib.Repositories.Interfaces
         Task<decimal> GetTotalAmountAsync(long? centerId = null);
         Task<bool> ExistsAsync(long id);
         Task<decimal> GetBuildingTotalAmountAsync(string? BuildingId = null);
+        Task<List<IncomeReportDto>> GetIncomeReportByDateRangeAsync(DateOnly? from, DateOnly? to);
+        
     }
 }

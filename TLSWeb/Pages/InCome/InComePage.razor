@@ -13,6 +13,21 @@
             <button class="btn btn-success shadow-sm" @onclick="OpenAddPage">
                 <i class="bi bi-plus-circle me-1"></i> إضافة وارد
             </button>
+
+                <button class="btn btn-success shadow-sm d-flex align-items-center gap-2"
+                        @onclick="ExportTotals"
+                        disabled="@(isExporting)">
+                    @if (isExporting)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                        <span>جاري التصدير...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-file-earmark-excel-fill"></i>
+                        <span>تصدير أرصدة المراكز Excel</span>
+                    }
+                </button>
         </div>
         </AuthorizeView>
     </div>
@@ -227,6 +242,7 @@
     private List<InComeDto> pagedIncomes = new();
     private InComeDto? incomeToDelete;
     private bool isLoading = true;
+    private bool isExporting = false;
     private bool isDeleting = false;
     private bool showDeleteModal = false;
 
@@ -272,8 +288,8 @@
                     if (BuildingCode is not null)
                     {
 
-                         TotalReceived = await InComeApi.GetBuildingTotal(BuildingCode);
-                         TotalDist = await DailyReportApi.GetBuildingTotalDist(BuildingCode);
+                        TotalReceived = await InComeApi.GetBuildingTotal(BuildingCode);
+                        TotalDist = await DailyReportApi.GetBuildingTotalDist(BuildingCode);
                         //var Rest = TotalReceived - TotalDist;
                     }
                 }
@@ -372,5 +388,28 @@
         currentPage = page;
         UpdatePagedIncomes();
     }
+
+    private async Task ExportTotals()
+    {
+        if (isExporting) return;
+        isExporting = true;
+        try
+        {
+            var response = await InComeApi.ExportIncomeBalance();
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "تقرير_أرصدة_المراكز.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExporting = false;
+            StateHasChanged();
+        }
+    
+    }
 }
-                  

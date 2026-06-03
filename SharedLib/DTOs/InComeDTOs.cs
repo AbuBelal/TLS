@@ -79,4 +79,15 @@ namespace SharedLib.DTOs
 
         public string? Comments { get; set; }
     }
+
+    public class IncomeReportDto
+    {
+        public string CenterNames { get; set; } = string.Empty;
+        public string CenterCode { get; set; } = string.Empty;
+        public int CenterSortOrder { get; set; }=0;
+        public string CenterBuildingCode { get; set; } = string.Empty;
+        public decimal TotalDist { get; set; }=0;
+        public decimal TotalReceived { get; set; }=0;
+        public decimal TotalBalance { get; set; } = 0;
+    }
 }

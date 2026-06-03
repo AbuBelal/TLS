@@ -205,6 +205,7 @@ namespace TLSClientSharedLib.Helpers
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
             public const string GetBuildingTotal = PriorUrl + "/Buildingtotal";
+            public const string ExportIncomeBalance = PriorUrl + "/export-Income-Balance";
         }
         public static class Attendance
         {

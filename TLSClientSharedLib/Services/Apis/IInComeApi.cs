@@ -32,5 +32,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Get(ApiUrls.InCome.GetBuildingTotal)]
         Task<decimal> GetBuildingTotal(string? BuildingId = null);
+
+        [Post(ApiUrls.InCome.ExportIncomeBalance)]
+        Task<HttpResponseMessage> ExportIncomeBalance();
     }
 }

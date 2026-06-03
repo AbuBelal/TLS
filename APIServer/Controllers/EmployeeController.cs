@@ -46,7 +46,7 @@ namespace APIServer.Controllers
         public EmployeeController(IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService) //: base(EmployeeRepository, UserRepository)
         {
             _employeeRepository = EmployeeRepository;
-            //_userRepository = UserRepository;
+            _userRepository = UserRepository;
             _auditLogService = auditLogService;
         }
 

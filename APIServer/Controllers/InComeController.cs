@@ -15,12 +15,15 @@ namespace APIServer.Controllers
         private readonly IInComeRepository _repository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUserRepository _userRepository;
+        private readonly AuditLogService _auditLogService;
 
-        public InComeController(IInComeRepository repository, IUserRepository userRepository, IEmployeeRepository employeeRepository)
+        public InComeController(IInComeRepository repository, IUserRepository userRepository, 
+            IEmployeeRepository employeeRepository, AuditLogService auditLogService)
         {
             _repository = repository;
             _userRepository = userRepository;
             _employeeRepository = employeeRepository;
+            _auditLogService = auditLogService;
         }
 
 
@@ -158,6 +161,20 @@ namespace APIServer.Controllers
             //NotFound(new { message = "الإيراد غير موجود" });
 
             return new GeneralResponse(true, "تم حذف الإيراد بنجاح");
+        }
+
+        [HttpPost("export-Income-Balance")]
+        public async Task<IActionResult> ExportIncomeBalance()
+        {
+            var report = await _repository.GetIncomeReportByDateRangeAsync(null, null);
+            var bytes = IncomeReportExportService.GenerateExcel(report, " تقرير أرصدة الواردات");
+            var fileName = $"تقرير-رصيد-الواردات{DateTime.Now.ToString("yyyy-MM-dd")}.xlsx";
+
+            await _auditLogService.LogAsync("Read", "Export Income Balance Report", "", $"تصدير تقرير أرصدة الواردات: {fileName}");
+
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
         }
 
         private static InComeDto MapToDto(InCome i) => new(

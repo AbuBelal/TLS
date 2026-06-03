@@ -11,10 +11,12 @@ namespace APIServerLib.Repositories.Implemntations
     public class InComeRepository : IInComeRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDailyReportRepository _dailyReportRepository;
 
-        public InComeRepository(ApplicationDbContext context)
+        public InComeRepository(ApplicationDbContext context, IDailyReportRepository dailyReportRepository)
         {
             _context = context;
+            _dailyReportRepository = dailyReportRepository;
         }
 
         public async Task<IEnumerable<InCome>> GetAllAsync()
@@ -117,6 +119,40 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<bool> ExistsAsync(long id)
         {
             return await _context.InComes.AnyAsync(i => i.Id == id);
+        }
+
+        public async Task<List<IncomeReportDto>> GetIncomeReportByDateRangeAsync(DateOnly? from, DateOnly? to)
+        {
+            from ??= DateOnly.MinValue;
+            to ??= DateOnly.MaxValue;
+
+            var centers = await _context.Centers.OrderBy(c => c.SortOrder)
+                .AsNoTracking().ToListAsync();
+
+            List<IncomeReportDto> report = new List<IncomeReportDto>();
+            foreach (var center in centers)
+            {
+                IncomeReportDto dto = new IncomeReportDto
+                {
+                    CenterNames = string.Join(", ", centers.Where(x => x.BuildingCode == center.BuildingCode)
+                     .Select(x => x.Name)),
+                    CenterCode = string.Join(", ", centers.Where(x => x.BuildingCode == center.BuildingCode)
+                     .Select(x => x.CenterCode)),
+                    CenterSortOrder = center.SortOrder ?? 0,
+                    CenterBuildingCode = center.BuildingCode ?? "",
+                    TotalDist = 0, // Assuming you have a way to calculate this
+                    TotalReceived = 0, // Assuming you have a way to calculate this
+                    TotalBalance = 0   // Assuming you have a way to calculate this
+                };
+                dto.TotalReceived = await GetBuildingTotalAmountAsync(dto.CenterBuildingCode);
+
+                dto.TotalDist = await _dailyReportRepository.GetBuildingTotalDistAsync(dto.CenterBuildingCode);
+
+                dto.TotalBalance = dto.TotalReceived - dto.TotalDist;
+                // You can calculate TotalDist and TotalBalance based on your business logic
+                report.Add(dto);
+            }
+            return report;
         }
     }
 }
