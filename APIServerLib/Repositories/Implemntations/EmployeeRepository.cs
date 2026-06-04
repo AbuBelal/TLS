@@ -25,7 +25,13 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<Employee> GetById(long id)
         {
-            var emp = await _context.Employees.AsNoTracking().Where(x => x.Id == id)
+            var emp = await _context.Employees.Where(x => x.Id == id).Include(x=>x.EmpCenters).FirstOrDefaultAsync();
+            var dd = emp?.EmpCenters.MaxBy(x => x.FromDate);
+            emp?.EmpCenters.Where(x => x.IsActive && x.FromDate != dd?.FromDate).ToList()
+                .ForEach(x => x.IsActive = false);
+            await _context.SaveChangesAsync();
+
+            emp = await _context.Employees.AsNoTracking().Where(x => x.Id == id)
                 .Include(x => x.EmpCenters).ThenInclude(x => x.Center)
                 .Include(x=>x.Job)
                 .Include(x=>x.Gender)
