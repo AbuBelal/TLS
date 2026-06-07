@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using SharedLib.Responses;
 using System.Security.Claims;
 
@@ -262,6 +263,28 @@ namespace APIServer.Controllers
                 ? "تصفية: " + string.Join(" | ", parts)
                 : "المعروض على الشاشة";
         }
+
+        #region std counts
+        [HttpPost("StdCounts")]
+        public async Task<ActionResult<List<StudentsCountsDto>>> GetStudentsCounts(StudentsCountsRequestDto request)
+        {
+            request.From ??= DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
+            request.To ??= DateOnly.FromDateTime(DateTime.Now);
+
+            if (User.IsInRole(AppRoles.User)|| User.IsInRole(AppRoles.UserViewer))
+            {
+                if (request.CenterId == null || request.CenterId <= 0)
+                {
+                    request.CenterId = await CurrentCenterId();
+                }
+            }
+            
+           var result = await _studentRepository.GetTotalStudentsCountAsync(request);
+           await _auditLogService.LogAsync("Read", "Student", "", $"قراءة إحصائيات أعداد الطلاب");
+           return Ok(result);
+            
+        }
+        #endregion
 
     }
 }

@@ -1,0 +1,158 @@
+﻿@using TLSWeb.Components
+@attribute [Route(PagesUris.StudentsPages.StudentsCounts)]
+@inject ISnackbar Snackbar
+
+<div class="container-xl mt-4">
+    <h4 class="mb-4">إحصائيات أعداد الطلاب</h4>
+
+    <div class="row">
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card shadow-sm p-4 h-100">
+                <h6 class="mb-3">خيارات البحث</h6>
+
+                <div class="mb-3">
+                    <label for="centername" class="form-label">رقم المركز (اختياري للمدير)</label>
+                   
+                    <select id="centerId"
+                            class="form-select"
+                            @bind="_request.CenterId">
+
+                        <option value="0">-- جميع المراكز --</option>
+
+                        @if (_availableCenters != null)
+                        {
+                            @foreach (var center in _availableCenters)
+                            {
+                                <option value="@center.Id">@center.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="fromDate" class="form-label">من تاريخ</label>
+                        <input type="date"
+                               id="fromDate"
+                               class="form-control"
+                               @bind="_request.From" />
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="toDate" class="form-label">إلى تاريخ</label>
+                        <input type="date"
+                               id="toDate"
+                               class="form-control"
+                               @bind="_request.To" />
+                    </div>
+                </div>
+                <button type="button"
+                        class="btn btn-primary w-100 mt-auto"
+                        @onclick="LoadChartDataAsync"
+                        disabled="@_isLoading">
+                    @if (_isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                        <span>جاري التحميل...</span>
+                    }
+                    else
+                    {
+                        <span>عرض الإحصائيات</span>
+                    }
+                </button>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8 mb-3">
+            <div class="card shadow-sm p-4" style="min-height: 400px;">
+                @if (_isLoading)
+                {
+                   <LoadingComponent/>
+                }
+                else if (Series.Any())
+                {
+                    <MudChart ChartType="ChartType.Line"
+                              ChartSeries="@Series"
+                              ChartLabels="@Labels"
+                              Width="100%"
+                              Height="400px"
+                              ChartOptions="@_options" />
+                }
+                else
+                {
+                    <div class="d-flex justify-content-center align-items-center text-muted" style="height: 100%; min-height: 350px;">
+                        <p class="m-0 fs-5">لا توجد بيانات لعرضها، اضغط على زر عرض الإحصائيات.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LineChartOptions _options = new LineChartOptions()
+    {
+        XAxisTitle = "الزمن",
+        YAxisTitle = "عدد الطلاب المسجلين",
+
+    };
+    private string[] Labels=[];
+    private List<ChartSeries<double>> Series = new List<ChartSeries<double>>();
+
+    // 1. المتغيرات للتحكم بالواجهة والبيانات
+    private bool _isLoading = false;
+    private StudentsCountsRequestDto _request = new() {CenterId=0, From = DateOnly.FromDateTime(DateTime.Now.AddDays(-7)), To = DateOnly.FromDateTime(DateTime.Now) };
+    private List<Center> _availableCenters = new();
+
+
+    override protected async Task OnInitializedAsync()
+    {
+        _options.ShowDataMarkers = true;
+        _availableCenters = await CenterApi.GetAll();
+    }
+
+
+    private async Task LoadChartDataAsync()
+    {
+        Series.Clear();
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response =await StudentApi.GetStdCounts(_request);
+
+            if (response.Count > 0)
+            {
+                double[] countsData = response.Select(x => (double)x.StdCount).ToArray();
+                Series.Add(new ChartSeries<double>
+                {
+                    Name = _request.CenterId==0?"جميع المراكز": _availableCenters.FirstOrDefault(c => c.Id == _request.CenterId).Name,
+                    Data = countsData
+                });
+               
+                List<string> Dates = new();
+                int daysDifference = _request.To.Value.DayNumber - _request.From.Value.DayNumber;
+                int step = Math.Max(1, daysDifference / 9);
+                for (DateOnly currentDate = _request.From.Value; currentDate <= _request.To.Value; currentDate = currentDate.AddDays(step))
+                {
+                    Dates.Add(currentDate.ToString("d/M"));
+                    Dates.AddRange(Enumerable.Repeat("", step-1));
+                }
+                Labels = Dates.ToArray();
+            }
+            else
+            {
+                Snackbar.Add("حدث خطأ أثناء جلب البيانات من الخادم.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"حدث خطأ غير متوقع: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

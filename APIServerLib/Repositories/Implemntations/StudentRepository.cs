@@ -1,6 +1,7 @@
 using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
@@ -418,5 +419,67 @@ namespace APIServerLib.Repositories.Implemntations
             return new GeneralResponse(true, "تم حذف الطالب نهائياً من قاعدة البيانات بنجاح.", studentId);
 
         }
+
+        #region Std Counts
+        public async Task<List<StudentsCountsDto>> GetTotalStudentsCountAsync(StudentsCountsRequestDto request)
+        {
+           if(request == null) return new List<StudentsCountsDto>();
+           if(request.CenterId.HasValue && request.CenterId.Value > 0)
+            {
+                List<StudentsCountsDto> StdCounts = new List<StudentsCountsDto>();
+                for (DateOnly currentDate = request.From.Value; currentDate <= request.To.Value; currentDate = currentDate.AddDays(1))
+                {
+                    StdCounts.Add(new StudentsCountsDto
+                    {
+                        date = currentDate,
+                        StdCount = _context.StdCenters.Count(sc => sc.CenterId == request.CenterId.Value &&
+                            sc.FromDate <= currentDate &&
+                            (sc.ToDate == null || sc.ToDate >= currentDate))
+                    });
+                }
+
+                return StdCounts;
+                //return await _context.StdCenters
+                //    .Where(sc => sc.CenterId == request.CenterId.Value
+                //                 && (!request.From.HasValue || sc.FromDate >= request.From.Value)
+                //                 && (!request.To.HasValue || sc.FromDate <= request.To.Value))
+                //    .GroupBy(sc => sc.FromDate)
+                //    .Select(g => new StudentsCountsDto
+                //    {
+                //        date = g.Key,
+                //        StdCount = g.Count()
+                //    })
+                //    .ToListAsync();
+            }
+            else
+            {
+                List<StudentsCountsDto> StdCounts = new List<StudentsCountsDto>();
+                for (DateOnly currentDate = request.From.Value; currentDate <= request.To.Value; currentDate = currentDate.AddDays(1))
+                {
+                    StdCounts.Add(new StudentsCountsDto
+                    {
+                        date = currentDate,
+                        StdCount = _context.StdCenters.Count(sc =>
+                            sc.FromDate <= currentDate &&
+                            (sc.ToDate == null || sc.ToDate >= currentDate))
+                    });
+                }
+
+                return StdCounts;
+                //return await _context.Students
+                //    .Where(s => s.StdCenters.Any(sc =>
+                //                 (!request.From.HasValue || sc.FromDate >= request.From.Value) &&
+                //                 (!request.To.HasValue || sc.FromDate <= request.To.Value)))
+                //    .SelectMany(s => s.StdCenters)
+                //    .GroupBy(sc => sc.FromDate)
+                //    .Select(g => new StudentsCountsDto
+                //    {
+                //        date = g.Key,
+                //        StdCount = g.Count()
+                //    })
+                //    .ToListAsync();
+            }
+        }
+        #endregion
     }
 }

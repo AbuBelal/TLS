@@ -50,5 +50,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Post(ApiUrls.Student.GetStdInfoFromEmis)]
         Task<StudentEmisDto> GetStdInfoFromEmis(StudentEmisRequest request);
+
+        [Post(ApiUrls.Student.GetStdCounts)]
+        Task<List<StudentsCountsDto>> GetStdCounts(StudentsCountsRequestDto request);
     }
 }

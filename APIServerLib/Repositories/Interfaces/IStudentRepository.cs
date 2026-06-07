@@ -24,5 +24,7 @@ namespace APIServerLib.Repositories.Interfaces
         /// </summary>
         Task<List<Student>> GetAllByCenterAsync(long centerId);
         Task<GeneralResponse> DeleteFromDBAsync(long studentId);
+        Task<List<StudentsCountsDto>> GetTotalStudentsCountAsync(StudentsCountsRequestDto request);
+
     }
 }
