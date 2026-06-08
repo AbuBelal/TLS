@@ -75,7 +75,26 @@ namespace APIServerLib.Repositories.Implemntations
         {
 
             /////// تحديث بيانات الموظف
-            _context.Employees.Update(item);
+            // _context.Employees.Update(item);
+            var employee = await _context.Employees.FindAsync(item.Id);
+            if (employee != null)
+            {
+                employee.Name = item.Name;
+                employee.EnName = item.EnName;
+                employee.CivilId = item.CivilId;
+                employee.EmpId = item.EmpId;
+                employee.Mobile = item.Mobile;
+                employee.BirthDate = item.BirthDate;
+                employee.GenderId = item.GenderId;
+                employee.JobId = item.JobId;
+                employee.OrgJobId = item.OrgJobId;
+                employee.OrgSchool = item.OrgSchool;
+                employee.SpecializationId = item.SpecializationId;
+                employee.AdrGovId = item.AdrGovId;
+                employee.AdrAreaId = item.AdrAreaId;
+                employee.Adr_Details = item.Adr_Details;
+                employee.Comments = item.Comments;
+            }
             await _context.SaveChangesAsync();
             return new GeneralResponse(true, "تم تعديل بيانات الموظف بنجاح.");
         }

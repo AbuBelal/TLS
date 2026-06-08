@@ -45,6 +45,21 @@
                                @bind="_request.To" />
                     </div>
                 </div>
+                 <button type="button"
+                        class="btn btn-primary w-100 mt-auto"
+                        @onclick="AddSerias"
+                        disabled="@_isLoading">
+                    @if (_isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                        <span>جاري التحميل...</span>
+                    }
+                    else
+                    {
+                        <span>إضافة</span>
+                    }
+                </button>
+
                 <button type="button"
                         class="btn btn-primary w-100 mt-auto"
                         @onclick="LoadChartDataAsync"
@@ -56,9 +71,11 @@
                     }
                     else
                     {
-                        <span>عرض الإحصائيات</span>
+                        <span>حذف الجميع</span>
                     }
                 </button>
+
+               
             </div>
         </div>
 
@@ -110,33 +127,29 @@
         _availableCenters = await CenterApi.GetAll();
     }
 
-
-    private async Task LoadChartDataAsync()
+    private async Task AddSerias()
     {
-        Series.Clear();
         _isLoading = true;
-        StateHasChanged();
-
         try
         {
-            var response =await StudentApi.GetStdCounts(_request);
+            var response = await StudentApi.GetStdCounts(_request);
 
             if (response.Count > 0)
             {
                 double[] countsData = response.Select(x => (double)x.StdCount).ToArray();
                 Series.Add(new ChartSeries<double>
                 {
-                    Name = _request.CenterId==0?"جميع المراكز": _availableCenters.FirstOrDefault(c => c.Id == _request.CenterId).Name,
+                    Name = _request.CenterId == 0 ? "جميع المراكز" : _availableCenters.FirstOrDefault(c => c.Id == _request.CenterId).Name,
                     Data = countsData
                 });
-               
+
                 List<string> Dates = new();
                 int daysDifference = _request.To.Value.DayNumber - _request.From.Value.DayNumber;
                 int step = Math.Max(1, daysDifference / 9);
                 for (DateOnly currentDate = _request.From.Value; currentDate <= _request.To.Value; currentDate = currentDate.AddDays(step))
                 {
-                    Dates.Add(currentDate.ToString("d/M"));
-                    Dates.AddRange(Enumerable.Repeat("", step-1));
+                    Dates.Add(currentDate.ToString("d-MMMM"));
+                    Dates.AddRange(Enumerable.Repeat("", step - 1));
                 }
                 Labels = Dates.ToArray();
             }
@@ -154,5 +167,12 @@
             _isLoading = false;
             StateHasChanged();
         }
+    }
+    private async Task LoadChartDataAsync()
+    {
+        Series.Clear();
+        //_isLoading = true;
+        StateHasChanged();
+        //AddSerias();
     }
 }
