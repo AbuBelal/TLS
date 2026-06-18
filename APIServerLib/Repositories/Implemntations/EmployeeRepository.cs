@@ -513,16 +513,16 @@ namespace APIServerLib.Repositories.Implemntations
 
             //await _context.SaveChangesAsync();
 
-            var empCenter = new EmpCenter
+            _context.EmpCenters.Add( new EmpCenter
             {
                 EmployeeId = item.Id,
                 CenterId = item.CenterId ?? 0,
                 IsActive = true,
                 FromDate = DateOnly.FromDateTime(DateTime.Now)
-            };
-            _context.EmpCenters.Add(empCenter);
+            });
+            //_context.EmpCenters.Add(empCenter);
 
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             await _context.Database.CommitTransactionAsync();
 
 

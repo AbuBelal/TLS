@@ -32,8 +32,8 @@ namespace APIServerLib.Data
             base.OnModelCreating(modelBuilder);
 
             // 1. إعداد المفاتيح المركبة للجداول الوسيطة
-            modelBuilder.Entity<EmpCenter>().HasKey(ec => new { ec.EmployeeId, ec.CenterId });
-            modelBuilder.Entity<StdCenter>().HasKey(sc => new { sc.StudentId, sc.CenterId });
+            modelBuilder.Entity<EmpCenter>().HasKey(ec => new { ec.EmployeeId, ec.CenterId ,ec.FromDate });
+            modelBuilder.Entity<StdCenter>().HasKey(sc => new { sc.StudentId, sc.CenterId ,sc.FromDate });
 
             // 2. حل مشكلة الـ Multiple Cascade Paths للموظف
             // نقوم بتعريف كل علاقة ونحدد أن OnDelete هو Restrict أو NoAction
