@@ -232,6 +232,7 @@ namespace APIServerLib.Repositories.Implemntations
                 pageNumber = totalPages;
             }
 
+            var managers = await GetAllManagers();
             var items = await query
                 .OrderBy(e => e.Name)
                 .Skip((pageNumber - 1) * pageSize)
@@ -248,7 +249,8 @@ namespace APIServerLib.Repositories.Implemntations
                     JobName = e.Job != null ? e.Job.Name : null,
                     SpecializationName = e.Specialization != null ? e.Specialization.Name : null,
                     CenterName = e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name,
-                    AddedDate = e.EmpCenters.FirstOrDefault(x => x.IsActive).FromDate,  // ← جديد
+                    AddedDate = e.EmpCenters.FirstOrDefault(x => x.IsActive).FromDate,
+                    //ManagerName = managers.FirstOrDefault(m => m.EmpCenters.FirstOrDefault().CenterId == e.EmpCenters.FirstOrDefault(x => x.IsActive).CenterId).Name
                 })
                 .ToListAsync();
 

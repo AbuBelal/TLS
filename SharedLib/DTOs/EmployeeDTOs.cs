@@ -45,7 +45,8 @@ namespace SharedLib.DTOs
         public string? AdrGov { get; set; }
         public string? AdrArea { get; set; }
         public string? AdrDetails { get; set; }
-        public DateOnly? AddedDate { get; set; }  // ← جديد
+        public DateOnly? AddedDate { get; set; }  
+        public string? ManagerName { get; set; } 
     }
 
     public sealed class EmployeePaginatedResponse

@@ -108,7 +108,7 @@ namespace APIServerLib.Repositories.Implemntations
         }
         public async Task<decimal> GetBuildingTotalAmountAsync(string? BuildingId = null)
         {
-            var query = _context.InComes.AsQueryable();
+            var query = _context.InComes.Where(x=>x.Name.Contains("بسكويت")).AsQueryable();
 
             if (BuildingId is not null)
                 query = query.Where(i => i.Center.BuildingCode == BuildingId);
