@@ -273,7 +273,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
                 TotalRooms = center.Rooms??0,
                 TotalTarpaulins = center.Tarpaulins??0,
                 TotalOtherSpaces = center.OtherSpaces??0,
-                CenterManager = center.EmpCenters.FirstOrDefault(x=>x.Employee?.Job?.Name == "مدير مركز")?.Employee?.Name ?? "غير محدد",
+                CenterManager = center.EmpCenters.FirstOrDefault(x=> x.IsActive && x.Employee?.Job?.Name == "مدير مركز")?.Employee?.Name ?? "غير محدد",
                 WHoures = center.Whours?.Name
             };
 
