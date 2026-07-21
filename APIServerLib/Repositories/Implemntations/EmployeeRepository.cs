@@ -25,7 +25,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<Employee> GetById(long id)
         {
-            var emp = await _context.Employees.Where(x => x.Id == id).Include(x=>x.EmpCenters).FirstOrDefaultAsync();
+            var emp = await _context.Employees.Where(x => x.Id == id).Include(x=>x.Specialization).Include(x=>x.EmpCenters).FirstOrDefaultAsync();
             var dd = emp?.EmpCenters.MaxBy(x => x.FromDate);
             emp?.EmpCenters.Where(x => x.IsActive && x.FromDate != dd?.FromDate).ToList()
                 .ForEach(x => x.IsActive = false);

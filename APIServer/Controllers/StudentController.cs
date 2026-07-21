@@ -142,7 +142,7 @@ namespace APIServer.Controllers
         {
             var std = await _studentRepository.GetById(id);
             var response = await _studentRepository.DeleteFromDBAsync(id);
-            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $" تم حذف طالب كلياً من قاعدة البيانات{std?.Name ?? "غير معروف"}");
+            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $" تم حذف الطالب كلياً من قاعدة البيانات{std?.Name ?? "غير معروف"}");
             return Ok(response);
         }
             [HttpDelete("{id}")]
@@ -150,7 +150,7 @@ namespace APIServer.Controllers
         {
             var std = await _studentRepository.GetById(id);
             var response = await _studentRepository.DeleteById(id);
-            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $" تم حذف طالب {std?.Name ?? "غير معروف"}");
+            await _auditLogService.LogAsync("Delete", "Student", id.ToString(), $" تم حذف الطالب {std?.Name ?? "غير معروف"}");
             return Ok(response);
         }
 

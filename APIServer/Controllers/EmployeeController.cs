@@ -198,16 +198,24 @@ namespace APIServer.Controllers
         [HttpDelete("DeleteFromDB/{id}")]
         public async Task<ActionResult<GeneralResponse>> DeleteFromDB(long id)
         {
+            var employee = await _employeeRepository.GetById(id);
             var response = await _employeeRepository.DeleteFromDBAsync(id);
-            await _auditLogService.LogAsync("Delete", "Employee", id.ToString(), $"تم حذف موظف من قاعدة البيانات");
+            if (response.Success)
+            {
+                await _auditLogService.LogAsync("Delete", "Employee", id.ToString(), $"تم حذف الموظف من قاعدة البيانات {employee.Name} التخصص {employee.Specialization?.Name}");
+            }
             return Ok(response);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<GeneralResponse>> Delete(long id)
         {
+            var employee = await _employeeRepository.GetById(id);
             var response = await _employeeRepository.DeleteById(id);
-            await _auditLogService.LogAsync("Delete", "Employee", id.ToString(), $"تم حذف موظف");
+            if (response.Success)
+            {
+                await _auditLogService.LogAsync("Delete", "Employee", id.ToString(), $"تم حذف الموظف {employee.Name} التخصص {employee.Specialization?.Name}");
+            }
             return Ok(response);
         }
 
