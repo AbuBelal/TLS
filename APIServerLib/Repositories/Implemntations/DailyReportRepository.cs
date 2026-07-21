@@ -171,7 +171,8 @@ namespace APIServerLib.Repositories.Implemntations
                 .OrderBy(lv => lv.SortOrder)
                 .ToListAsync();
 
-            var levelNames = levels.Select(l => l.Name).ToList();
+            var levelNames = levels.SkipWhile(x=>x.Name.Contains("قبل")).Select(l => l.Name).ToList();
+            
             var levelMaleTotals = new Dictionary<string, int>();
             var levelFemaleTotals = new Dictionary<string, int>();
             foreach (var levelName in levelNames)
