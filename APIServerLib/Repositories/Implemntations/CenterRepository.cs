@@ -48,6 +48,7 @@ namespace APIServerLib.Repositories.Implemntations
             userCenter.EnName = dto.EnName;
             userCenter.SortOrder = dto.SortOrder;
             userCenter.BuildingCode = dto.BuildingCode;
+            userCenter.IsActive = dto.IsActive;
 
 
             _context.Centers.Update(userCenter);

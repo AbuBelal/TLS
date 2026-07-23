@@ -43,4 +43,5 @@ public class CenterUpsertDto
     public string? EnName { get; set; }
     public string? BuildingCode { get; set; }
     public int? SortOrder { get; set; } = 0;
+    public bool IsActive { get; set; } = true;
 }

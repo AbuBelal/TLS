@@ -202,7 +202,7 @@ public class AdminDashboardRepository : IAdminDashboardRepository
     public async Task<DetailedCentersReportDto> GetDetailedCentersReportAsync()
     {
         // جلب جميع المراكز
-        var centers = await _context.Centers
+        var centers = await _context.Centers.Where(c => c.IsActive)
             .AsNoTracking()
             .Include(x=>x.EmpCenters)
             .ThenInclude(ec => ec.Employee)

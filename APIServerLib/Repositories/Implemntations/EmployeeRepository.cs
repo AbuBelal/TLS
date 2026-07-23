@@ -199,6 +199,11 @@ namespace APIServerLib.Repositories.Implemntations
             //{
             //    query = query.Where(e => e.EmpCenters != null && e.EmpCenters.FirstOrDefault(x => x.IsActive).Center.Name == request.Center);
             //}
+            if(request.ActiveCenters)
+            {
+                query = query.Where(x => x.EmpCenters.Any(c =>c.IsActive && c.Center.IsActive) );
+            }
+
             if (!string.IsNullOrWhiteSpace(request.Center))
             {
                 switch (request.Center)
@@ -354,6 +359,11 @@ namespace APIServerLib.Repositories.Implemntations
 
             if (!string.IsNullOrWhiteSpace(request.Job))
                 query = query.Where(e => e.Job != null && e.Job.Name == request.Job);
+
+            if (request.ActiveCenters)
+            {
+                query = query.Where(x => x.EmpCenters.Any(c => c.IsActive && c.Center.IsActive));
+            }
 
             // فلتر المركز
             //if (!string.IsNullOrWhiteSpace(request.Center))

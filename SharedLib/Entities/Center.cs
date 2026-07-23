@@ -23,10 +23,11 @@ namespace SharedLib.Entities
         [Required]
         public string? DaysOfWeek { get; set; } = string.Empty;
         public string? Address { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
 
         //Navigation properties
-       
-        
+
+
         public ICollection<EmpCenter> EmpCenters { get; set; } = new List<EmpCenter>();
         //[NotMapped]
         //public Employee? Manager => EmpCenters.FirstOrDefault(e=>e.Employee.Job?.Name.Contains("مدير مركز")==true && e.IsActive)?.Employee;

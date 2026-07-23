@@ -16,6 +16,7 @@ public partial class Employees : ComponentBase
     private string selectedGender = string.Empty;
     private string selectedJob = string.Empty;
     private string selectedCenter = string.Empty;
+    private bool ActiveCenters = false;
 
     private List<string> genderOptions = [];
     private List<string> jobOptions = [];
@@ -53,7 +54,8 @@ public partial class Employees : ComponentBase
                 Center=selectedCenter,
                 Job = selectedJob,
                 PageNumber = currentPage,
-                PageSize = pageSize
+                PageSize = pageSize,
+                ActiveCenters = ActiveCenters
             };
 
             var response = await EmployeeApi.GetPaginated(request);
@@ -194,6 +196,7 @@ public partial class Employees : ComponentBase
         Center = selectedCenter,
         PageNumber = currentPage,
         PageSize = pageSize,
+        ActiveCenters=ActiveCenters
     };
     private async Task ExportFiltered()
     {

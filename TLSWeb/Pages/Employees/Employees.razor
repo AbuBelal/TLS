@@ -139,6 +139,13 @@
                             }
                         </select>
                     </div>
+
+                      <div class="col-md-2">
+                        <InputCheckbox @bind-Value="ActiveCenters" @bind-Value:after="OnFilterChangedAsync" />
+                        &ensp;
+                        <label class="form-label fw-semibold text-muted small">   المراكز الفعالة فقط  </label>
+                       </div>
+
                 </AuthorizeView>
 
                 <div class="col-md-2">

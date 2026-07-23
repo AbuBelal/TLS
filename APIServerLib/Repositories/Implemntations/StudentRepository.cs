@@ -233,6 +233,12 @@ namespace APIServerLib.Repositories.Implemntations
                 query = query.Where(s =>
                     s.Level != null && s.SectionNo == request.Section);
             }
+
+            if (request.ActiveCenters)
+            {
+                query = query.Where(x => x.StdCenters.Any(c => c.IsActive && c.Center.IsActive));
+            }
+
             // فلتر المركز
             if (!string.IsNullOrWhiteSpace(request.Center))
             {
@@ -310,6 +316,12 @@ namespace APIServerLib.Repositories.Implemntations
                      .FirstOrDefault(z => z.IsActive)!.CenterId)
                     .ThenBy(s => s.Level.SortOrder)
                 .Include(s => s.StdCenters).ThenInclude(sc => sc.Center).AsQueryable();
+
+            if (request.ActiveCenters)
+            {
+                query = query.Where(x => x.StdCenters.Any(c => c.IsActive && c.Center.IsActive));
+            }
+
             if (centerId == 0)
             {
                 switch (request.Center)

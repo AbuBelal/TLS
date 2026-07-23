@@ -13,7 +13,8 @@ namespace SharedLib.DTOs
         public string Center { get; set; } = string.Empty;
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
-        public DateOnly? FromDate { get; set; }  // ← جديد
+        public DateOnly? FromDate { get; set; } 
+        public bool ActiveCenters { get; set; } = false;   
     }
 
     public sealed class EmployeeListItemDto

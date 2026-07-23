@@ -28,4 +28,5 @@ public class StudentFilterRequest
     public string? Center { get; set; }
     /// <summary>فلتر تاريخ الإضافة — من هذا التاريخ فصاعلاً</summary>
     public DateOnly? FromDate { get; set; } 
+    public bool ActiveCenters { get; set; }=false;
 }

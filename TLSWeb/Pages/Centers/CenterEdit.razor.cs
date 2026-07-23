@@ -80,6 +80,7 @@ public partial class CenterEdit : ComponentBase
         Model.EnName    = c.EnName;
         Model.SortOrder    = c.SortOrder;
         Model.BuildingCode    = c.BuildingCode;
+        Model.IsActive = c.IsActive;
         Model.ManagerName = Managers.FirstOrDefault(m => m.EmpCenters.OrderByDescending(x=>x.FromDate).FirstOrDefault(ec => ec.CenterId == c.Id) != null)?.Name;
 
         // تحليل DaysOfWeek إلى Checkboxes
@@ -107,6 +108,7 @@ public partial class CenterEdit : ComponentBase
         c.EnName = Model.EnName;
         c.SortOrder = Model.SortOrder;
         c.BuildingCode = Model.BuildingCode;
+        c.IsActive = Model.IsActive;
         return c;
     }
 
