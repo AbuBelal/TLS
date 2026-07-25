@@ -1,0 +1,67 @@
+﻿@using SharedLib.Entities
+
+<div class="row g-3">
+    <div class="col-12 mb-2">
+        <h4 class="fw-bold text-dark">التحديات والمخاطر</h4>
+    </div>
+
+    <div class="col-12 border p-3 rounded-3 bg-light">
+        <h6 class="fw-bold text-primary mb-3">التحدي/الخطر #1</h6>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">التحدي/الخطر <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.RiskChallenge" class="form-control" placeholder="حدد التحدي أو الخطر" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">الأثر <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.RiskImpact" class="form-control" placeholder="ما هو الأثر المتوقع؟" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">الاحتمالية <span class="text-danger">*</span></label>
+                <InputSelect @bind-Value="Model.RiskProbability" class="form-select">
+                    <option value="">اختر...</option>
+                    <option value="1">منخفضة</option>
+                    <option value="2">متوسطة</option>
+                    <option value="3">عالية</option>
+                </InputSelect>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">مستوى الأولوية <span class="text-danger">*</span></label>
+                <InputSelect @bind-Value="Model.RiskPriority" class="form-select">
+                    <option value="">اختر...</option>
+                    <option value="1">منخفضة</option>
+                    <option value="2">متوسطة</option>
+                    <option value="3">عالية</option>
+                </InputSelect>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-bold">الإجراء المتخذ/المقترح <span class="text-danger">*</span></label>
+                <InputTextArea @bind-Value="Model.RiskAction" class="form-control" rows="2" placeholder="ما هو الإجراء المتخذ أو المقترح؟" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">المسؤول <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.RiskResponsible" class="form-control" placeholder="من المسؤول عن التنفيذ؟" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">الحالة <span class="text-danger">*</span></label>
+                <InputSelect @bind-Value="Model.RiskStatus" class="form-select">
+                    <option value="">اختر...</option>
+                    <option value="1">قيد المعالجة</option>
+                    <option value="2">مغلق</option>
+                    <option value="3">مُعلق</option>
+                </InputSelect>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public WReportDetail Model { get; set; } = default!;
+}

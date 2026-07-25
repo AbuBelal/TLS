@@ -23,6 +23,9 @@ namespace APIServerLib.ProgramSettings
             builder.Services.AddScoped<IInComeRepository, InComeRepository>();
             builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 
+            builder.Services.AddScoped<IWReportRepository, WReportRepository>();
+            builder.Services.AddScoped<IWReportDetailRepository, WReportDetailRepository>();
+
             builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             builder.Services.AddScoped<IBackupService, BackupService>();
 

@@ -227,5 +227,26 @@ namespace TLSClientSharedLib.Helpers
             public const string Download = Base + "/download/{id}";
             public const string Delete = Base + "/{id}";
         }
+
+        public static class WReport
+        {
+            private const string PriorUrl = "/api/WReports";
+
+            public const string GetAll = PriorUrl;
+            public const string GetById = PriorUrl + "/{id}";
+            public const string Insert = PriorUrl;
+            public const string Update = PriorUrl;
+            public const string DeleteById = PriorUrl + "/{id}";
+        }
+        public static class WReportDetails
+        {
+            private const string PriorUrl = "/api/WReportDetails";
+
+            public const string GetAll = PriorUrl;
+            public const string GetById = PriorUrl + "/{id}";
+            public const string Insert = PriorUrl;
+            public const string Update = PriorUrl;
+            public const string DeleteById = PriorUrl + "/{id}";
+        }
     }
 }

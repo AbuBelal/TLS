@@ -1,0 +1,48 @@
+﻿@using SharedLib.Entities
+
+<div class="row g-3">
+    <div class="col-12 mb-2">
+        <h4 class="fw-bold text-dark">📝 الاحتياجات المهنية للعاملين</h4>
+        <small class="text-muted">تحديد الاحتياجات المهنية والتدريبية</small>
+    </div>
+
+    <div class="col-12 border p-3 rounded-3 bg-light">
+        <h6 class="fw-bold text-primary mb-3">الاحتياج التدريبي #1</h6>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">الاحتياج التدريبي <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.TrainingNeed" class="form-control" placeholder="حدد الاحتياج التدريبي" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">نوع الدعم/التدريب <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.SupportType" class="form-control" placeholder="نوع الدعم المطلوب" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">الفئة المستهدفة <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.TargetGroup" class="form-control" placeholder="من هم المستهدفون؟" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">المسؤول <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.TrainingResponsible" class="form-control" placeholder="من المسؤول عن التنفيذ؟" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">موعد التنفيذ <span class="text-danger">*</span></label>
+                <InputDate @bind-Value="Model.TrainingDate" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">دليل الإنجاز <span class="text-danger">*</span></label>
+                <InputText @bind-Value="Model.AchievementEvidence" class="form-control" placeholder="ما هو دليل الإنجاز؟" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public WReportDetail Model { get; set; } = default!;
+}

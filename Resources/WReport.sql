@@ -1,0 +1,23 @@
+USE [NorthTLS]
+GO
+
+/****** Object:  Table [dbo].[WReports]    Script Date: 25/07/2026 12:38:40 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[WReports](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[WReportBegin] [date] NULL,
+	[WReportEnd] [date] NULL,
+	[WReportNo] [int] NULL,
+	[Comments] [nvarchar](150) NULL,
+ CONSTRAINT [PK_WReport] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+

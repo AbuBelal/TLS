@@ -24,6 +24,8 @@ namespace APIServerLib.Data
         public DbSet<DailyReport> DailyReports { get; set; }
         public DbSet<InCome> InComes { get; set; }
         public DbSet<BackupRecord> BackupRecords { get; set; }
+        public DbSet<WReport> WReports { get; set; }
+        public DbSet<WReportDetail> WReportDetails { get; set; }
 
 
 

@@ -1,0 +1,37 @@
+﻿@using SharedLib.Entities
+
+<div class="row g-3">
+    <div class="col-12 mb-2">
+        <h4 class="fw-bold text-dark">📝 الملخص التنفيذي</h4>
+        <small class="text-muted">ملخص تنفيذي مدعوم بالبيانات</small>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">📋 مستوى التنفيذ العام <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.OverallImplementation" class="form-control" rows="3" placeholder="صف مستوى التنفيذ العام للأنشطة خلال الأسبوع" />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">🏆 أبرز إنجاز تعليمي <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.EducationalAchievement" class="form-control" rows="3" placeholder="اذكر أبرز إنجاز تعليمي تحقق خلال الأسبوع" />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">🎯 أبرز إنجاز ترفيهي/نفسي اجتماعي <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.PsychosocialAchievement" class="form-control" rows="3" placeholder="اذكر أبرز إنجاز ترفيهي أو نفسي اجتماعي" />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">⚠️ أهم تحدٍ أو خطر <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.MainChallenge" class="form-control" rows="3" placeholder="اذكر أهم تحدٍ أو خطر واجهته خلال الأسبوع" />
+    </div>
+
+    <div class="col-md-6 offset-md-6">
+        <label class="form-label fw-bold">📌 أولوية الأسبوع القادم <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.NextWeekPriority" class="form-control" rows="3" placeholder="اذكر أولوية العمل للأسبوع القادم" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public WReportDetail Model { get; set; } = default!;
+}

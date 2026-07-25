@@ -1,0 +1,112 @@
+﻿@using SharedLib.Entities
+
+<div class="row g-3">
+    <div class="col-12 mb-2">
+        <h4 class="fw-bold text-dark">أداء العاملين</h4>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">الالتزام بالحضور والوقت والخطة <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.AttendanceCommitment" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">إدارة الصف بصورة إيجابية <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.ClassroomManagement" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">تنويع الاستراتيجيات والأنشطة التعليمية <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.TeachingStrategies" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">تنويع الاستراتيجيات والأنشطة الترفيهية <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.RecreationalStrategies" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">مراعاة الفروق الفردية <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.IndividualDifferences" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">دمج الطلبة من ذوي الإعاقة <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.DisabilityInclusion" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">التقويم وتقديم التغذية الراجعة <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.FeedbackQuality" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">التنسيق والعمل ضمن الفريق <span class="text-danger">*</span></label>
+        <InputSelect @bind-Value="Model.TeamworkCoordination" class="form-select">
+            <option value="">اختر...</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6 offset-md-6">
+        <label class="form-label fw-bold">📝 ملاحظات إضافية</label>
+        <InputTextArea @bind-Value="Model.StaffNotes" class="form-control" rows="3" placeholder="أضف أي ملاحظات إضافية حول أداء العاملين" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public WReportDetail Model { get; set; } = default!;
+}

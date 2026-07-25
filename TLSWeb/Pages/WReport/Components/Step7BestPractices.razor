@@ -1,0 +1,42 @@
+﻿@using SharedLib.Entities
+
+<div class="row g-3">
+    <div class="col-12 mb-2">
+        <h4 class="fw-bold text-dark">📝 الممارسات المتميزة</h4>
+        <small class="text-muted">توثيق الممارسات المتميزة والدروس المستفادة</small>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">🏅 الممارسة/النشاط المتميز واسم المساحة <span class="text-danger">*</span></label>
+        <InputText @bind-Value="Model.BestPracticeName" class="form-control" placeholder="اذكر الممارسة المتميزة واسم المساحة" />
+        <small class="text-muted">مثال: نشاط الرسم والتلوين - مساحة غرب خان يونس</small>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">📝 وصف الممارسة/النشاط <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.PracticeDescription" class="form-control" rows="3" placeholder="صف الممارسة أو النشاط بالتفصيل (ماذا تم؟ كيف تم؟ من شارك؟)" />
+        <small class="text-muted">اذكر تفاصيل النشاط، عدد المشاركين، الأدوات المستخدمة</small>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">🔧 كيفية التنفيذ وعوامل النجاح <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.SuccessImplementation" class="form-control" rows="3" placeholder="صف كيفية التنفيذ وعوامل النجاح التي ساعدت في تحقيق الأهداف" />
+        <small class="text-muted">اذكر الخطوات التي تم اتباعها، التحديات التي تم تجاوزها</small>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-bold">📊 الأثر المدعوم بشواهد أو بيانات <span class="text-danger">*</span></label>
+        <InputTextArea @bind-Value="Model.ImpactEvidenceData" class="form-control" rows="3" placeholder="اذكر الأثر مع دليل أو شاهد (مشاركة الطلبة، تحسن المهارات...)" />
+        <small class="text-muted">قدم دليلاً ملموساً على الأثر: شهادات، ملاحظات، إحصائيات</small>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label fw-bold">💡 الدروس المستفادة</label>
+        <InputTextArea @bind-Value="Model.LessonsLearned" class="form-control" rows="3" placeholder="اذكر الدروس المستفادة من هذه الممارسة" />
+        <small class="text-muted">ما الذي تعلمته من هذه التجربة؟ ما الذي يمكن تحسينه؟</small>
+    </div>
+</div>
+
+@code {
+    [Parameter] public WReportDetail Model { get; set; } = default!;
+}
