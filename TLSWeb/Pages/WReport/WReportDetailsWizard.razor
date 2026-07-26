@@ -1,11 +1,11 @@
 ﻿
 
-@attribute [Route(PagesUris.WReportsPages.Add)]
+@attribute [Route(PagesUris.WReportsDetailsPages.Add)]
+@attribute [Route(PagesUris.WReportsDetailsPages.Edit + "/{Id:long}/{wr:long}")]
 
 @using SharedLib.Entities
 @using TLSWeb.Pages.WReport.Components
-@inject HttpClient Http
-@inject NavigationManager Navigation
+
 
 <div class="container my-4" dir="rtl">
     <!-- Header Card -->
@@ -85,8 +85,37 @@
 </div>
 
 @code {
+    [Parameter] public long Id { get; set; }
+    [Parameter] public long wr { get; set; }
+
     private int _currentStep = 1;
     public WReportDetail Model { get; set; } = new WReportDetail();
+    private bool EditMode => Id > 0;
+
+    override protected async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            var response = await WReportDetailsApi.GetById(Id);
+            if (response is not null)
+            {
+                Model = response;
+                //EditMode = true;
+            }
+        }
+        else
+        {
+            Model.WReportId = wr;
+            // var response = await WReportDetailsApi.Insert(Model);
+            // if (response is not null)
+            // {
+            //     Id = Model.Id;
+
+            // }
+            // EditMode = false;
+        }
+
+    }
 
     private void NextStep()
     {
@@ -100,15 +129,26 @@
 
     private async Task HandleValidSubmit()
     {
-        var response = await Http.PostAsJsonAsync("api/WReportDetails", Model);
-        if (response.IsSuccessStatusCode)
+        if (Id > 0)
         {
-            Navigation.NavigateTo("/wreport-details");
+            var response = await WReportDetailsApi.Update(Model);
+            if (response.Success)
+            {
+                NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
+            }
+        }
+        else
+        {
+            var response = await WReportDetailsApi.Insert(Model);
+            if (response.Success)
+            {
+                NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
+            }
         }
     }
 
     private void Cancel()
     {
-        Navigation.NavigateTo("/wreport-details");
+        NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
     }
 }

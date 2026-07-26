@@ -24,6 +24,13 @@ namespace APIServerLib.Repositories.Implemntations
                 .AsNoTracking()
                 .ToListAsync();
         }
+        public async Task<IEnumerable<WReport>> GetReportsByCenterIdAsync(long CurCenterId)
+        {
+
+            return await _context.WReports.Include(r => r.WReportDetails.Where(c=>c.CenterId==CurCenterId)) // جلب تفاصيل التقرير
+                .AsNoTracking()
+                .ToListAsync();
+        }
 
         public async Task<WReport?> GetByIdAsync(long id)
         {
@@ -34,6 +41,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<WReport> AddAsync(WReport report)
         {
+            
             await _context.WReports.AddAsync(report);
             await _context.SaveChangesAsync();
             return report;

@@ -78,6 +78,13 @@
             public const string AllCentersAttendantChart = PriorUrl + "/all-centers-attendant-chart";
         }
 
+        public static class WReportsDetailsPages
+        {
+            public const string PriorUrl = "wreportdetails";
+            public const string Manage = PriorUrl + "/Manage";
+            public const string Add = PriorUrl + "/Add";
+            public const string Edit = PriorUrl + "/Edit";
+        }
         public static class WReportsPages
         {
             public const string PriorUrl = "wreport";

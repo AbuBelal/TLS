@@ -84,6 +84,17 @@ namespace APIServerLib.Data
                 .WithMany(s => s.StdCenters)
                 .HasForeignKey(sc => sc.StudentId);
 
+            modelBuilder.Entity<WReportDetail>(entity =>
+            {
+                // تحديد المفتاح الرئيسي للجدول
+                entity.HasKey(d => d.Id);
+
+                // إعداد العلاقة (One-to-Many)
+                entity.HasOne(d => d.WReport)                    // كل تفصيل يتبع تقريراً واحداً
+                      .WithMany(r => r.WReportDetails)           // كل تقرير لديه عدة تفاصيل
+                      .HasForeignKey(d => d.WReportId)           // تحديد المفتاح الأجنبي
+                      .OnDelete(DeleteBehavior.Cascade);         // عند حذف التقرير الأب، يتم حذف تفاصيله تلقائياً
+            });
 
             // بيانات ابتدائية للموظفين
             modelBuilder.Entity<Employee>().HasData(

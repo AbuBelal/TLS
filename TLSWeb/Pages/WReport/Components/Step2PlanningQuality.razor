@@ -9,11 +9,11 @@
         <label class="form-label fw-bold">تنفيذ الخطة الأسبوعية ضمن الجدول المعتمد <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.PlanImplementation" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">ضعيف جداً (1)</option>
-            <option value="2">ضعيف (2)</option>
-            <option value="3">جيد (3)</option>
-            <option value="4">جيد جداً (4)</option>
-            <option value="5">ممتاز (5)</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -21,11 +21,11 @@
         <label class="form-label fw-bold">التوازن بين الأنشطة التعليمية والترفيهية <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.BalanceActivities" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+            @foreach (var item in Mesure.OrderBy(x=>x.SortOrder))
+            {
+             <option value="@item.Id">@item.Name</option>
+            }
         </InputSelect>
     </div>
 
@@ -33,11 +33,11 @@
         <label class="form-label fw-bold">توافر المواد قبل بدء النشاط <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.MaterialsAvailability" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -45,11 +45,11 @@
         <label class="form-label fw-bold">ملاءمة زمن النشاط للفئة العمرية والظروف <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.TimeSuitability" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+            @foreach (var item in Mesure)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
         </InputSelect>
     </div>
 
@@ -57,11 +57,11 @@
         <label class="form-label fw-bold">توزيع الأدوار بوضوح بين الفريق <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.RoleDistribution" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -69,11 +69,11 @@
         <label class="form-label fw-bold">الالتزام بتنفيذ المواد التعليمية المعتمدة <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.CurriculumCompliance" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -81,11 +81,11 @@
         <label class="form-label fw-bold">الأنشطة لا تتعارض مع مبادئ الأونروا <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.UNRWAPrinciplesCompliance" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -93,11 +93,11 @@
         <label class="form-label fw-bold">توثيق التنفيذ والحضور والنتائج <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.DocumentationQuality" class="form-select">
             <option value="">اختر التقييم...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -109,4 +109,10 @@
 
 @code {
     [Parameter] public WReportDetail Model { get; set; } = default!;
+    List<LookupValue> Mesure;
+    protected override async Task OnParametersSetAsync()
+    {
+        Mesure = await LookupValueApi.GetByValueType(LookupTypes.Mesure);
+        Mesure = Mesure.OrderBy(x => x.SortOrder).ToList();
+    }
 }
