@@ -10,7 +10,7 @@
         <InputSelect @bind-Value="Model.PlanImplementation" class="form-select">
             <option value="">اختر التقييم...</option>
             @if (Mesure != null)
-                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                @foreach (var item in Mesure)
                 {
                     <option value="@item.Id">@item.Name</option>
                 }
@@ -34,7 +34,7 @@
         <InputSelect @bind-Value="Model.MaterialsAvailability" class="form-select">
             <option value="">اختر التقييم...</option>
             @if (Mesure != null)
-                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                @foreach (var item in Mesure)
                 {
                     <option value="@item.Id">@item.Name</option>
                 }
@@ -58,7 +58,7 @@
         <InputSelect @bind-Value="Model.RoleDistribution" class="form-select">
             <option value="">اختر التقييم...</option>
             @if (Mesure != null)
-                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                @foreach (var item in Mesure)
                 {
                     <option value="@item.Id">@item.Name</option>
                 }
@@ -70,7 +70,7 @@
         <InputSelect @bind-Value="Model.CurriculumCompliance" class="form-select">
             <option value="">اختر التقييم...</option>
             @if (Mesure != null)
-                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                @foreach (var item in Mesure)
                 {
                     <option value="@item.Id">@item.Name</option>
                 }
@@ -82,7 +82,7 @@
         <InputSelect @bind-Value="Model.UNRWAPrinciplesCompliance" class="form-select">
             <option value="">اختر التقييم...</option>
             @if (Mesure != null)
-                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                @foreach (var item in Mesure)
                 {
                     <option value="@item.Id">@item.Name</option>
                 }
@@ -94,7 +94,7 @@
         <InputSelect @bind-Value="Model.DocumentationQuality" class="form-select">
             <option value="">اختر التقييم...</option>
             @if (Mesure != null)
-                @foreach (var item in Mesure.OrderBy(x => x.SortOrder))
+                @foreach (var item in Mesure)
                 {
                     <option value="@item.Id">@item.Name</option>
                 }

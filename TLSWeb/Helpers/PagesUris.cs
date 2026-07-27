@@ -89,6 +89,7 @@
         {
             public const string PriorUrl = "wreport";
             public const string Manage = PriorUrl + "/Manage";
+            public const string CentersManage = PriorUrl + "/CentersManage";
             public const string Add = PriorUrl + "/Add";
             public const string Edit = PriorUrl + "/Edit";
         }

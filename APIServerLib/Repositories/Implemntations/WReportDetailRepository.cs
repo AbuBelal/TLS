@@ -2,6 +2,7 @@
 using APIServerLib.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.Entities;
+using SharedLib.Responses;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -52,94 +53,52 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task UpdateAsync(WReportDetail reportDetail)
         {
-            var existingDetail1 = await _context.WReportDetails.FindAsync(reportDetail.Id);
-            //if(existingDetail != null)
-            //{
-            //    reportDetail.Id = 0;
-            //    _context.WReportDetails.Remove(existingDetail);
-            //    _context.WReportDetails.Add(reportDetail);
-            //    await _context.SaveChangesAsync();
-            //}
+            // 1. تفريغ العلاقات لعدم قفل الشجرة المترابطة
+            //reportDetail.WReport = null;
+            // 1. البحث عن العنصر الموجود فعلياً في قاعدة البيانات (Tracked Entity)
+            var existingDetail = await _context.WReportDetails.FindAsync(reportDetail.Id);
 
-            if (existingDetail1 != null)
+            if (existingDetail != null)
             {
-                var existingDetail = new WReportDetail();
-                // 2. نسخ كل قيمة يدوياً من الكائن الجديد إلى الكائن الموجود
-                existingDetail.SubmissionDate = reportDetail.SubmissionDate;
-                existingDetail.OverallImplementation = reportDetail.OverallImplementation;
-                existingDetail.EducationalAchievement = reportDetail.EducationalAchievement;
-                existingDetail.PsychosocialAchievement = reportDetail.PsychosocialAchievement;
-                existingDetail.MainChallenge = reportDetail.MainChallenge;
-                existingDetail.NextWeekPriority = reportDetail.NextWeekPriority;
+                // 2. نسخ جميع القيم الجديدة إلى الكائن الحالي المتتبع تلقائياً
+                _context.Entry(existingDetail).CurrentValues.SetValues(reportDetail);
 
-                // التخطيط وجودة التنفيذ
-                existingDetail.PlanImplementation = reportDetail.PlanImplementation;
-                existingDetail.BalanceActivities = reportDetail.BalanceActivities;
-                existingDetail.MaterialsAvailability = reportDetail.MaterialsAvailability;
-                existingDetail.TimeSuitability = reportDetail.TimeSuitability;
-                existingDetail.RoleDistribution = reportDetail.RoleDistribution;
-                existingDetail.CurriculumCompliance = reportDetail.CurriculumCompliance;
-                existingDetail.UNRWAPrinciplesCompliance = reportDetail.UNRWAPrinciplesCompliance;
-                existingDetail.DocumentationQuality = reportDetail.DocumentationQuality;
-                existingDetail.PlanningNotes = reportDetail.PlanningNotes;
+                // 3. ضمان عدم ضياع المفتاح الأجنبي WReportId إذا جاء فارغاً من الواجهة
+                if (reportDetail.WReportId == null)
+                {
+                    _context.Entry(existingDetail).Property(x => x.WReportId).IsModified = false;
+                }
 
-                // أداء العاملين
-                existingDetail.AttendanceCommitment = reportDetail.AttendanceCommitment;
-                existingDetail.ClassroomManagement = reportDetail.ClassroomManagement;
-                existingDetail.TeachingStrategies = reportDetail.TeachingStrategies;
-                existingDetail.RecreationalStrategies = reportDetail.RecreationalStrategies;
-                existingDetail.IndividualDifferences = reportDetail.IndividualDifferences;
-                existingDetail.DisabilityInclusion = reportDetail.DisabilityInclusion;
-                existingDetail.FeedbackQuality = reportDetail.FeedbackQuality;
-                existingDetail.TeamworkCoordination = reportDetail.TeamworkCoordination;
-                existingDetail.StaffNotes = reportDetail.StaffNotes;
-
-                // الاحتياجات التدريبية
-                existingDetail.TrainingNeed = reportDetail.TrainingNeed;
-                existingDetail.SupportType = reportDetail.SupportType;
-                existingDetail.TargetGroup = reportDetail.TargetGroup;
-                existingDetail.TrainingResponsible = reportDetail.TrainingResponsible;
-                existingDetail.TrainingDate = reportDetail.TrainingDate;
-                existingDetail.AchievementEvidence = reportDetail.AchievementEvidence;
-
-                // البيئة المدرسية
-                existingDetail.WaterSanitationCleanliness = reportDetail.WaterSanitationCleanliness;
-                existingDetail.VentilationShadeSeating = reportDetail.VentilationShadeSeating;
-                existingDetail.FirstAidEmergencyProcedures = reportDetail.FirstAidEmergencyProcedures;
-                existingDetail.ChildProtectionProfessionalConduct = reportDetail.ChildProtectionProfessionalConduct;
-                existingDetail.ComplaintReferralMechanism = reportDetail.ComplaintReferralMechanism;
-                existingDetail.DisabilityAccessActivities = reportDetail.DisabilityAccessActivities;
-                existingDetail.DignityNonDiscrimination = reportDetail.DignityNonDiscrimination;
-                existingDetail.EnvironmentNotes = reportDetail.EnvironmentNotes;
-
-                // التحديات والمخاطر
-                existingDetail.RiskChallenge = reportDetail.RiskChallenge;
-                existingDetail.RiskImpact = reportDetail.RiskImpact;
-                existingDetail.RiskProbability = reportDetail.RiskProbability;
-                existingDetail.RiskPriority = reportDetail.RiskPriority;
-                existingDetail.RiskAction = reportDetail.RiskAction;
-                existingDetail.RiskResponsible = reportDetail.RiskResponsible;
-                existingDetail.RiskStatus = reportDetail.RiskStatus;
-
-                // الممارسات المتميزة
-                existingDetail.BestPracticeName = reportDetail.BestPracticeName;
-                existingDetail.PracticeDescription = reportDetail.PracticeDescription;
-                existingDetail.SuccessImplementation = reportDetail.SuccessImplementation;
-                existingDetail.ImpactEvidenceData = reportDetail.ImpactEvidenceData;
-                existingDetail.LessonsLearned = reportDetail.LessonsLearned;
-
-                // المعرفات الإضافية
-                existingDetail.CenterId = reportDetail.CenterId;
-
-                // تحديث المفتاح الأجنبي WReportId فقط إذا جاء بقيمة صالحة
-                //if (reportDetail.WReportId.HasValue && reportDetail.WReportId.Value > 0)
-
-                existingDetail.WReportId = reportDetail.WReportId;
-
-                _context.WReportDetails.Add(existingDetail);
-                // 3. حفظ التعديلات في قاعدة البيانات
+                // 4. إرسال أمر UPDATE إلى قاعدة البيانات
                 await _context.SaveChangesAsync();
             }
+
+            //// 2. فحص وإلغاء أي تتبع قديم لنفس الكائن في الـ Change Tracker
+            //var local = _context.WReportDetails
+            //    .Local
+            //    .FirstOrDefault(entry => entry.Id == reportDetail.Id);
+
+            //if (local != null)
+            //{
+            //    _context.Entry(local).State = EntityState.Detached;
+            //}
+
+            //// 3. تعيين حالة الكائن إلى Modified
+            //_context.Entry(reportDetail).State = EntityState.Modified;
+
+            //// 4. الحفظ مع تعيين مهلة واستخدام ConfigureAwait لتجنب الـ Deadlock
+            //_context.Database.SetCommandTimeout(15); // تحديد مهلة 15 ثانية للشفافية
+
+            //try
+            //{
+            //    await _context.SaveChangesAsync().ConfigureAwait(false);
+            //}
+            //catch (Exception ex)
+            //{
+            //    // إذا حدث خطأ أو مهلة، ستكتشفه هنا بدلاً من التجمّد
+            //    throw new Exception($"خطأ أثناء الحفظ: {ex.Message}", ex);
+            //}
+
         }
         
 

@@ -9,11 +9,11 @@
         <label class="form-label fw-bold">الالتزام بالحضور والوقت والخطة <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.AttendanceCommitment" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -21,11 +21,11 @@
         <label class="form-label fw-bold">إدارة الصف بصورة إيجابية <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.ClassroomManagement" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -33,11 +33,11 @@
         <label class="form-label fw-bold">تنويع الاستراتيجيات والأنشطة التعليمية <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.TeachingStrategies" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -45,11 +45,11 @@
         <label class="form-label fw-bold">تنويع الاستراتيجيات والأنشطة الترفيهية <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.RecreationalStrategies" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -57,11 +57,11 @@
         <label class="form-label fw-bold">مراعاة الفروق الفردية <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.IndividualDifferences" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -69,11 +69,11 @@
         <label class="form-label fw-bold">دمج الطلبة من ذوي الإعاقة <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.DisabilityInclusion" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -81,11 +81,11 @@
         <label class="form-label fw-bold">التقويم وتقديم التغذية الراجعة <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.FeedbackQuality" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -93,11 +93,11 @@
         <label class="form-label fw-bold">التنسيق والعمل ضمن الفريق <span class="text-danger">*</span></label>
         <InputSelect @bind-Value="Model.TeamworkCoordination" class="form-select">
             <option value="">اختر...</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            @if (Mesure != null)
+                @foreach (var item in Mesure)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
         </InputSelect>
     </div>
 
@@ -109,4 +109,10 @@
 
 @code {
     [Parameter] public WReportDetail Model { get; set; } = default!;
+    List<LookupValue> Mesure;
+    protected override async Task OnParametersSetAsync()
+    {
+        Mesure = await LookupValueApi.GetByValueType(LookupTypes.Mesure1);
+        Mesure = Mesure.OrderBy(x=>x.SortOrder).ToList();
+    }
 }

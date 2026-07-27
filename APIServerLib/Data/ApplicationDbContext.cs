@@ -93,7 +93,7 @@ namespace APIServerLib.Data
                 entity.HasOne(d => d.WReport)                    // كل تفصيل يتبع تقريراً واحداً
                       .WithMany(r => r.WReportDetails)           // كل تقرير لديه عدة تفاصيل
                       .HasForeignKey(d => d.WReportId)           // تحديد المفتاح الأجنبي
-                      .OnDelete(DeleteBehavior.Cascade);         // عند حذف التقرير الأب، يتم حذف تفاصيله تلقائياً
+                      .OnDelete(DeleteBehavior.NoAction);         // عند حذف التقرير الأب، يتم حذف تفاصيله تلقائياً
             });
 
             // بيانات ابتدائية للموظفين

@@ -99,7 +99,7 @@ namespace APIServer.Controllers
 
             // يمكنك إما تحديث الحقول يدوياً أو استخدام Update للملف بالكامل
             // لأن الكلاس يحتوي على حقول كثيرة جداً، الطريقة الأفضل في هذه المرحلة بدون DTO:
-            _repository.UpdateAsync(reportDetail); // يفترض أن الكائن القادم يحتوي على كل البيانات المطلوبة
+           await _repository.UpdateAsync(reportDetail); // يفترض أن الكائن القادم يحتوي على كل البيانات المطلوبة
 
             return new GeneralResponse(true, "تم تحديث تفاصيل التقرير بنجاح", reportDetail.Id);
         }
