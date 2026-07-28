@@ -69,11 +69,7 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <!-- View -->
-                                            @* <button class="btn btn-sm btn-outline-info" title="عرض" @onclick="() => OpenViewModal(item)">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            &nbsp;&nbsp; *@
+                                          
                                             
                                             <AuthorizeView Roles="@AppRoles.User">
                                             <!-- Manage Details Component -->
@@ -84,6 +80,12 @@
                                             </AuthorizeView>
 
                                             <AuthorizeView Roles="@AppRoles.Admin">
+                                                  <!-- View -->
+                                             <button class="btn btn-sm btn-outline-info" title="عرض" @onclick="() =>NavigateToSummery(item.Id)">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            &nbsp;&nbsp; 
+
                                                 <!-- Edit -->
                                                 <button class="btn btn-sm btn-outline-warning" title="تعديل" @onclick="() => OpenEditModal(item)">
                                                     <i class="bi bi-pencil"></i>
@@ -297,6 +299,10 @@ Icon="bi-exclamation-triangle" />
     private void NavigateToEdit(long wrd ,long wr)
     {
         NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{wrd}/{wr}");
+    }
+    private void NavigateToSummery(long wr)
+    {
+        NavManager.NavigateTo($"{PagesUris.WReportsPages.FullSummery}/{wr}");
     }
 
 }

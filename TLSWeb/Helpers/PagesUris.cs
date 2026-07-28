@@ -92,6 +92,7 @@
             public const string CentersManage = PriorUrl + "/CentersManage";
             public const string Add = PriorUrl + "/Add";
             public const string Edit = PriorUrl + "/Edit";
+            public const string FullSummery = PriorUrl + "/FullSummery";
         }
     }
 }

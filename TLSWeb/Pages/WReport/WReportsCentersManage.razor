@@ -51,7 +51,7 @@
                                 <tr>
                                     <td class="fw-bold">@item.Id</td>
                                     <td>
-                                        <span class="badge bg-info text-dark">@item.Name </span>
+                                        @item.Name 
                                     </td>
                                     <td>
                                         @((MarkupString)((reports.Where(r => r.CenterId == item.Id && r.WReportId == WRId).FirstOrDefault()?.Id ?? 0) == 0 ?
