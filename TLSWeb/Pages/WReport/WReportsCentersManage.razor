@@ -49,16 +49,61 @@
                             @foreach (var item in centers)
                             {
                                 <tr>
-                                    <td class="fw-bold">@item.Id</td>
+                                    <td class="fw-bold">@item.SortOrder</td>
                                     <td>
                                         @item.Name 
                                     </td>
                                     <td>
-                                        @((MarkupString)((reports.Where(r => r.CenterId == item.Id && r.WReportId == WRId).FirstOrDefault()?.Id ?? 0) == 0 ?
-                                        "<Span> <i class= \"bi bi-x-circle-fill text-danger\" > </i> </span>"
-                                        :"<span> <i class= \"bi bi-check-circle-fill text-success\" ></i>  </span>"))
-                                        
+                                        @{
+                                            // حساب النسبة مرة واحدة
+                                            var progress = CalcReportProgress(WRId, item.Id);
+
+                                            // التحقق من وجود التقرير
+                                            var isSubmitted = reports.Any(r => r.CenterId == item.Id && r.WReportId == WRId);
+
+                                            // تحديد لون شريط التقدم بناءً على النسبة
+                                            string barColor = progress switch
+                                            {
+                                                100 => "bg-success", // أخضر للاكتمل
+                                                >= 50 => "bg-info",  // أزرق فوق النصف
+                                                > 0 => "bg-warning", // أصفر للبدايات
+                                                _ => "bg-danger"     // أحمر للصفر
+                                            };
+                                        }
+
+                                        <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
+                                            <!-- أيقونة الحالة -->
+                                            @if (isSubmitted)
+                                            {
+                                                <i class="bi bi-check-circle-fill text-success fs-5" title="تم إدخال التقرير"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-x-circle-fill text-danger fs-5" title="لم يتم الإدخال بعد"></i>
+                                            }
+
+                                            <!-- شريط التقدم -->
+                                            <div class="progress flex-grow-1" style="height: 18px; background-color: #e9ecef; border-radius: 6px;">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated @barColor"
+                                                     role="progressbar"
+                                                     style="width: @(progress)%; font-size: 11px; font-weight: bold; line-height: 18px;"
+                                                     aria-valuenow="@progress"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    @progress%
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
+                                  @*   <td>
+                                        @((MarkupString)((reports.Where(r => r.CenterId == item.Id && r.WReportId == WRId).FirstOrDefault()?.Id ?? 0) == 0 ?
+                                         "<Span> <i class= \"bi bi-x-circle-fill text-danger\" > </i> </span>"
+                                        :"<span> <i class= \"bi bi-check-circle-fill text-success\" ></i>  </span>"))
+                                    
+                                        <span class="ms-2">
+                                            @CalcReportProgress(WRId,item.Id) %
+                                        </span>
+                                    </td> *@
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
                                             <!-- View -->
@@ -98,6 +143,7 @@
     protected override async Task OnInitializedAsync()
     {
         centers = await CenterApi.GetAll();
+        centers = centers.Where(x=>x.IsActive).OrderBy(c => c.SortOrder).ToList();
         await LoadReports();
     }
 
@@ -112,6 +158,73 @@
             Console.WriteLine($"Error loading reports: {ex.Message}");
             reports = new List<WReportDetail>();
         }
+    }
+
+    private int CalcReportProgress(long reportId, long centerId)
+    {
+        float ProgressPercentage = 0f;
+        float allFieldsCount = 50;
+
+        var existingDetail = reports?.FirstOrDefault(r => r.WReportId == reportId && r.CenterId == centerId);
+
+        if (existingDetail != null)
+        {
+
+            ProgressPercentage += existingDetail.SubmissionDate is null ?0:1;
+            ProgressPercentage += existingDetail.OverallImplementation is null ?0:1;
+            ProgressPercentage += existingDetail.EducationalAchievement is null ?0:1;
+            ProgressPercentage += existingDetail.PsychosocialAchievement is null ?0:1;
+            ProgressPercentage += existingDetail.MainChallenge is null ?0:1;
+            ProgressPercentage += existingDetail.NextWeekPriority is null ?0:1;
+            ProgressPercentage += existingDetail.PlanImplementation is null ?0:1;
+            ProgressPercentage += existingDetail.BalanceActivities is null ?0:1;
+            ProgressPercentage += existingDetail.MaterialsAvailability is null ?0:1;
+            ProgressPercentage += existingDetail.TimeSuitability is null ?0:1;
+            ProgressPercentage += existingDetail.RoleDistribution is null ?0:1;
+            ProgressPercentage += existingDetail.CurriculumCompliance is null ?0:1;
+            ProgressPercentage += existingDetail.UNRWAPrinciplesCompliance is null ?0:1;
+            ProgressPercentage += existingDetail.DocumentationQuality is null ?0:1;
+            ProgressPercentage += existingDetail.PlanningNotes is null ?0:1;
+            ProgressPercentage += existingDetail.AttendanceCommitment is null ?0:1;
+            ProgressPercentage += existingDetail.ClassroomManagement is null ?0:1;
+            ProgressPercentage += existingDetail.TeachingStrategies is null ?0:1;
+            ProgressPercentage += existingDetail.RecreationalStrategies is null ?0:1;
+            ProgressPercentage += existingDetail.IndividualDifferences is null ?0:1;
+            ProgressPercentage += existingDetail.DisabilityInclusion is null ?0:1;
+            ProgressPercentage += existingDetail.FeedbackQuality is null ?0:1;
+            ProgressPercentage += existingDetail.TeamworkCoordination is null ?0:1;
+            ProgressPercentage += existingDetail.StaffNotes is null ?0:1;
+            ProgressPercentage += existingDetail.TrainingNeed is null ?0:1;
+            ProgressPercentage += existingDetail.SupportType is null ?0:1; 
+            ProgressPercentage += existingDetail.TargetGroup is null ?0:1;
+            ProgressPercentage += existingDetail.TrainingResponsible is null ?0:1;
+            ProgressPercentage += existingDetail.TrainingDate is null ?0:1;
+            ProgressPercentage += existingDetail.AchievementEvidence is null ?0:1;
+            ProgressPercentage += existingDetail.WaterSanitationCleanliness is null ?0:1;
+            ProgressPercentage += existingDetail.VentilationShadeSeating is null ?0:1;
+            ProgressPercentage += existingDetail.FirstAidEmergencyProcedures is null ?0:1;
+            ProgressPercentage += existingDetail.ChildProtectionProfessionalConduct is null ?0:1;
+            ProgressPercentage += existingDetail.ComplaintReferralMechanism is null ?0:1;
+            ProgressPercentage += existingDetail.DisabilityAccessActivities is null ?0:1;
+            ProgressPercentage += existingDetail.DignityNonDiscrimination is null ?0:1;
+            ProgressPercentage += existingDetail.EnvironmentNotes is null ?0:1;
+            ProgressPercentage += existingDetail.RiskChallenge is null ?0:1;
+            ProgressPercentage += existingDetail.RiskImpact is null ?0:1;
+            ProgressPercentage += existingDetail.RiskProbability is null ?0:1;
+            ProgressPercentage += existingDetail.RiskPriority is null ?0:1;
+            ProgressPercentage += existingDetail.RiskAction is null ?0:1;
+            ProgressPercentage += existingDetail.RiskResponsible is null ?0:1;
+            ProgressPercentage += existingDetail.RiskStatus is null ?0:1;
+            ProgressPercentage += existingDetail.BestPracticeName is null ?0:1;
+            ProgressPercentage += existingDetail.PracticeDescription is null ?0:1;
+            ProgressPercentage += existingDetail.SuccessImplementation is null ?0:1;
+            ProgressPercentage += existingDetail.ImpactEvidenceData is null ?0:1;
+            ProgressPercentage += existingDetail.LessonsLearned is null ?0:1;
+
+        }
+
+        float P = ( (ProgressPercentage / allFieldsCount) * 100);
+        return (int) P;
     }
 
     private void NavigateToDetails(long reportId)

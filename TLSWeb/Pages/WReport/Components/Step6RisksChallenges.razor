@@ -58,7 +58,7 @@
                 <InputSelect @bind-Value="Model.RiskStatus" class="form-select">
                     <option value="">اختر...</option>
                     @if (Mesure4 != null)
-                        @foreach (var item in Mesure)
+                        @foreach (var item in Mesure4)
                         {
                             <option value="@item.Id">@item.Name</option>
                         }
@@ -78,6 +78,6 @@
         Mesure = Mesure.ToList();
 
         Mesure4 = await LookupValueApi.GetByValueType(LookupTypes.Mesure4);
-        Mesure4 = Mesure.ToList();
+        Mesure4 = Mesure4.ToList();
     }
 }
