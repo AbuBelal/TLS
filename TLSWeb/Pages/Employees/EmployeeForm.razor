@@ -16,6 +16,51 @@
                 <DataAnnotationsValidator />
                 <div class="row g-3">
 
+                    @* الرقم الوظيفي *@
+                    <div class="col-md-6">
+                        <label class="form-label">الرقم الوظيفي</label>
+
+                       <div class="input-group">
+                        <InputText @bind-Value="employee.EmpId"
+                                   class="form-control" />
+
+                        <ValidationMessage For="@(() => employee.EmpId)" class="text-danger" />
+
+                        <button type="button" class="btn btn-warning ml-2 mr-2" @onclick="CheckEmpId">
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+                            <span>فحص</span>
+                         </button>
+
+                      </div>
+                    </div>
+
+                    @* رقم الهوية *@
+                    <div class="col-md-6">
+                        <label class="form-label">رقم الهوية</label>
+
+                        <!-- قمنا بإنشاء مجموعة إدخال لدمج الحقل مع الأيقونة -->
+                        <div class="input-group">
+                            <InputText @bind-Value="employee.CivilId" class="form-control" @onblur="CheckCivilId" />
+
+                            <!-- الأيقونة داخل كلاس input-group-text لتظهر ملتصقة بالحقل -->
+                            @if (IsCivilIdGood)
+                            {
+                                <span class="bg-white">
+                                    <i class="bi bi-check2-all" style="color: #198754; font-size: 1.25rem;"></i>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="bg-white">
+                                    <i class="bi bi-exclamation-triangle-fill" style="color: red; font-size: 1.25rem;"></i>
+                                </span>
+                            }
+                        </div>
+
+                        <ValidationMessage For="@(() => employee.CivilId)" class="text-danger" />
+                    </div>
+
+
                     @* الاسم بالعربي والإنجليزي *@
                     <div class="col-md-6">
                         <label class="form-label">الاسم الكامل (بالعربي)</label>
@@ -29,42 +74,6 @@
                     <div class="col-md-6">
                         <label class="form-label">الاسم بالإنجليزية</label>
                         <InputText @bind-Value="employee.EnName" class="form-control" />
-                    </div>
-
-                    @* رقم الهوية *@
-                    <div class="col-md-6">
-                        <label class="form-label">رقم الهوية</label>
-
-                        <!-- قمنا بإنشاء مجموعة إدخال لدمج الحقل مع الأيقونة -->
-                        <div class="input-group">
-                            <InputText @bind-Value="employee.CivilId" class="form-control" @onblur="CheckCivilId"/>
-
-                            <!-- الأيقونة داخل كلاس input-group-text لتظهر ملتصقة بالحقل -->
-                            @if (IsCivilIdGood)
-                            {
-                                <span class="bg-white">
-                                    <i class="bi bi-check2-all" style="color: #198754; font-size: 1.25rem;"></i>
-                                </span>
-                            }
-                            else 
-                            {
-                                <span class="bg-white">
-                                    <i class="bi bi-exclamation-triangle-fill" style="color: red; font-size: 1.25rem;"></i>
-                                </span>
-                            }
-                        </div>
-
-                        <ValidationMessage For="@(() => employee.CivilId)" class="text-danger" />
-                    </div>
-              
-                    @* الرقم الوظيفي *@
-                    <div class="col-md-6">
-                        <label class="form-label">الرقم الوظيفي</label>
-                        <InputText @bind-Value="employee.EmpId" 
-                                   class="form-control" 
-                                   />
-
-                        <ValidationMessage For="@(() => employee.EmpId)" class="text-danger" />
                     </div>
 
                     @* الجوال *@

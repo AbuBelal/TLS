@@ -306,7 +306,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
         student.Name = student.Name.Trim();
         student.EnName = student.EnName?.Trim();
         student.CivilId = student.CivilId.Trim();
-        if (StdEmisInfo is not null && StdEmisInfo.StudentId is not null && StdEmisInfo.StudentId !="0")
+        if (StdEmisInfo is not null && StdEmisInfo.StudentId is not null && StdEmisInfo.StudentId != "0" && StdEmisInfo.Grade != "غير متوفر")
         {
             var emisgradeid =levels.FirstOrDefault(l => l.Name == StdEmisInfo.Grade)?.Id??0;
             if(emisgradeid != student.LevelId)

@@ -294,4 +294,46 @@ public partial class EmployeeForm : ComponentBase
         StateHasChanged();
         return;
     }
+
+    private async Task CheckEmpId()
+    {
+        employee.Name = employee.Name.Trim();
+        employee.EnName = employee.EnName?.Trim();
+        employee.CivilId = employee.CivilId.Trim();
+        employee.EmpId = employee.EmpId.Trim();
+        IsSaving = true;
+
+        EmployeeDuplicateCheckRequest request = new EmployeeDuplicateCheckRequest
+        {
+            EmpId = employee.EmpId,
+            CivilId = employee.CivilId,
+            ExcludeEmployeeId = Id
+        };
+
+        var IsDublicate = await EmployeeApi.IsEmployeeDuplicate(request);
+        if (IsDublicate?.Id > 0)
+        {
+            employee.Id = IsDublicate.Id;
+            IsDuplicate = true;
+            if (IsDublicate.EmpId == employee.EmpId)
+            {
+                if (IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive) != null)
+                {
+                    DuplicateMessage = $"رقم الوظيفة أو مكرران مع الموظف: {IsDublicate.Name} في مركز {IsDublicate.EmpCenters?.FirstOrDefault(c => c.IsActive)?.Center?.Name}";
+                }
+                else
+                {
+                    DuplicateMessage = $"رقم الوظيفة ورقم الهوية مكرران مع الموظف: {IsDublicate.Name} في مركز غير محدد";
+                    dialogMessage = $"هذا الموظف / {IsDublicate.Name} موجود مسبقاُ وغير مسجل في أي مركز ، هل ترغب بنقله لمركزكم ؟";
+                    isDialogOpen = true;
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+            IsSaving = false;
+            MudSnackbar.Add(DuplicateMessage, Severity.Error);
+            return;
+        }
+    }
 }

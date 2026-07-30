@@ -171,7 +171,7 @@ namespace APIServerLib.Repositories.Implemntations
                 .OrderBy(lv => lv.SortOrder)
                 .ToListAsync();
 
-            var levelNames = levels.SkipWhile(x=>x.Name.Contains("قبل")).Select(l => l.Name).ToList();
+            var levelNames = levels.Where(x=> !x.Name.Contains("قبل")).Select(l => l.Name).ToList();
             
             var levelMaleTotals = new Dictionary<string, int>();
             var levelFemaleTotals = new Dictionary<string, int>();
@@ -205,12 +205,24 @@ namespace APIServerLib.Repositories.Implemntations
 
                 foreach (var levelName in levelNames)
                 {
+                    if (levelName.Contains("أول"))
+                    {
+                        var awal = students.Count(s => s.Level?.Name == levelName && s.Gender?.Name == "ذكر");
+                        var qabl = students.Count(s => s.Gender?.Name == "ذكر" && (s.Level?.Name.Contains("قبل") ?? false));
+                        levelMales[levelName] = awal + qabl;
+                           
 
-                    levelMales[levelName] = students
-                        .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "ذكر");
-                    levelFemales[levelName] = students
-                        .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "أنثى");
-
+                        levelFemales[levelName] = 
+                            students.Count(s => s.Level?.Name == levelName && s.Gender?.Name == "أنثى")+
+                            students.Count(s => s.Level?.Name.Contains("قبل") ?? false && s.Gender?.Name == "أنثى"); ;
+                    }
+                    else
+                    {
+                        levelMales[levelName] = students
+                            .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "ذكر");
+                        levelFemales[levelName] = students
+                            .Count(s => s.Level?.Name == levelName && s.Gender?.Name == "أنثى");
+                    }
                     levelMaleTotals[levelName] += levelMales[levelName];
                     levelFemaleTotals[levelName] += levelFemales[levelName];
                     //////
