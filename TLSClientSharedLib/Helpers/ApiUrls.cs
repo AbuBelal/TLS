@@ -90,6 +90,7 @@ namespace TLSClientSharedLib.Helpers
             public const string ExportAll = PriorUrl + "/export/all";
             public const string GetStdInfoFromEmis = "/api/Emis/fetch-Std-Info";
             public const string GetStdCounts = PriorUrl + "/StdCounts";
+            public const string Promotion = PriorUrl + "/Promote";
 
         }
         public static class Center

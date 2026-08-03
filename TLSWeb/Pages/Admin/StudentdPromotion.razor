@@ -1,0 +1,184 @@
+﻿@using TLSWeb.Components
+@inject IJSRuntime JSRuntime
+
+@attribute [ Route(PagesUris.Admin.Promotion)]
+<h3>ترفيع الطلاب</h3>
+@if (levels == null || levels.Count == 0)
+{
+    <LoadingComponent />
+}
+else
+{
+    <div class="container py-4">
+        <div class="row g-3">
+            @foreach (var item in PromotionModels)
+            {
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body p-3">
+                            <div class="row g-3 align-items-center">
+
+                                <!-- أيقونة مؤشر حالة التنفيذ بناءً على الـ Model -->
+                                <div class="col-auto">
+                                    @if (item.Status == PromotionStatus.Processing)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning p-2 rounded-circle" title="جاري التنفيذ...">
+                                            <i class="bi bi-arrow-repeat spin-icon fs-5"></i>
+                                        </span>
+                                    }
+                                    else if (item.Status == PromotionStatus.Completed)
+                                    {
+                                        <span class="badge bg-success-subtle text-success p-2 rounded-circle" title="تم الترفيع بنجاح">
+                                            <i class="bi bi-check-circle-fill fs-5"></i>
+                                        </span>
+                                    }
+                                    else if (item.Status == PromotionStatus.Failed)
+                                    {
+
+                                        <span class="badge bg-danger-subtle text-danger p-2 rounded-circle" title="فشل التنفيذ">
+                                            <i class="bi bi-x-circle-fill fs-5"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary p-2 rounded-circle" title="قيد الانتظار">
+                                            <i class="bi bi-clock-history fs-5"></i>
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- المستوى الحالي -->
+                                <div class="col-md text-start">
+                                    <label class="form-label fw-semibold text-secondary small">المستوى الحالي</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-secondary">
+                                            <i class="bi bi-layers"></i>
+                                        </span>
+                                        <select class="form-select custom-select-rtl" @bind="item.CurrentLevelId">
+                                            <option value="-100">اختر المستوى الحالي...</option>
+                                            @foreach (var subLevel in levels)
+                                            {
+                                                <option value="@subLevel.Id">@subLevel.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- سهم الانتقال -->
+                                <div class="col-md-1 text-center d-none d-md-block">
+                                    <i class="bi bi-arrow-left fs-4 text-muted opacity-50 mt-4 d-block"></i>
+                                </div>
+
+                                <!-- المستوى التالي -->
+                                <div class="col-md text-start">
+                                    <label class="form-label fw-semibold text-secondary small">المستوى التالي (المنقول إليها)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-secondary">
+                                            <i class="bi bi-box-arrow-in-left"></i>
+                                        </span>
+                                        <select class="form-select custom-select-rtl" @bind="item.NextLevelId">
+                                            <option value="-200">اختر المستوى التالي...</option>
+                                            @foreach (var subLevel in levels)
+                                            {
+                                                <option value="@subLevel.Id">@subLevel.Name</option>
+                                            }
+                                            <option value="-100" class="text-danger fw-bold">🗑️ حذف بشكل نهائي (تخرج/إنهاء)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- زر الترفيع -->
+        <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-primary btn-lg px-4 rounded-pill" @onclick="PromoteStudents" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm ms-2" role="status"></span>
+                    <span>جاري الترفيع...</span>
+                }
+                else
+                {
+                    <i class="bi bi-check2-all me-1"></i>
+                    <span>تأكيد ترفيع الطلاب</span>
+                }
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    List<LookupValue> levels = new List<LookupValue>();
+    private List<LevelPromotionDto> PromotionModels = new();
+    private bool isSubmitting = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        levels = await LookupValueApi.GetByValueType(LookupTypes.Level);
+        levels = levels.OrderBy(x => x.SortOrder).ToList();
+        PromotionModels = levels.Select(level =>
+        {
+            var nextLevel = levels.FirstOrDefault(l => l.SortOrder == level.SortOrder + 1);
+            return new LevelPromotionDto
+            {
+                CurrentLevelId = level.Id,
+                CurrentLevelName = level.Name,
+                NextLevelId = nextLevel?.Id ?? -100, // -100 تعني تخرج/حذف تلقائياً
+                Status = PromotionStatus.Pending
+            };
+        }).ToList();
+    }
+
+    private async Task PromoteStudents()
+    {
+
+        isSubmitting = true;
+        await JSRuntime.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
+        var validPromotions = PromotionModels
+            .Where(p => p.CurrentLevelId != -200 && p.NextLevelId != -200)
+            .ToList();
+
+        foreach (var item in validPromotions)
+        {
+            item.Status = PromotionStatus.Processing;
+            StateHasChanged();
+            var response = await StudentApi.Promote(new SharedLib.DTOs.Students.StudentPromotionRequest
+            {
+                FromLevelId = item.CurrentLevelId,
+                ToLevelId = item.NextLevelId
+            });
+            if (response.Success)
+                item.Status = PromotionStatus.Completed;
+            else
+                item.Status = PromotionStatus.Failed;
+            StateHasChanged();
+        }
+
+        isSubmitting = false;
+    }
+    
+
+    public class LevelPromotionDto
+    {
+        public long CurrentLevelId { get; set; }
+        public string CurrentLevelName { get; set; } = string.Empty;
+        public long NextLevelId { get; set; }
+
+        // حالات التنفيذ (اختياري للربط مع الأيقونات)
+        public PromotionStatus Status { get; set; } = PromotionStatus.Pending;
+    }
+
+    public enum PromotionStatus
+    {
+        Pending,    // قيد الانتظار
+        Processing, // جاري التنفيذ
+        Completed,  // مكتمل
+        Failed      // حدث خطأ
+    }
+}

@@ -1,6 +1,7 @@
 // TLSClientSharedLib\Services\Apis\IStudentApi.cs
 using Refit;
 using SharedLib.DTOs;
+using SharedLib.DTOs.Students;
 using SharedLib.Entities;
 using SharedLib.Responses;
 using System.Collections.Generic;
@@ -53,5 +54,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Post(ApiUrls.Student.GetStdCounts)]
         Task<List<StudentsCountsDto>> GetStdCounts(StudentsCountsRequestDto request);
+
+        [Get(ApiUrls.Student.Promotion)]
+        Task<GeneralResponse> Promote(StudentPromotionRequest request);
     }
 }

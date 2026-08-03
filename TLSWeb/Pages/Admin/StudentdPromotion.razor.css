@@ -1,0 +1,51 @@
+﻿.hover-shadow {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }
+
+.input-group-text {
+    border-color: #dee2e6;
+}
+
+.form-select:focus {
+    box-shadow: none;
+    border-color: #86b7fe;
+}
+
+/* إصلاح موضع سهم الـ Select ليكون على اليسار مع إبقاء النص على اليمين */
+.custom-select-rtl {
+    background-position: left 0.75rem center !important; /* نقل السهم لليسام */
+    padding-left: 2.25rem !important; /* مسافة للسهم */
+    padding-right: 0.75rem !important; /* مسافة للنص */
+    text-align: right;
+}
+
+/* حركة دوران لأيقونة التجميع/التنفيذ */
+.spin-icon {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+/* تأثير التفاعل للأوراق/الكروت */
+.hover-shadow {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }

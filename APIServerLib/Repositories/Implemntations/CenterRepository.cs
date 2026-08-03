@@ -18,7 +18,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<List<Center>> GetAll()
         {
-            return await _context.Centers.ToListAsync();
+            return await _context.Centers.OrderBy(x=>x.SortOrder).ToListAsync();
         }
 
         public async Task<Center> GetById(long id)

@@ -50,6 +50,7 @@
             public const string ResetPassword = PriorUrl + "/ResetPassword";
             public const string DetailedCentersReport = PriorUrl + "/detailed-centers-report";
             public const string DailyReport = PriorUrl + "/daily-report";
+            public const string Promotion = PriorUrl + "/Promotion";
         }
 
         public static class CenterPages

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
+using SharedLib.DTOs.Students;
 using SharedLib.Entities;
 using SharedLib.Fixed;
 using SharedLib.Responses;
@@ -262,6 +263,14 @@ namespace APIServer.Controllers
             return parts.Count > 0
                 ? "تصفية: " + string.Join(" | ", parts)
                 : "المعروض على الشاشة";
+        }
+
+        [HttpGet("Promote")]
+        public async Task<ActionResult<GeneralResponse>> PromoteStudents([FromQuery] StudentPromotionRequest request)
+        {
+            var response = await _studentRepository.PromotionStudentsAsync(request.FromLevelId , request.ToLevelId);
+            await _auditLogService.LogAsync("Update", "Student", "", $"ترقية الطلاب من المستوى {request.FromLevelId} إلى {request.ToLevelId}");
+            return Ok(response);
         }
 
         #region std counts

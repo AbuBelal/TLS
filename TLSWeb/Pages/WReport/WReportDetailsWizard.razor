@@ -77,7 +77,7 @@
 
                 <AuthorizeView Context="authContext" Roles="@AppRoles.User">
 
-                    <button type="submit" class="btn btn-success px-5">
+                    <button type="submit" class="btn btn-success px-5" disabled="@(Saving)">
                         <i class="bi bi-check-circle me-1"></i> إنهاء وحفظ التقرير
                     </button>
                 
@@ -91,6 +91,7 @@
 @code {
     [Parameter] public long Id { get; set; }
     [Parameter] public long wr { get; set; }
+    bool Saving = false;
 
     private int _currentStep = 1;
     public WReportDetail Model { get; set; } = new WReportDetail();
@@ -134,12 +135,13 @@
 
     private async Task HandleValidSubmit()
     {
+        Saving = true;
         if (Id > 0)
         {
             var response = await WReportDetailsApi.Update(Model);
             if (response.Success)
             {
-               NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
+                NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
             }
         }
         else
@@ -147,9 +149,11 @@
             var response = await WReportDetailsApi.Insert(Model);
             if (response.Success)
             {
+                Id = response.ReturnId;
                 NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
             }
         }
+        Saving = false;
     }
 
     private void Cancel()
