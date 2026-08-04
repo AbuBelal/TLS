@@ -1,6 +1,7 @@
 using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.VariantTypes;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -497,17 +498,31 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<GeneralResponse> PromotionStudentsAsync(long FromLevelId, long ToLevelId)
         {
+            List<Student> students;
             var Levels = await _context.LookupValues.ToListAsync();
-            var students = await _context.Students.Where(s => s.LevelId == FromLevelId).ToListAsync();
             if (ToLevelId == -100)
             {
-                _context.Students.RemoveRange(students);
+                students = await _context.Students.Where(s => s.LevelId == FromLevelId).Include(x=>x.StdCenters).ToListAsync();
+                DateOnly Tday = DateOnly.FromDateTime(DateTime.Now);
+                foreach (var Std in students)
+                {
+                    var scs = Std.StdCenters.Where(x => x.IsActive).ToList();
+                    foreach (var sc in scs)
+                    {
+                        sc.IsActive = false;
+                        sc.ToDate = Tday;
+                        sc.Comments = "تم الترفيع للصف العاشر";
+                    }
+                }
             }
             else
+            {
+                students = await _context.Students.Where(s => s.LevelId == FromLevelId).ToListAsync();
                 foreach (var student in students)
                 {
                     student.LevelId = ToLevelId;
                 }
+            }
             await _context.SaveChangesAsync();
             return new GeneralResponse(true, $"تم ترقية {students.Count} الطلاب من المستوى {Levels.FirstOrDefault(l=>l.Id==FromLevelId)?.Name} إلى المستوى {Levels.FirstOrDefault(l => l.Id == ToLevelId)?.Name}.", students.Count);
         }

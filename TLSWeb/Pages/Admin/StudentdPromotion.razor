@@ -2,7 +2,29 @@
 @inject IJSRuntime JSRuntime
 
 @attribute [ Route(PagesUris.Admin.Promotion)]
-<h3>ترفيع الطلاب</h3>
+
+<div class="promotion-container" dir="rtl">
+    <!-- عنوان الصفحة -->
+    <h2 class="page-title">
+        <span class="icon">🚀</span> ترفيع الطلاب
+    </h2>
+
+    <!-- تنبيه تحذيري -->
+    <div class="alert-box danger">
+        <strong>⚠️ تنبيه هام:</strong> لا يمكن التراجع عن هذه العملية بعد إتمامها.
+    </div>
+
+    <!-- قائمة التعليمات -->
+    <div class="instructions-card">
+        <h3>📋 تعليمات وقواعد العملية:</h3>
+        <ul>
+            <li>يرجى التأكد من ترتيب العناصر أدناه من <strong>الصف التاسع حتى الصف الأول</strong>.</li>
+            <li>يرجى مراجعة الصف المُترفع إليه الطلاب بدقة.</li>
+            <li><strong>توصية:</strong> يفضل تصدير بيانات الطلاب إلى ملف Excel كنسخة احتياطية قبل إجراء العملية.</li>
+        </ul>
+    </div>
+</div>
+
 @if (levels == null || levels.Count == 0)
 {
     <LoadingComponent />
@@ -48,7 +70,7 @@ else
                                 </div>
 
                                 <!-- المستوى الحالي -->
-                                <div class="col-md text-start">
+                                <div class="col-md text-start ">
                                     <label class="form-label fw-semibold text-secondary small">المستوى الحالي</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light text-secondary">
@@ -121,7 +143,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level);
-        levels = levels.OrderBy(x => x.SortOrder).ToList();
+        levels = levels.OrderByDescending(x => x.SortOrder).ToList();
         PromotionModels = levels.Select(level =>
         {
             var nextLevel = levels.FirstOrDefault(l => l.SortOrder == level.SortOrder + 1);
