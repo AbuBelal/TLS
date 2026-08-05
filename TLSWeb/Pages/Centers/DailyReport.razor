@@ -49,7 +49,7 @@
         <!-- قسم تصفية المراكز (Checkbox) -->
         <div class="d-flex align-items-center bg-white-50 p-2 px-3 rounded-pill shadow-sm border border-white">
             <div class="form-check form-switch m-0 d-flex align-items-center">
-                <input type="checkbox"
+                <input type="checkbox" disabled="@((DailyReports is null || DailyReports.Count <= 0))"
                        class="form-check-input ms-0 me-2"
                        role="switch"
                        id="centerFilter"

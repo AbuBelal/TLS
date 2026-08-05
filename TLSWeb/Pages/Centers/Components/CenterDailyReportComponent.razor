@@ -7,7 +7,15 @@
             {
                 <span class="badge bg-danger text-warning ms-2">ليس يوم عمل</span>
             }
-            <span style="color:darkred"> @(item.Id == 0 ? "  -  جديد" : "")  </span>
+            @if (item.Id == 0)
+            {
+                <span style="color:darkred">   -  جديد  </span>
+                <AuthorizeView Roles="Admin">
+                    <button class="btn btn-sm btn-light text-dark ms-2" @onclick="FillFromLastREport">
+                        <i class="bi bi-pencil-square me-1"></i> تعبئة من آخر تقرير
+                    </button>
+                </AuthorizeView>
+            }
         </h5>
         <span class="small opacity-75">كود المركز: @item.Center?.CenterCode</span>
     </div>
@@ -207,7 +215,7 @@
         // var managers = await EmployeeApi.GetAllManagers();
         // Manager = await EmployeeApi.GetCenterManager(item.Center?.Id ?? 0);
 
-       
+
     }
     override protected async Task OnParametersSetAsync()
     {
@@ -223,7 +231,7 @@
         string dayInEnglish = item.ReportDate.ToString("dddd");
         string dayInArabic = SharedLib.Fixed.GlobalData.ArabicDays.GetValueOrDefault(dayInEnglish, dayInEnglish);
 
-       
+
         if (item.Center?.DaysOfWeek?.Contains(dayInArabic) ?? false)
         {
             // IsWorkingDay = true;
@@ -295,5 +303,39 @@
         var regValue = item.GetType().GetProperty(propertyName)?.GetValue(item, null) ?? 0;
         string AttName = propertyName.Replace("Reg", "Att");
         item.GetType().GetProperty(AttName)?.SetValue(item, regValue);
+    }
+
+    private async Task FillFromLastREport()
+    {
+        DateOnly TowdaysBefore = item.ReportDate.AddDays(-2);
+        var LastReports = await DailyReportApi.GetDailyReportForDate(TowdaysBefore);
+        var lastReportForCenter = LastReports.FirstOrDefault(r => r.CenterId == item.CenterId);
+        if (lastReportForCenter != null)
+        {
+            item.AttMale01 = lastReportForCenter.AttMale01;
+            item.AttFemale01 = lastReportForCenter.AttFemale01;
+            item.AttMale02 = lastReportForCenter.AttMale02;
+            item.AttFemale02 = lastReportForCenter.AttFemale02;
+            item.AttMale03 = lastReportForCenter.AttMale03;
+            item.AttFemale03 = lastReportForCenter.AttFemale03;
+            item.AttMale04 = lastReportForCenter.AttMale04;
+            item.AttFemale04 = lastReportForCenter.AttFemale04;
+            item.AttMale05 = lastReportForCenter.AttMale05;
+            item.AttFemale05 = lastReportForCenter.AttFemale05;
+            item.AttMale06 = lastReportForCenter.AttMale06;
+            item.AttFemale06 = lastReportForCenter.AttFemale06;
+            item.AttMale07 = lastReportForCenter.AttMale07;
+            item.AttFemale07 = lastReportForCenter.AttFemale07;
+            item.AttMale08 = lastReportForCenter.AttMale08;
+            item.AttFemale08 = lastReportForCenter.AttFemale08;
+            item.AttMale09 = lastReportForCenter.AttMale09;
+            item.AttFemale09 = lastReportForCenter.AttFemale09;
+
+            item.IsUNRWA = lastReportForCenter.IsUNRWA;
+            item.WFPBiscDist = lastReportForCenter.WFPBiscDist;
+            item.WFPBiscLost = lastReportForCenter.WFPBiscLost;
+        }
+
+        StateHasChanged();
     }
 }

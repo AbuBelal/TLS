@@ -159,6 +159,15 @@ else
 
     private async Task PromoteStudents()
     {
+        var invalidPromotions = PromotionModels
+            .Where(p => p.NextLevelId == -200)
+            .ToList();
+
+        if (invalidPromotions is not null && invalidPromotions.Count > 0)
+        {
+            MudSnackbar.Add("حدث خطأ أثناء إعداد بيانات الترقية. يرجى التحقق من مستويات الطلاب.", Severity.Error);
+            return;
+        }
 
         isSubmitting = true;
         await JSRuntime.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
