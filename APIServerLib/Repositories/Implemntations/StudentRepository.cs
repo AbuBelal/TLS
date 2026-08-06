@@ -498,22 +498,36 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<GeneralResponse> PromotionStudentsAsync(long FromLevelId, long ToLevelId)
         {
-            List<Student> students;
+            List<Student> students=new List<Student>();
             var Levels = await _context.LookupValues.ToListAsync();
             if (ToLevelId == -100)
             {
-                students = await _context.Students.Where(s => s.LevelId == FromLevelId).Include(x=>x.StdCenters).ToListAsync();
-                DateOnly Tday = DateOnly.FromDateTime(DateTime.Now);
-                foreach (var Std in students)
-                {
-                    var scs = Std.StdCenters.Where(x => x.IsActive).ToList();
-                    foreach (var sc in scs)
-                    {
-                        sc.IsActive = false;
-                        sc.ToDate = Tday;
-                        sc.Comments = "تم الترفيع للصف العاشر";
-                    }
-                }
+                var DeletedCount = await _context.Students.Where(s => s.LevelId == FromLevelId).Include(x => x.StdCenters).ExecuteDeleteAsync();
+            }
+            else if(ToLevelId == -300)   
+            {
+                DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+
+                await _context.StdCenters
+                    .Where(sc => sc.Student.LevelId == FromLevelId && sc.IsActive)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(sc => sc.IsActive, false)
+                        .SetProperty(sc => sc.ToDate, today)
+                        .SetProperty(sc => sc.Comments, "تم الحذف أثناء عملية الترفيع ! ")
+                    );
+
+                //students = await _context.Students.Where(s => s.LevelId == FromLevelId).Include(x => x.StdCenters).ToListAsync();
+                //DateOnly Tday = DateOnly.FromDateTime(DateTime.Now);
+                //foreach (var Std in students)
+                //{
+                //    var scs = Std.StdCenters.Where(x => x.IsActive).ToList();
+                //    foreach (var sc in scs)
+                //    {
+                //        sc.IsActive = false;
+                //        sc.ToDate = Tday;
+                //        sc.Comments = "تم الحذف أثناء عملية الترفيع ! ";
+                //    }
+                //}
             }
             else
             {
@@ -523,7 +537,7 @@ namespace APIServerLib.Repositories.Implemntations
                     student.LevelId = ToLevelId;
                 }
             }
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
             return new GeneralResponse(true, $"تم ترقية {students.Count} الطلاب من المستوى {Levels.FirstOrDefault(l=>l.Id==FromLevelId)?.Name} إلى المستوى {Levels.FirstOrDefault(l => l.Id == ToLevelId)?.Name}.", students.Count);
         }
 

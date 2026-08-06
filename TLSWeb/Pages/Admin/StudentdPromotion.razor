@@ -104,7 +104,8 @@ else
                                             {
                                                 <option value="@subLevel.Id">@subLevel.Name</option>
                                             }
-                                            <option value="-100" class="text-danger fw-bold">🗑️ حذف بشكل نهائي (تخرج/إنهاء)</option>
+                                            <option value="-100" class="text-danger fw-bold">🗑️ حذف بشكل نهائي من قاعدة البيانات (تخرج/إنهاء)</option>
+                                            <option value="-300" class="text-danger fw-bold">🗑️ حذف (تخرج/إنهاء)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -118,7 +119,7 @@ else
 
         <!-- زر الترفيع -->
         <div class="d-flex justify-content-end mt-4">
-            <button class="btn btn-primary btn-lg px-4 rounded-pill" @onclick="PromoteStudents" disabled="@isSubmitting">
+            <button class="btn btn-primary btn-lg px-4 rounded-pill" @onclick="OpenDialog" disabled="@isSubmitting">
                 @if (isSubmitting)
                 {
                     <span class="spinner-border spinner-border-sm ms-2" role="status"></span>
@@ -134,11 +135,17 @@ else
     </div>
 }
 
+
+<DialogMsg IsOpen="@isDialogOpen" Title="تأكيد الترفيع" Message="@dialogMessage"
+           OnConfirmed="ConfirmDialog" OnCancel="CancelDialog" DialogType="warning"
+           Icon="bi-exclamation-triangle" />
+
 @code {
     List<LookupValue> levels = new List<LookupValue>();
     private List<LevelPromotionDto> PromotionModels = new();
     private bool isSubmitting = false;
-
+    bool isDialogOpen = false;
+    string dialogMessage = " هذه العملية لا يمكن التراجع عنها ، هل أنت متأكد من عملية ترفيع الطلاب ؟";
 
     protected override async Task OnInitializedAsync()
     {
@@ -192,6 +199,27 @@ else
         }
 
         isSubmitting = false;
+        MudSnackbar.Add("تمت عملية ترفيع الطلاب .", Severity.Success);
+    }
+
+    private void OpenDialog()
+    {
+        isDialogOpen = true;
+
+        StateHasChanged();
+        return;
+    }
+
+    private void CancelDialog()
+    {
+        isDialogOpen = false;
+        StateHasChanged();
+    }
+    private async void ConfirmDialog()
+    {
+        isDialogOpen = false;
+        await PromoteStudents();
+
     }
     
 
