@@ -20,6 +20,7 @@ namespace SharedLib.Entities
         [StringLength(150)]
         public string? Comments { get; set; }
 
+        public bool IsActive { get; set; } = true;
         public virtual ICollection<WReportDetail> WReportDetails { get; set; } = new List<WReportDetail>();
     }
 }

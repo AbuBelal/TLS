@@ -109,4 +109,11 @@ thead .sticky-col-right {
     border-left: 1px solid #495057;
 }
 
+/* تطبيق على الجدول أو خلايا الجدول */
+table td {
+    white-space: normal !important; /* السماح بالتفاف النص */
+    word-break: break-word; /* كسر الكلمات الطويلة إذا لزم الأمر */
+    max-width: 250px; /* حد أقصى اختياري لعرض الخلية */
+}
+
 

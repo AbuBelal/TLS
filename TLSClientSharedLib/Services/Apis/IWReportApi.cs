@@ -19,7 +19,7 @@ namespace TLSClientSharedLib.Services.Apis
         Task<GeneralResponse> Insert([Body] WReport report);
 
         [Put(ApiUrls.WReport.Update)]
-        Task<GeneralResponse> Update([Body] WReport report);
+        Task<GeneralResponse> Update(WReport report);
 
         [Delete(ApiUrls.WReport.DeleteById)]
         Task<GeneralResponse> DeleteById(long id);

@@ -86,7 +86,7 @@ namespace APIServer.Controllers
         }
 
         [HttpPut]
-        public async Task<GeneralResponse> UpdateReport([FromBody] WReport report)
+        public async Task<GeneralResponse> UpdateReport(WReport report)
         {
           
             if (!ModelState.IsValid)
@@ -100,6 +100,7 @@ namespace APIServer.Controllers
             existingReport.WReportBegin = report.WReportBegin;
             existingReport.WReportEnd = report.WReportEnd;
             existingReport.WReportNo = report.WReportNo;
+            existingReport.IsActive = report.IsActive;
             existingReport.Comments = report.Comments;
 
             await _repository.UpdateAsync(existingReport);

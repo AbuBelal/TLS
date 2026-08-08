@@ -48,6 +48,7 @@
                                 <th>رقم التقرير</th>
                                 <th>تاريخ البداية</th>
                                 <th>تاريخ النهاية</th>
+                                <th>قعال</th>
                                 <th>الملاحظات</th>
                                 <th class="text-center">الإجراءات</th>
                             </tr>
@@ -62,6 +63,20 @@
                                     </td>
                                     <td>@item.WReportBegin?.ToString("yyyy-MM-dd")</td>
                                     <td>@item.WReportEnd?.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-center align-middle">
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fs-6">
+                                                <i class="bi bi-check-circle-fill me-1"></i> نشط
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill fs-6">
+                                                <i class="bi bi-x-circle-fill me-1"></i> غير نشط
+                                            </span>
+                                        }
+                                    </td>
                                     <td>
                                         <span class="text-truncate d-inline-block" style="max-width: 250px;">
                                             @(string.IsNullOrEmpty(item.Comments) ? "-" : item.Comments)
@@ -146,6 +161,11 @@
                                 <label class="form-label fw-bold">تاريخ النهاية</label>
                                 <InputDate @bind-Value="activeReport.WReportEnd" class="form-control" disabled="@(modalMode == ModalMode.View)" />
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">فعال</label>
+                            <InputCheckbox @bind-Value="activeReport.IsActive" class="form-check-input" disabled="@(modalMode == ModalMode.View)" />
                         </div>
 
                         <div class="mb-3">

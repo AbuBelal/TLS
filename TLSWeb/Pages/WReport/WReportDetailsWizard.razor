@@ -76,11 +76,12 @@
                 @* else *@
 
                 <AuthorizeView Context="authContext" Roles="@AppRoles.User">
-
-                    <button type="submit" class="btn btn-success px-5" disabled="@(Saving)">
-                        <i class="bi bi-check-circle me-1"></i> إنهاء وحفظ التقرير
-                    </button>
-                
+                    @if (!ReadOnly)
+                    {
+                        <button type="submit" class="btn btn-success px-5 mr-2" disabled="@(Saving)">
+                            <i class="bi bi-check-circle me-1"></i> إنهاء وحفظ التقرير
+                        </button>
+                    }
                 </AuthorizeView>
                 
             </div>
@@ -92,7 +93,8 @@
     [Parameter] public long Id { get; set; }
     [Parameter] public long wr { get; set; }
     bool Saving = false;
-
+    bool ReadOnly = true;
+    WReport wReport;
     private int _currentStep = 1;
     public WReportDetail Model { get; set; } = new WReportDetail();
     private bool EditMode => Id > 0;
@@ -101,6 +103,8 @@
     {
         if (Id > 0)
         {
+            wReport = await WReportApi.GetById(wr);
+            ReadOnly = !wReport.IsActive;
             var response = await WReportDetailsApi.GetById(Id);
             if (response is not null)
             {
@@ -111,6 +115,7 @@
         else
         {
             Model.WReportId = wr;
+           
             //Model.CenterId = 1;
             // var response = await WReportDetailsApi.Insert(Model);
             // if (response is not null)
