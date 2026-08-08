@@ -228,7 +228,7 @@ Icon="bi-exclamation-triangle" />
 
     private void OpenCreateModal()
     {
-        activeReport = new WReport { WReportBegin = DateTime.Today, WReportEnd = DateTime.Today.AddDays(7) };
+        activeReport = new WReport { WReportBegin = DateTime.Today, WReportEnd = DateTime.Today.AddDays(5) };
         modalMode = ModalMode.Create;
         isModalOpen = true;
     }
@@ -242,6 +242,7 @@ Icon="bi-exclamation-triangle" />
             WReportNo = report.WReportNo,
             WReportBegin = report.WReportBegin,
             WReportEnd = report.WReportEnd,
+            IsActive = report.IsActive,
             Comments = report.Comments
         };
         modalMode = ModalMode.Edit;

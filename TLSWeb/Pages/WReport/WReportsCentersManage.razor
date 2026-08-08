@@ -51,7 +51,10 @@
                                 <tr>
                                     <td class="fw-bold">@item.SortOrder</td>
                                     <td>
-                                        @item.Name 
+                                        <div class="fw-bold">@item.Name</div>
+                                        <small class="text-muted d-block fs-7">
+                                            <i class="bi bi-person me-1"></i>@ListManagers.FirstOrDefault(x => x.CenterId == item.Id)?.ManagerName
+                                        </small>
                                     </td>
                                     <td>
                                         @{
@@ -114,7 +117,7 @@
                                             
                                             <!-- Manage Details Component -->
                                                 <button class="btn btn-sm btn-outline-primary" title="إدخال تفاصيل الأنشطة" @onclick="() => 
-                                                    NavigateToEdit(reports.Where(r=>r.CenterId==item.Id && r.WReportId==WRId).FirstOrDefault()?.Id??0,item.Id)">
+                                                    NavigateToEdit(reports.Where(r=>r.CenterId==item.Id && r.WReportId==WRId).FirstOrDefault()?.Id??0,WRId)">
                                                 <i class="bi bi-list-check"></i> التفاصيل
                                             </button>
                                             &nbsp;&nbsp;
@@ -140,6 +143,8 @@
 
     private enum ModalMode { Create, Edit, View }
 
+    private List<Manager> ListManagers { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         centers = await CenterApi.GetAll();
@@ -152,6 +157,15 @@
         try
         {
             reports = await WReportDetailsApi.GetAll();
+            var Mng= await EmployeeApi.GetAllManagers();
+
+            ListManagers = Mng.SelectMany(x => x.EmpCenters ?? Enumerable.Empty<EmpCenter>(),
+                                (manager, center) => new Manager
+                                {
+                                    ManagerName = manager.Name,
+                                    CenterId = center.CenterId
+                                })
+                   .ToList();
         }
         catch (Exception ex)
         {
@@ -234,6 +248,12 @@
     private void NavigateToEdit(long wrd ,long wr)
     {
         NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{wrd}/{wr}");
+    }
+
+    private class Manager
+    {
+        public string ManagerName { get; set; } = string.Empty;
+        public long? CenterId { get; set; } = 0;
     }
 
 }

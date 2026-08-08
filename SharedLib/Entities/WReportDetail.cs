@@ -117,6 +117,8 @@ namespace SharedLib.Entities
         public string? LessonsLearned { get; set; }
 
         public long? CenterId { get; set; }
+        [ForeignKey("CenterId")]
+        public virtual Center? Center { get; set; }
 
         // Foreign Key & Navigation Property للربط مع جدول WReport
         public long? WReportId { get; set; }

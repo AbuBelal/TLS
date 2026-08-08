@@ -35,7 +35,7 @@ namespace APIServerLib.Repositories.Implemntations
         public async Task<WReport?> GetByIdAsync(long id)
         {
             return await _context.WReports
-                .Include(r => r.WReportDetails) // جلب تفاصيل التقرير
+                .Include(r => r.WReportDetails.OrderBy(c=>c.Center.SortOrder)) // جلب تفاصيل التقرير
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 

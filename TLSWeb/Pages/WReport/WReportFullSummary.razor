@@ -36,7 +36,7 @@
             {
                 <div class="table-scrollable-container pb-2">
                     <table class="table table-bordered table-hover table-full-data mb-0">
-                        <thead>
+                        <thead class="sticky-top">
                             <!-- الصف الأول: تجميع المراحل -->
                             <tr>
                                 <th rowspan="2" class="sticky-col-right align-middle w-auto">اسم المركز</th>
@@ -114,7 +114,11 @@
                             {
                                 <tr>
                                     <!-- العمود المجمد -->
-                                    <td class="sticky-col-right text-primary fs-5">  @Centers.FirstOrDefault(x=>x.Id==detail.CenterId)?.Name</td>
+                                    <td class="sticky-col-right text-primary fs-5">  @Centers.FirstOrDefault(x=>x.Id==detail.CenterId)?.Name
+                                        <small class="text-muted d-block fs-7">
+                                            <i class="bi bi-person me-1"></i>@ListManagers.FirstOrDefault(x => x.CenterId == detail.CenterId)?.ManagerName
+                                        </small>
+                                    </td>
 
                                     <!-- المرحلة 1 -->
                                     <td title="@detail.OverallImplementation">@detail.OverallImplementation</td>
@@ -195,6 +199,8 @@
     private List<LookupValue>? LookupValues;
     private List<Center> Centers;
     private bool isLoading = false;
+    private List<Manager> ListManagers { get; set; } = new();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -205,6 +211,15 @@
             LookupValues = await LookupValueApi.GetAll();
             Centers = await CenterApi.GetAll();
             report = await WReportApi.GetById(WRId);
+            var Mng = await EmployeeApi.GetAllManagers();
+
+            ListManagers = Mng.SelectMany(x => x.EmpCenters ?? Enumerable.Empty<EmpCenter>(),
+                                (manager, center) => new Manager
+                                {
+                                    ManagerName = manager.Name,
+                                    CenterId = center.CenterId
+                                })
+                   .ToList();
             await LoadDetails(0);
         }
         catch (Exception ex)
@@ -233,5 +248,11 @@
             isLoading = false;
             StateHasChanged();
         }
+    }
+
+    private class Manager
+    {
+        public string ManagerName { get; set; } = string.Empty;
+        public long? CenterId { get; set; } = 0;
     }
 }

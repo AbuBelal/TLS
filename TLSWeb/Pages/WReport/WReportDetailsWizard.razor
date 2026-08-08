@@ -94,7 +94,7 @@
     [Parameter] public long wr { get; set; }
     bool Saving = false;
     bool ReadOnly = true;
-    WReport wReport;
+    WReport wReport=new ();
     private int _currentStep = 1;
     public WReportDetail Model { get; set; } = new WReportDetail();
     private bool EditMode => Id > 0;
@@ -103,19 +103,21 @@
     {
         if (Id > 0)
         {
-            wReport = await WReportApi.GetById(wr);
-            ReadOnly = !wReport.IsActive;
             var response = await WReportDetailsApi.GetById(Id);
             if (response is not null)
             {
                 Model = response;
                 //EditMode = true;
             }
+            wReport = await WReportApi.GetById(wr);
+            ReadOnly = !wReport.IsActive;
+            StateHasChanged();
         }
         else
         {
             Model.WReportId = wr;
-           
+            wReport = await WReportApi.GetById(wr);
+            ReadOnly = !wReport.IsActive;
             //Model.CenterId = 1;
             // var response = await WReportDetailsApi.Insert(Model);
             // if (response is not null)
