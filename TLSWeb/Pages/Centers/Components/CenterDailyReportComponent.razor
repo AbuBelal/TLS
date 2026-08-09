@@ -308,6 +308,12 @@
     private async Task FillFromLastREport()
     {
         DateOnly TowdaysBefore = item.ReportDate.AddDays(-2);
+
+        if (item.ReportDate.DayOfWeek == DayOfWeek.Saturday || item.ReportDate.DayOfWeek == DayOfWeek.Sunday)
+        {
+            TowdaysBefore = TowdaysBefore.AddDays(-1);
+        }
+
         var LastReports = await DailyReportApi.GetDailyReportForDate(TowdaysBefore);
         var lastReportForCenter = LastReports.FirstOrDefault(r => r.CenterId == item.CenterId);
         if (lastReportForCenter != null)

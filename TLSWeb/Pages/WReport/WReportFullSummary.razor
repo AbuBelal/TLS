@@ -1,6 +1,7 @@
 ﻿@attribute [ Route(PagesUris.WReportsPages.FullSummery +"/{WRId:long}")]
 
 @using SharedLib.Entities
+@inject IJSRuntime JSRuntime
 
 
 <div class="container-fluid my-4" dir="rtl">
@@ -34,7 +35,13 @@
             }
             else if (detailsSummary != null)
             {
-                <div class="table-scrollable-container pb-2">
+                <div class="d-flex justify-content-end mb-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#fullscreenTableModal">
+                        <i class="bi bi-arrows-fullscreen me-1"></i> تكبير الجدول
+                    </button>
+                </div>
+
+                <div class="table-scrollable-container pb-2" >
                     <table class="table table-bordered table-hover table-full-data mb-0">
                         <thead class="sticky-top">
                             <!-- الصف الأول: تجميع المراحل -->
@@ -114,7 +121,10 @@
                             {
                                 <tr>
                                     <!-- العمود المجمد -->
-                                    <td class="sticky-col-right text-primary fs-5">  @Centers.FirstOrDefault(x=>x.Id==detail.CenterId)?.Name
+                                    <td class="sticky-col-right text-primary fs-5">  
+                                         <a href="@(PagesUris.WReportsDetailsPages.Edit + "/" + detail.Id + "/" + WRId.ToString())" >
+                                        @Centers.FirstOrDefault(x=>x.Id==detail.CenterId)?.Name
+                                        </a> 
                                         <small class="text-muted d-block fs-7">
                                             <i class="bi bi-person me-1"></i>@ListManagers.FirstOrDefault(x => x.CenterId == detail.CenterId)?.ManagerName
                                         </small>
@@ -192,6 +202,200 @@
     </div>
 </div>
 
+
+
+
+
+
+<!-- Modal ملء الشاشة لعرض الجدول بكامل المساحة -->
+<div class="modal fade" id="fullscreenTableModal" tabindex="-1" aria-labelledby="fullscreenTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="fullscreenTableModalLabel">
+                    <i class="bi bi-table me-2 text-primary"></i> عرض الجدول بالكامل
+                </h5>
+            </div>
+            <div class="modal-body p-0">
+                @if (detailsSummary != null)
+                {
+                    <div class="table-scrollable-container pb-2" style="max-height:85vh;">
+                    <table class="table table-bordered table-hover table-full-data mb-0">
+                        <thead class="sticky-top">
+                            <!-- الصف الأول: تجميع المراحل -->
+                            <tr>
+                                <th rowspan="2" class="sticky-col-right align-middle w-auto">اسم المركز</th>
+                                <th colspan="5" class="group-header stage-1">المرحلة 1: الملخص التنفيذي</th>
+                                <th colspan="9" class="group-header stage-2">المرحلة 2: التخطيط والجودة</th>
+                                <th colspan="9" class="group-header stage-3">المرحلة 3: أداء العاملين</th>
+                                <th colspan="6" class="group-header stage-4">المرحلة 4: الاحتياجات المهنية</th>
+                                <th colspan="8" class="group-header stage-5">المرحلة 5: البيئة المدرسية</th>
+                                <th colspan="7" class="group-header stage-6">المرحلة 6: التحديات والمخاطر</th>
+                                <th colspan="5" class="group-header stage-7">المرحلة 7: الممارسات المتميزة</th>
+                            </tr>
+
+                            <!-- الصف الثاني: أسماء الحقول بالتفصيل -->
+                            <tr class="table-light text-center small fw-bold text-muted">
+                                <!-- المرحلة 1 -->
+                                <th>مستوى التنفيذ</th>
+                                <th>إنجاز تعليمي</th>
+                                <th>إنجاز ترفيهي</th>
+                                <th>التحدي الرئيسي</th>
+                                <th>أولوية الأسبوع القادم</th>
+                                <!-- المرحلة 2 -->
+                                <th>انتظام التنفيذ</th>
+                                <th>التوازن</th>
+                                <th>توفر المواد</th>
+                                <th>ملاءمة الزمن</th>
+                                <th>توزيع الأدوار</th>
+                                <th>الالتزام بالمواد</th>
+                                <th>مبادئ الأونروا</th>
+                                <th>التوثيق</th>
+                                <th>ملاحظات التخطيط</th>
+                                <!-- المرحلة 3 -->
+                                <th>الالتزام بالحضور</th>
+                                <th>إدارة الصف</th>
+                                <th>الاستراتيجيات التعليمية</th>
+                                <th>الاستراتيجيات الترفيهية</th>
+                                <th>الفروق الفردية</th>
+                                <th>دمج الإعاقة</th>
+                                <th>التقويم والتغذية</th>
+                                <th>التنسيق والفريق</th>
+                                <th>ملاحظات الأداء</th>
+                                <!-- المرحلة 4 -->
+                                <th>الاحتياج التدريبي</th>
+                                <th>نوع الدعم</th>
+                                <th>الفئة المستهدفة</th>
+                                <th>المسؤول</th>
+                                <th>موعد التنفيذ</th>
+                                <th>دليل الإنجاز</th>
+                                <!-- المرحلة 5 -->
+                                <th>المياه والنظافة</th>
+                                <th>التهوية والظل</th>
+                                <th>الإسعافات والطوارئ</th>
+                                <th>حماية الطفل</th>
+                                <th>آلية الشكاوى</th>
+                                <th>إتاحة الأنشطة للإعاقة</th>
+                                <th>الخصوصية والكرامة</th>
+                                <th>ملاحظات البيئة</th>
+                                <!-- المرحلة 6 -->
+                                <th>التحدي/الخطر</th>
+                                <th>الأثر</th>
+                                <th>الاحتمالية</th>
+                                <th>مستوى الأولوية</th>
+                                <th>الإجراء المتخذ</th>
+                                <th>المسؤول</th>
+                                <th>الحالة</th>
+                                <!-- المرحلة 7 -->
+                                <th>اسم الممارسة/المساحة</th>
+                                <th>الوصف</th>
+                                <th>كيفية التنفيذ</th>
+                                <th>الأثر (شواهد)</th>
+                                <th>الدروس المستفادة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detail in detailsSummary)
+                            {
+                                <tr>
+                                    <!-- العمود المجمد -->
+                                    <td class="sticky-col-right text-primary fs-5">
+                                        @* <a href="@(PagesUris.WReportsDetailsPages.Edit + "/" + detail.Id + "/" + WRId.ToString())">
+                                            @Centers.FirstOrDefault(x => x.Id == detail.CenterId)?.Name
+                                        </a> *@
+
+                                            <a href="javascript:void(0)"
+                                              
+                                               class="btn-secondary"
+                                             
+                                               @onclick="@(() => NavToDetails(detail.Id, WRId))">
+                                               @Centers.FirstOrDefault(x => x.Id == detail.CenterId)?.Name
+                                            </a>
+
+                                        <small class="text-muted d-block fs-7">
+                                            <i class="bi bi-person me-1"></i>@ListManagers.FirstOrDefault(x => x.CenterId == detail.CenterId)?.ManagerName
+                                        </small>
+                                    </td>
+
+                                    <!-- المرحلة 1 -->
+                                    <td title="@detail.OverallImplementation">@detail.OverallImplementation</td>
+                                    <td title="@detail.EducationalAchievement">@detail.EducationalAchievement</td>
+                                    <td title="@detail.PsychosocialAchievement">@detail.PsychosocialAchievement</td>
+                                    <td title="@detail.MainChallenge" class="text-danger">@detail.MainChallenge</td>
+                                    <td title="@detail.NextWeekPriority">@detail.NextWeekPriority</td>
+
+                                    <!-- المرحلة 2 -->
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.PlanImplementation)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.BalanceActivities)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.MaterialsAvailability)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.TimeSuitability)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.RoleDistribution)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.CurriculumCompliance)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.UNRWAPrinciplesCompliance)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.DocumentationQuality)?.Name</td>
+                                    <td title="@detail.PlanningNotes">@detail.PlanningNotes</td>
+
+                                    <!-- المرحلة 3 -->
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.AttendanceCommitment)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.ClassroomManagement)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.TeachingStrategies)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.RecreationalStrategies)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.IndividualDifferences)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.DisabilityInclusion)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.FeedbackQuality)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.TeamworkCoordination)?.Name</td>
+                                    <td title="@detail.StaffNotes">@detail.StaffNotes</td>
+
+                                    <!-- المرحلة 4 -->
+                                    <td title="@detail.TrainingNeed">@detail.TrainingNeed</td>
+                                    <td title="@detail.SupportType">@detail.SupportType</td>
+                                    <td title="@detail.TargetGroup">@detail.TargetGroup</td>
+                                    <td title="@detail.TrainingResponsible">@detail.TrainingResponsible</td>
+                                    <td class="text-center">@detail.TrainingDate?.ToString("yyyy/MM/dd")</td>
+                                    <td title="@detail.AchievementEvidence">@detail.AchievementEvidence</td>
+
+                                    <!-- المرحلة 5 -->
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.WaterSanitationCleanliness)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.VentilationShadeSeating)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.FirstAidEmergencyProcedures)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.ChildProtectionProfessionalConduct)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.ComplaintReferralMechanism)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.DisabilityAccessActivities)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.DignityNonDiscrimination)?.Name</td>
+                                    <td title="@detail.EnvironmentNotes">@detail.EnvironmentNotes</td>
+
+                                    <!-- المرحلة 6 -->
+                                    <td title="@detail.RiskChallenge">@detail.RiskChallenge</td>
+                                    <td title="@detail.RiskImpact">@detail.RiskImpact</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.RiskProbability)?.Name</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.RiskPriority)?.Name</td>
+                                    <td title="@detail.RiskAction">@detail.RiskAction</td>
+                                    <td title="@detail.RiskResponsible">@detail.RiskResponsible</td>
+                                    <td class="text-center">@LookupValues?.FirstOrDefault(x => x.Id == detail.RiskStatus)?.Name</td>
+
+                                    <!-- المرحلة 7 -->
+                                    <td title="@detail.BestPracticeName" class="fw-bold">@detail.BestPracticeName</td>
+                                    <td title="@detail.PracticeDescription">@detail.PracticeDescription</td>
+                                    <td title="@detail.SuccessImplementation">@detail.SuccessImplementation</td>
+                                    <td title="@detail.ImpactEvidenceData">@detail.ImpactEvidenceData</td>
+                                    <td title="@detail.LessonsLearned">@detail.LessonsLearned</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                }
+            </div>
+            <div class="modal-footer bg-light py-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 @code {
     [Parameter] public long WRId { get; set; } = 0;
     private WReport? report;
@@ -254,5 +458,12 @@
     {
         public string ManagerName { get; set; } = string.Empty;
         public long? CenterId { get; set; } = 0;
+    }
+
+    private async Task NavToDetails(long detailsId , long WrID)
+    {
+       // NavManager.NavigateTo(PagesUris.WReportsDetailsPages.Edit + "/" + detailsId + "/" + WrID.ToString());
+        var url = $"{PagesUris.WReportsDetailsPages.Edit}/{detailsId}/{WrID}";
+        await JSRuntime.InvokeVoidAsync("eval", $"window.open('{url}', '_blank')");
     }
 }

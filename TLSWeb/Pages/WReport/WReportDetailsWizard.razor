@@ -15,6 +15,10 @@
                 <h3 class="fw-bold text-primary mb-1">إدخال تفاصيل التقرير الأسبوعي</h3>
                 <p class="text-muted mb-0">يرجى تعبئة كافة المراحل المطلوبة بدقة</p>
             </div>
+            @if (!string.IsNullOrEmpty(CenterName))
+            {
+                <span class="badge bg-success fs-6 px-3 py-2 rounded-pill">@CenterName</span>
+            }
             <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">المرحلة @_currentStep من 7</span>
         </div>
     </div>
@@ -98,6 +102,7 @@
     private int _currentStep = 1;
     public WReportDetail Model { get; set; } = new WReportDetail();
     private bool EditMode => Id > 0;
+    string CenterName = "";
 
     override protected async Task OnInitializedAsync()
     {
@@ -127,7 +132,8 @@
             // }
             // EditMode = false;
         }
-
+        var Center =await CenterApi.GetById(Model.CenterId??0);
+        CenterName = Center?.Name;
     }
 
     private void NextStep()
