@@ -241,7 +241,8 @@ Icon="bi-exclamation-triangle" />
         </div>
     </div>
 </div>
-@if(isEmisInfoLoading)
+
+@* @if(isEmisInfoLoading)
 {
     <div class="d-flex justify-content-center align-items-center my-5">
         <div class="spinner-border text-primary" role="status">
@@ -253,7 +254,7 @@ Icon="bi-exclamation-triangle" />
 else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
 {
     <StdEmisInfoComponent studentData="StdEmisInfo" />
-}
+} *@
 
 @code {
     [Parameter] public long Id { get; set; }
@@ -289,7 +290,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
         selectedCenterId = student.StdCenters?.FirstOrDefault(x => x.IsActive)?.CenterId;
         isLoading = false;
 
-        await GetStdInfoFromEmis();
+        //await GetStdInfoFromEmis();
     }
     private async Task TranslateName()
     {

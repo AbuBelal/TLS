@@ -29,6 +29,7 @@ namespace SharedLib.Entities
 
 
         public ICollection<EmpCenter> EmpCenters { get; set; } = new List<EmpCenter>();
+        public ICollection<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
         //[NotMapped]
         //public Employee? Manager => EmpCenters.FirstOrDefault(e=>e.Employee.Job?.Name.Contains("مدير مركز")==true && e.IsActive)?.Employee;
 

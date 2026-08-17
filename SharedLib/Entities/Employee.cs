@@ -49,5 +49,7 @@ namespace SharedLib.Entities
         //[JsonIgnore]
         public virtual ApplicationUser? User { get; set; }
 
+        public ICollection<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
+
     }
 }

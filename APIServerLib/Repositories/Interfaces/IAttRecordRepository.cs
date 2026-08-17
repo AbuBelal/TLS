@@ -1,0 +1,13 @@
+using SharedLib.DTOs;
+using SharedLib.Entities;
+using SharedLib.Responses;
+
+namespace APIServerLib.Repositories.Interfaces
+{
+    public interface IAttRecordRepository 
+    {
+        Task<int> GenerateMonthlyAttendanceAsync(int year, int month, long holidayCode);
+        Task<List<AttendanceRecord>> GetAttendanceByCenterAsync(long centerId, int year, int month);
+        Task<bool> UpdateAttendanceRecordsAsync(List<AttendanceRecord> records);
+    }
+}

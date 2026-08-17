@@ -26,6 +26,7 @@ namespace APIServerLib.Data
         public DbSet<BackupRecord> BackupRecords { get; set; }
         public DbSet<WReport> WReports { get; set; }
         public DbSet<WReportDetail> WReportDetails { get; set; }
+        public DbSet<AttendanceRecord> AttendanceRecord { get; set; }
 
 
 
@@ -36,6 +37,7 @@ namespace APIServerLib.Data
             // 1. إعداد المفاتيح المركبة للجداول الوسيطة
             modelBuilder.Entity<EmpCenter>().HasKey(ec => new { ec.EmployeeId, ec.CenterId ,ec.FromDate });
             modelBuilder.Entity<StdCenter>().HasKey(sc => new { sc.StudentId, sc.CenterId ,sc.FromDate });
+            modelBuilder.Entity<AttendanceRecord>().HasKey(a => new { a.EmployeeId, a.Date });
 
             // 2. حل مشكلة الـ Multiple Cascade Paths للموظف
             // نقوم بتعريف كل علاقة ونحدد أن OnDelete هو Restrict أو NoAction
@@ -153,6 +155,9 @@ namespace APIServerLib.Data
             //          .HasForeignKey(a => a.CenterId)
             //          .OnDelete(DeleteBehavior.NoAction);
             //});
+
+
+        
         }
 
     }
