@@ -95,5 +95,11 @@
             public const string Edit = PriorUrl + "/Edit";
             public const string FullSummery = PriorUrl + "/FullSummery";
         }
+
+        public static class AttendanceRecordPages
+        {
+            public const string PriorUrl = "attendance";
+            public const string Manage = PriorUrl + "/Manage";
+        }
     }
 }

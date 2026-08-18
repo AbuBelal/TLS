@@ -129,7 +129,13 @@ namespace TLSWeb.Helpers
          }).AddHttpMessageHandler<CookieHandler>();
 
 
-            builder.Services.AddRefitClient<IWReportDetailsApi>()
+         builder.Services.AddRefitClient<IWReportDetailsApi>()
+         .ConfigureHttpClient(c =>
+         {
+             c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+         }).AddHttpMessageHandler<CookieHandler>();
+
+         builder.Services.AddRefitClient<IAttendanceRecordApi>()
          .ConfigureHttpClient(c =>
          {
              c.BaseAddress = new Uri(ApiUrls.BaseUrl);

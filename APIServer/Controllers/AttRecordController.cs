@@ -1,5 +1,6 @@
 ﻿using APIServerLib.Repositories.Implemntations;
 using APIServerLib.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SharedLib.DTOs;
@@ -9,8 +10,9 @@ using System.Security.Claims;
 
 namespace APIServer.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class AttRecordController : ControllerBase
     {
         private readonly IAttRecordRepository _repository;
@@ -83,7 +85,7 @@ namespace APIServer.Controllers
         }
 
 
-        [HttpGet("center/{year}/{month}")]
+        [HttpGet("{year}/{month}")]
         public async Task<IActionResult> GetCenterAttendance(int year, int month)
         {
             var centerId = await CurrentCenterId();
@@ -97,20 +99,20 @@ namespace APIServer.Controllers
             return Ok(records);
         }
 
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateAttendance([FromBody] List<AttendanceRecord> records)
+        [HttpPut()]
+        public async Task<GeneralResponse> UpdateAttendance([FromBody] List<AttendanceRecord> records)
         {
             if (records == null || !records.Any())
-                return BadRequest("لم يتم إرسال أي بيانات للتحديث.");
+                return new GeneralResponse(true,"لم يتم إرسال أي بيانات للتحديث.",0);
 
             try
             {
                 var result = await _repository.UpdateAttendanceRecordsAsync(records);
-                return Ok(new { Message = "تم حفظ التعديلات بنجاح." });
+                return new GeneralResponse(true, "تم حفظ التعديلات بنجاح." ,0);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"حدث خطأ أثناء الحفظ: {ex.Message}");
+                return new GeneralResponse(true, $"حدث خطأ أثناء الحفظ: {ex.Message}",0);
             }
         }
 

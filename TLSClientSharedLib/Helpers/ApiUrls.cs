@@ -249,5 +249,13 @@ namespace TLSClientSharedLib.Helpers
             public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
         }
+        public static class AttendanceRecord
+        {
+            private const string PriorUrl = "/api/AttRecord";
+
+            public const string GetAll = PriorUrl;
+            public const string GetGenerateMonthlyAttendance = PriorUrl + "/{Year}/{Month}";
+            public const string Update = PriorUrl;
+        }
     }
 }

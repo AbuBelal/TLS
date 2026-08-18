@@ -1,9 +1,3 @@
-@* ╔══════════════════════════════════════════════════════════════╗ *@
-@* ║  TLSWeb/Layout/NavMenu.razor  — Responsive                   ║ *@
-@* ║  يعتمد على Tailwind (كما في المشروع الأصلي)                   ║ *@
-@* ║  + material-symbols-outlined للأيقونات                        ║ *@
-@* ╚══════════════════════════════════════════════════════════════╝ *@
-
 @implements IDisposable
 
 @* ══ زر Hamburger — يظهر فقط على الجوال ══ *@
@@ -297,7 +291,7 @@
                 </div>
             }
         </div>
-        <AuthorizeView Roles="@AppRoles.Admin">
+       
         <div>
             <button class="@GroupBtnClass("settings")"
                     @onclick='() => ToggleGroup("settings")'>
@@ -309,30 +303,28 @@
             </button>
             @if (openGroup == "settings")
             {
-                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
-                    <a href="@PagesUris.Admin.EditCenters" class="@SubLinkClass" @onclick="CloseSidebar">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                        <span>المراكز</span>
-                    </a>
 
-                   @*  <a href="@PagesUris.InComePages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                        <span>الوارد</span>
-                    </a> *@
-                   @*  <a href="#" class="@SubLinkClass" @onclick="CloseSidebar">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
-                        <span>إدارة الصلاحيات</span>
-                    </a> *@
+                <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
+                    <AuthorizeView Roles="@AppRoles.Admin">
+                        <a href="@PagesUris.Admin.EditCenters" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>المراكز</span>
+                        </a>
 
                         <a href="@PagesUris.Admin.Promotion" class="@SubLinkClass" @onclick="CloseSidebar">
                             <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                             <span>ترفيع الطلاب</span>
                         </a>
-                    
+                    </AuthorizeView>
+                    <a href="@PagesUris.AttendanceRecordPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                        <span>لوائح الدوام </span>
+                    </a>
+
                 </div>
             }
         </div>
-       </AuthorizeView>
+      
     </nav>
 
     @* ── Footer القائمة ── *@

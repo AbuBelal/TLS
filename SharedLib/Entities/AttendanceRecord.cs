@@ -11,7 +11,7 @@ namespace SharedLib.Entities
         public long EmployeeId { get; set; }
 
         [ForeignKey(nameof(EmployeeId))]
-        public Employee Employee { get; set; } = null!;
+        public Employee? Employee { get; set; } = null!;
 
         public long? CenterId { get; set; }
 

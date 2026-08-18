@@ -1,0 +1,14 @@
+﻿/* كلاس مخصص لتصغير القائمة وإخفاء السهم */
+.compact-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important; /* منع ظهور أي سهم */
+    padding: 0 !important; /* إلغاء المسافات الداخلية لتوفير المساحة */
+    text-align: center;
+    text-align-last: center; /* توسيط النص حتى بدون السهم */
+    font-size: 0.75rem; /* تصغير حجم الخط */
+    height: 20px; /* تقليل الارتفاع بشكل كبير */
+    border-radius: 3px;
+    cursor: pointer;
+}

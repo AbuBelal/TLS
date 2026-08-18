@@ -130,7 +130,9 @@ namespace APIServerLib.Repositories.Implemntations
                 // جلب السجلات مع بيانات الموظف لعرض اسمه في الواجهة
                 return await _context.AttendanceRecord
                     .Include(a => a.Employee)
+                    .Include(c=>c.Center)
                     .Where(a => a.Date.Year == year && a.Date.Month == month)
+                    .OrderBy(c=>c.Center.SortOrder)
                     .ToListAsync();
             }
             else
@@ -138,12 +140,13 @@ namespace APIServerLib.Repositories.Implemntations
                 // جلب السجلات مع بيانات الموظف لعرض اسمه في الواجهة
                 return await _context.AttendanceRecord
                     .Include(a => a.Employee)
+                    //.Include(c => c.Center)
                     .Where(a => a.CenterId == centerId && a.Date.Year == year && a.Date.Month == month)
                     .ToListAsync();
             }
         }
 
-        public async Task<bool> UpdateAttendanceRecordsAsync(List<AttendanceRecord> updatedRecords)
+        public async Task<bool> UpdateAttendanceRecordsAsync(List<AttendanceRecord>? updatedRecords)
         {
             foreach (var record in updatedRecords)
             {

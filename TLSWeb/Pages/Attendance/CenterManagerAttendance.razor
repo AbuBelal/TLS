@@ -1,0 +1,212 @@
+﻿@attribute [Route(PagesUris.AttendanceRecordPages.Manage)]
+
+@using TLSClientSharedLib.ViewModels
+
+
+<h3>إدارة دوام المركز - مدير المركز</h3>
+<hr />
+
+<!-- أدوات الفلترة -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label>السنة</label>
+        <input type="number" class="form-control" @bind="Year" />
+    </div>
+    <div class="col-md-3">
+        <label>الشهر</label>
+        <input type="number" class="form-control" @bind="Month" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button class="btn btn-primary" @onclick="LoadData">جلب اللوائح</button>
+        <button class="btn btn-success ms-2" @onclick="SaveChanges" disabled="@(!EmployeeList.Any())">حفظ التعديلات</button>
+    </div>
+</div>
+
+@if (isLoading)
+{
+    <div class="alert alert-info">جاري تحميل البيانات...</div>
+}
+else if (EmployeeList.Any())
+{
+    <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
+        <table class="table table-bordered table-hover table-striped table-sm text-center align-middle">
+            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                <tr>
+                    <th style="min-width: 150px; position: sticky; right: 0; background-color: #212529; z-index: 2;">اسم الموظف</th>
+                    @for (int i = 1; i <= DaysInMonth; i++)
+                    {
+                        <th style="min-width: 45px;">
+                            @i<br />
+                            @* <span>@MonthDayes.AddDays(i-1).DayOfWeek.ToString().Substring(0,3)</span> *@
+                            <span>@(new DateTime(Year, Month, i).DayOfWeek.ToString().Substring(0, 3))</span>
+                            </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var emp in EmployeeList)
+                {
+                    <tr>
+                        <td style="position: sticky; right: 0; background-color: #f8f9fa; font-weight: bold; z-index: 1;">
+                            <span>@emp.EmployeeName</span><br />
+                            <small>@emp.CenterName</small>
+                        </td>
+
+                        @foreach (var day in emp.Days)
+                        {
+                            bool isFriday = new DateTime(Year, Month, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
+
+                            string fridayClass = isFriday ? "bg-danger bg-opacity-10" : "";
+
+                            <td class="p-1 align-middle @fridayClass" style="@(isFriday ? "background-color: #f8d7da !important;" : "")">
+                                <!-- استخدام d-flex مع flex-column لوضع العنصرين فوق بعضهما بمسافة شبه معدومة -->
+                                <div class="d-flex flex-column align-items-center justify-content-center" style="gap: 2px;">
+
+                                    <!-- Checkbox للحضور -->
+                                    <input class="form-check-input border-secondary m-0"
+                                           type="checkbox"
+                                           @bind="day.IsAttendant"
+                                           disabled="@(day.DescId > -1)"
+                                           style="width: 16px; height: 16px; cursor: pointer; box-shadow: none;"
+                                           id="chk_@(emp.EmployeeId)_@(day.DayNumber)">
+
+                                    <!-- Dropdown لنوع الإجازة -->
+                                    <select class="form-control compact-select border-secondary"
+                                            style="width: 30px;"
+                                            @bind="day.DescId"
+                                            disabled="@(day.IsAttendant == true)">
+                                        <option value="-1">-</option>
+                                        @foreach (var leaveType in LeaveTypes)
+                                        {
+                                            <option value="@leaveType.Id">@leaveType.Name</option>
+                                        }
+                                    </select>
+
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private DateTime MonthDayes ;
+    private int Year = DateTime.Now.Year;
+    private int Month = DateTime.Now.Month;
+    private int DaysInMonth = 31;
+    private bool isLoading = false;
+
+    // قائمة الموظفين (الـ ViewModel) التي سيتم عرضها في الجدول
+    private List<EmployeeAttendanceVM> EmployeeList = new();
+
+    // قائمة أنواع الإجازات (من المفترض جلبها من الـ API)
+    private List<LookupValue> LeaveTypes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // جلب أنواع الإجازات (محاكاة لبيانات تجريبية)
+        // يجب استبدالها بـ Http.GetFromJsonAsync("api/lookup/leaves")
+        LeaveTypes = new List<LookupValue>
+        {
+            new LookupValue { Id = 1, Name = "A" },
+            new LookupValue { Id = 2, Name = "S" },
+            new LookupValue { Id = 3, Name = "Z" },
+            new LookupValue { Id = 4, Name = "D" },
+            new LookupValue { Id = 5, Name = "W" }
+        };
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        DaysInMonth = DateTime.DaysInMonth(Year, Month);
+        MonthDayes = new DateTime(Year, Month, 1);
+        // جلب البيانات الأصلية من الـ API
+        var records = await AttendanceRecordApi.GetGenerateMonthlyAttendance(Year,Month); 
+
+        // تحويل البيانات الأصلية إلى ViewModel
+        EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
+
+        isLoading = false;
+    }
+
+    private async Task SaveChanges()
+    {
+        isLoading = true;
+
+        // تحويل الـ ViewModel للبيانات الأصلية لإرسالها
+        var recordsToUpdate = EmployeeList.Select(e => MapToEntity(e)).ToList();
+
+        var response = await AttendanceRecordApi.Update(recordsToUpdate); 
+        if (response.Success)
+        {
+            // يمكنك إضافة SweetAlert هنا لإشعار المستخدم بالنجاح
+            MudSnackbar.Add("تم حفظ البيانات بنجاح", Severity.Success);
+        }
+
+        isLoading = false;
+    }
+
+    #region Mapper Methods (التحويل بين قاعدة البيانات والواجهة)
+
+    private EmployeeAttendanceVM MapToViewModel(AttendanceRecord record, int daysInMonth)
+    {
+        var vm = new EmployeeAttendanceVM
+        {
+            EmployeeId = record.EmployeeId,
+            EmployeeName = record.Employee?.Name ?? record.Employee?.EnName ?? "غير معروف",
+            CenterName = record.Center?.Name??"",
+            OriginalRecord = record
+        };
+
+        var type = typeof(AttendanceRecord);
+        for (int i = 1; i <= daysInMonth; i++)
+        {
+            var isAttendantProp = type.GetProperty($"Day{i:D2}_IsAttendant");
+            var descProp = type.GetProperty($"Day{i:D2}_Desc");
+
+            vm.Days.Add(new DayVM
+            {
+                DayNumber = i,
+                IsAttendant = isAttendantProp?.GetValue(record) as bool?,
+                DescId = descProp?.GetValue(record) as long?
+            });
+        }
+        return vm;
+    }
+
+    private AttendanceRecord MapToEntity(EmployeeAttendanceVM vm)
+    {
+        var record = vm.OriginalRecord;
+
+        record.Center = null; // تجنب إرسال بيانات المركز لتجنب مشاكل التتبع في EF Core
+        record.Employee = null; // تجنب إرسال بيانات الموظف لتجنب مشاكل التتبع في EF Core
+
+        var type = typeof(AttendanceRecord);
+
+        foreach (var day in vm.Days)
+        {
+            var isAttendantProp = type.GetProperty($"Day{day.DayNumber:D2}_IsAttendant");
+            var descProp = type.GetProperty($"Day{day.DayNumber:D2}_Desc");
+
+            isAttendantProp?.SetValue(record, day.IsAttendant);
+            descProp?.SetValue(record, day.DescId);
+        }
+
+        return record;
+    }
+
+    #endregion
+}
+
+<!-- كلاس بسيط لمحاكاة أنواع الإجازات -->
+@code {
+    public class LookupValue
+    {
+        public long Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}
