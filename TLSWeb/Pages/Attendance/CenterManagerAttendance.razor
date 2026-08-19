@@ -95,16 +95,18 @@ else
     }
     else
     {
-        <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
-            <table class="table table-bordered table-hover table-striped table-sm text-center align-middle">
-                <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+        <div class="table-attendance-container shadow-sm">
+            <table class="table table-bordered table-hover table-sm text-center  mb-0">
+                <thead>
                     <tr>
-                        <th style="min-width: 150px; position: sticky; right: 0; background-color: #212529; z-index: 2;">اسم الموظف</th>
+                        <th class="sticky-corner text-white align-content-lg-start" style="min-width: 160px; padding: 12px;">اسم الموظف</th>
                         @for (int i = 1; i <= DaysInMonth; i++)
                         {
-                            <th style="min-width: 35px;">
-                                @i<br />
-                                <span>@(new DateTime(LoadYear, LoadMonth, i).DayOfWeek.ToString().Substring(0, 3))</span>
+                            <th class="sticky-header" style="min-width: 30px;">
+                                <span class="d-block" style="font-size: 1.1rem;">@i</span>
+                                <span style="font-size: 0.75rem; color: #adb5bd;">
+                                    @(new DateTime(LoadYear, LoadMonth, i).ToString("ddd", new System.Globalization.CultureInfo("ar-AE")))
+                                </span>
                             </th>
                         }
                     </tr>
@@ -113,71 +115,61 @@ else
                     @foreach (var emp in EmployeeList)
                     {
                         <tr>
-                            <td style="position: sticky; right: 0; background-color: #f8f9fa; font-weight: bold; z-index: 1;">
-                                <span>@emp.EmployeeName</span><br />
-                                <small>@emp.CenterName</small>
+                            <td class="sticky-col bg-white  px-3">
+                                <div class="fw-bold text-dark text-truncate" style="max-width: 150px;" title="@emp.EmployeeName">
+                                    @emp.EmployeeName
+                                </div>
+                                <div class="text-muted" style="font-size: 0.8rem;">@emp.CenterName</div>
                             </td>
 
                             @foreach (var day in emp.Days)
                             {
                                 bool isFriday = new DateTime(LoadYear, LoadMonth, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
+                                string cellClass = isFriday ? "weekend-bg" : "";
 
-                                string fridayClass = isFriday ? "bg-danger bg-opacity-10" : "";
-
-                                <td class="p-1 align-middle @fridayClass" style="@(isFriday ? "background-color: #f8d7da !important;" : "")">
-                                   @if(day.IsLocked)
+                                <td class="p-1 align-middle @cellClass">
+                                    @if (day.IsLocked)
                                     {
-                                         <div class="d-flex flex-column align-items-center justify-content-center" style="gap: 2px;">
-                                           @if(day.IsAttendant??false)
+                                        <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
+                                            @if (day.IsAttendant ?? false)
                                             {
-                                                <span class="badge bg-success" style="font-size: 0.75rem;"> X </span>
+                                                <span class="badge bg-success rounded-pill px-2" style="font-size: 0.75rem;">X</span>
                                             }
                                             else
                                             {
-                                                string Desc = LeaveTypes.FirstOrDefault(lt => lt.Id == day.DescId)?.Name ?? "غير مدخل";
-                                                if (Desc == "غير مدخل")
+                                                string Desc = LeaveTypes.FirstOrDefault(lt => lt.Id == day.DescId)?.EnName;
+                                                if (string.IsNullOrEmpty(Desc))
                                                 {
-                                                    <span class="badge bg-danger " style="font-size: 0.75rem;">@Desc</span>
+                                                    <span class="text-muted" style="font-size: 0.85rem;">-</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-warning text-body" style="font-size: 0.75rem;">@Desc</span>
+                                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.75rem;">@Desc</span>
                                                 }
                                             }
                                         </div>
                                     }
                                     else
                                     {
-                                    <div class="d-flex flex-column align-items-center justify-content-center" style="gap: 2px;">
-
-                                        <!-- Checkbox للحضور -->
-                                       @*  <input class="form-check-input border-secondary m-0"
-                                               type="checkbox"
-                                               @bind="day.IsAttendant"
-                                               disabled="@(day.DescId > -1)"
-                                               style="width: 16px; height: 16px; cursor: pointer; box-shadow: none;"
-                                               id="chk_@(emp.EmployeeId)_@(day.DayNumber)"> *@
-
-                                            <input class="form-check-input border-secondary m-0 custom-checkbox-x"
+                                        <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
+                                            <!-- Checkbox للحضور -->
+                                            <input class="form-check-input custom-checkbox-x m-0 shadow-none"
                                                    type="checkbox"
                                                    @bind="day.IsAttendant"
                                                    disabled="@(day.DescId > -1)"
-                                                   style="width: 16px; height: 16px; cursor: pointer; box-shadow: none;"
                                                    id="chk_@(emp.EmployeeId)_@(day.DayNumber)">
 
-                                        <!-- Dropdown لنوع الإجازة -->
-                                        <select class="form-control compact-select border-secondary"
-                                                style="width: 20px;"
-                                                @bind="day.DescId"
-                                                disabled="@(day.IsAttendant == true)">
-                                            <option value="-1">-</option>
-                                            @foreach (var leaveType in LeaveTypes)
-                                            {
-                                                <option value="@leaveType.Id">@(leaveType.EnName)</option>
-                                            }
-                                        </select>
-
-                                    </div>
+                                            <!-- Dropdown لنوع الإجازة -->
+                                            <select class="compact-select text-secondary"
+                                                    @bind="day.DescId"
+                                                    disabled="@(day.IsAttendant == true)">
+                                                <option value="-1">-</option>
+                                                @foreach (var leaveType in LeaveTypes)
+                                                {
+                                                    <option value="@leaveType.Id" title="@leaveType.Name">@leaveType.EnName</option>
+                                                }
+                                            </select>
+                                        </div>
                                     }
                                 </td>
                             }
