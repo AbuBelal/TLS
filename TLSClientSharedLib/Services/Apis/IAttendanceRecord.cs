@@ -1,4 +1,5 @@
 using Refit;
+using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Responses;
 using System.Collections.Generic;
@@ -9,11 +10,17 @@ namespace TLSClientSharedLib.Services.Apis
 {
     public interface IAttendanceRecordApi
     {
-        [Get(ApiUrls.AttendanceRecord.GetGenerateMonthlyAttendance)]
-        Task<List<AttendanceRecord>> GetGenerateMonthlyAttendance(int year, int month);
+        [Get(ApiUrls.AttendanceRecord.GetGeneratedMonthlyAttendance)]
+        Task<List<AttendanceRecord>> GetGeneratedMonthlyAttendance(int year, int month);
 
         [Put(ApiUrls.AttendanceRecord.Update)]
         Task<GeneralResponse> Update(List<AttendanceRecord> records);
+
+        [Post(ApiUrls.AttendanceRecord.GenerateMonthlyAttendance)]
+        Task<GeneralResponse> GenrateMonthlyAttendance(GenerateAttendanceRequest request);
+
+        [Post(ApiUrls.AttendanceRecord.LockMonthlyAttendance)]
+        Task<GeneralResponse> LockMonthlyAttendance(GenerateAttendanceRequest request);
 
     }
 }

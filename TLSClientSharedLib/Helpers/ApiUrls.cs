@@ -254,8 +254,10 @@ namespace TLSClientSharedLib.Helpers
             private const string PriorUrl = "/api/AttRecord";
 
             public const string GetAll = PriorUrl;
-            public const string GetGenerateMonthlyAttendance = PriorUrl + "/{Year}/{Month}";
+            public const string GetGeneratedMonthlyAttendance = PriorUrl + "/{Year}/{Month}";
             public const string Update = PriorUrl;
+            public const string GenerateMonthlyAttendance = PriorUrl;
+            public const string LockMonthlyAttendance = PriorUrl+ "/lock";
         }
     }
 }

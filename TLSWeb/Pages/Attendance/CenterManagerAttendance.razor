@@ -1,6 +1,7 @@
 ﻿@attribute [Route(PagesUris.AttendanceRecordPages.Manage)]
 
 @using TLSClientSharedLib.ViewModels
+@using TLSWeb.Components
 
 
 <h3>إدارة دوام المركز - مدير المركز</h3>
@@ -8,94 +9,249 @@
 
 <!-- أدوات الفلترة -->
 <div class="row mb-4">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label>السنة</label>
         <input type="number" class="form-control" @bind="Year" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label>الشهر</label>
         <input type="number" class="form-control" @bind="Month" />
     </div>
-    <div class="col-md-3 d-flex align-items-end">
+    <div class="col-md-6 d-flex align-items-end">
         <button class="btn btn-primary" @onclick="LoadData">جلب اللوائح</button>
         <button class="btn btn-success ms-2" @onclick="SaveChanges" disabled="@(!EmployeeList.Any())">حفظ التعديلات</button>
+        <AuthorizeView Roles="@AppRoles.Admin">
+            <button class="btn btn-info ml-2" @onclick="GenerateAttRecord">إنشاء / تحديث لوائح الدوام</button>
+            <button class="btn btn-danger ml-2 " @onclick="@(()=>LockAttRecord(true))">إغلاق لوائح الداوم </button>
+            <button class="btn btn-success " @onclick="@(()=>LockAttRecord(false))">فتح لوائح الداوم </button>
+        </AuthorizeView>
     </div>
 </div>
 
-@if (isLoading)
+<AuthorizeView Roles="@AppRoles.Admin">
+@if (EmployeeList.Any())
 {
-    <div class="alert alert-info">جاري تحميل البيانات...</div>
-}
-else if (EmployeeList.Any())
-{
-    <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
-        <table class="table table-bordered table-hover table-striped table-sm text-center align-middle">
-            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
-                <tr>
-                    <th style="min-width: 150px; position: sticky; right: 0; background-color: #212529; z-index: 2;">اسم الموظف</th>
-                    @for (int i = 1; i <= DaysInMonth; i++)
+    <div class="d-flex align-items-center flex-wrap gap-3 p-3 mb-4 bg-light border rounded-3 shadow-sm">
+
+        <!-- العنوان / الأيقونة -->
+        <span class="fw-bold text-secondary text-nowrap mb-0">
+            <i class="bi bi-calendar-event me-1"></i> تعميم إجازة:
+        </span>
+
+        <!-- حقل اليوم -->
+        <div class="input-group input-group-sm" style="width: 140px;">
+            <span class="input-group-text bg-white text-muted">اليوم</span>
+            <input type="number" class="form-control" placeholder="1-31" @bind="DayNoToVac" min="1" max="@DaysInMonth" />
+        </div>
+
+        <!-- حقل نوع الإجازة -->
+        @if (LeaveTypes is not null && LeaveTypes.Any())
+        {
+            <div class="input-group input-group-sm" style="max-width: 250px;">
+                <span class="input-group-text bg-white text-muted">النوع</span>
+                <select class="form-select" @bind="VacationTypeId">
+                    <option value="-1">-- اختر --</option>
+                    @foreach (var leaveType in LeaveTypes)
                     {
-                        <th style="min-width: 45px;">
-                            @i<br />
-                            @* <span>@MonthDayes.AddDays(i-1).DayOfWeek.ToString().Substring(0,3)</span> *@
-                            <span>@(new DateTime(Year, Month, i).DayOfWeek.ToString().Substring(0, 3))</span>
-                            </th>
+                        <option value="@leaveType.Id">@($"{leaveType.EnName} - {leaveType.Name}")</option>
                     }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var emp in EmployeeList)
-                {
-                    <tr>
-                        <td style="position: sticky; right: 0; background-color: #f8f9fa; font-weight: bold; z-index: 1;">
-                            <span>@emp.EmployeeName</span><br />
-                            <small>@emp.CenterName</small>
-                        </td>
+                </select>
+            </div>
+        }
 
-                        @foreach (var day in emp.Days)
-                        {
-                            bool isFriday = new DateTime(Year, Month, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
+        <!-- زر التطبيق (يأخذ باقي المساحة ليدفع نفسه لليسار أو يبقى بجانبهم حسب الشاشة) -->
+        <div class="ms-auto">
+            <button class="btn btn-warning btn-sm text-body px-3 shadow-sm text-nowrap" @onclick="ApplyVacation">
+                <i class="bi bi-check2-all me-1"></i> تطبيق على الجميع
+            </button>
+        </div>
 
-                            string fridayClass = isFriday ? "bg-danger bg-opacity-10" : "";
-
-                            <td class="p-1 align-middle @fridayClass" style="@(isFriday ? "background-color: #f8d7da !important;" : "")">
-                                <!-- استخدام d-flex مع flex-column لوضع العنصرين فوق بعضهما بمسافة شبه معدومة -->
-                                <div class="d-flex flex-column align-items-center justify-content-center" style="gap: 2px;">
-
-                                    <!-- Checkbox للحضور -->
-                                    <input class="form-check-input border-secondary m-0"
-                                           type="checkbox"
-                                           @bind="day.IsAttendant"
-                                           disabled="@(day.DescId > -1)"
-                                           style="width: 16px; height: 16px; cursor: pointer; box-shadow: none;"
-                                           id="chk_@(emp.EmployeeId)_@(day.DayNumber)">
-
-                                    <!-- Dropdown لنوع الإجازة -->
-                                    <select class="form-control compact-select border-secondary"
-                                            style="width: 30px;"
-                                            @bind="day.DescId"
-                                            disabled="@(day.IsAttendant == true)">
-                                        <option value="-1">-</option>
-                                        @foreach (var leaveType in LeaveTypes)
-                                        {
-                                            <option value="@leaveType.Id">@leaveType.Name</option>
-                                        }
-                                    </select>
-
-                                </div>
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
 }
+</AuthorizeView>
+
+
+@if (isLoading)
+{
+    @*  <div class="alert alert-info">جاري تحميل البيانات...</div> *@
+    <LoadingComponent></LoadingComponent>
+}
+else
+    if (!EmployeeList.Any())
+    {
+        <div class="alert alert-warning d-flex align-items-center shadow-sm rounded-3 p-3 border-0 border-start border-warning border-4" role="alert">
+            <!-- أيقونة التحذير (SVG) -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-exclamation-triangle-fill ms-3 text-warning" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>
+                <h6 class="alert-heading mb-1 fw-bold text-dark">لوائح الدوام غير متوفرة</h6>
+                <p class="mb-0 text-muted" style="font-size: 0.95rem;">
+                    عذراً، لوائح الدوام الخاصة بهذا الشهر لم يتم إصدارها بعد. يرجى التواصل مع الإدارة  للمتابعة.
+                </p>
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
+            <table class="table table-bordered table-hover table-striped table-sm text-center align-middle">
+                <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                    <tr>
+                        <th style="min-width: 150px; position: sticky; right: 0; background-color: #212529; z-index: 2;">اسم الموظف</th>
+                        @for (int i = 1; i <= DaysInMonth; i++)
+                        {
+                            <th style="min-width: 35px;">
+                                @i<br />
+                                <span>@(new DateTime(LoadYear, LoadMonth, i).DayOfWeek.ToString().Substring(0, 3))</span>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var emp in EmployeeList)
+                    {
+                        <tr>
+                            <td style="position: sticky; right: 0; background-color: #f8f9fa; font-weight: bold; z-index: 1;">
+                                <span>@emp.EmployeeName</span><br />
+                                <small>@emp.CenterName</small>
+                            </td>
+
+                            @foreach (var day in emp.Days)
+                            {
+                                bool isFriday = new DateTime(LoadYear, LoadMonth, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
+
+                                string fridayClass = isFriday ? "bg-danger bg-opacity-10" : "";
+
+                                <td class="p-1 align-middle @fridayClass" style="@(isFriday ? "background-color: #f8d7da !important;" : "")">
+                                   @if(day.IsLocked)
+                                    {
+                                         <div class="d-flex flex-column align-items-center justify-content-center" style="gap: 2px;">
+                                           @if(day.IsAttendant??false)
+                                            {
+                                                <span class="badge bg-success" style="font-size: 0.75rem;"> X </span>
+                                            }
+                                            else
+                                            {
+                                                string Desc = LeaveTypes.FirstOrDefault(lt => lt.Id == day.DescId)?.Name ?? "غير مدخل";
+                                                if (Desc == "غير مدخل")
+                                                {
+                                                    <span class="badge bg-danger " style="font-size: 0.75rem;">@Desc</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-body" style="font-size: 0.75rem;">@Desc</span>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                    <div class="d-flex flex-column align-items-center justify-content-center" style="gap: 2px;">
+
+                                        <!-- Checkbox للحضور -->
+                                       @*  <input class="form-check-input border-secondary m-0"
+                                               type="checkbox"
+                                               @bind="day.IsAttendant"
+                                               disabled="@(day.DescId > -1)"
+                                               style="width: 16px; height: 16px; cursor: pointer; box-shadow: none;"
+                                               id="chk_@(emp.EmployeeId)_@(day.DayNumber)"> *@
+
+                                            <input class="form-check-input border-secondary m-0 custom-checkbox-x"
+                                                   type="checkbox"
+                                                   @bind="day.IsAttendant"
+                                                   disabled="@(day.DescId > -1)"
+                                                   style="width: 16px; height: 16px; cursor: pointer; box-shadow: none;"
+                                                   id="chk_@(emp.EmployeeId)_@(day.DayNumber)">
+
+                                        <!-- Dropdown لنوع الإجازة -->
+                                        <select class="form-control compact-select border-secondary"
+                                                style="width: 20px;"
+                                                @bind="day.DescId"
+                                                disabled="@(day.IsAttendant == true)">
+                                            <option value="-1">-</option>
+                                            @foreach (var leaveType in LeaveTypes)
+                                            {
+                                                <option value="@leaveType.Id">@(leaveType.EnName)</option>
+                                            }
+                                        </select>
+
+                                    </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+<div>
+    @if (LeaveTypes != null && LeaveTypes.Any())
+    {
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-secondary">
+                    <i class="bi bi-list-ul me-2"></i> دليل أنواع الإجازات
+                </h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-3 text-muted fw-semibold">الرمز (عربي)</th>
+                            <th class="py-3 text-muted fw-semibold">الرمز (إنجليزي)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         <tr>
+                                <td class="py-3">
+                                    <span class="badge bg-success text-dark px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.9rem;">
+                                        حضور
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                                        X
+                                    </span>
+                                </td>
+                            </tr>
+
+                        @foreach (var leaveType in LeaveTypes)
+                        {
+                            <tr>
+                                <td class="py-3">
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.9rem;">
+                                        @leaveType.Name
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                                        @leaveType.EnName
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
     private DateTime MonthDayes ;
     private int Year = DateTime.Now.Year;
     private int Month = DateTime.Now.Month;
+
+    private long VacationTypeId=-1;
+    private int DayNoToVac=0;
+
+    private int LoadYear = DateTime.Now.Year;
+    private int LoadMonth = DateTime.Now.Month;
+
     private int DaysInMonth = 31;
     private bool isLoading = false;
 
@@ -107,25 +263,19 @@ else if (EmployeeList.Any())
 
     protected override async Task OnInitializedAsync()
     {
-        // جلب أنواع الإجازات (محاكاة لبيانات تجريبية)
-        // يجب استبدالها بـ Http.GetFromJsonAsync("api/lookup/leaves")
-        LeaveTypes = new List<LookupValue>
-        {
-            new LookupValue { Id = 1, Name = "A" },
-            new LookupValue { Id = 2, Name = "S" },
-            new LookupValue { Id = 3, Name = "Z" },
-            new LookupValue { Id = 4, Name = "D" },
-            new LookupValue { Id = 5, Name = "W" }
-        };
+        LeaveTypes = await LookupValueApi.GetByValueType("Vacation");
+        await LoadData();
     }
 
     private async Task LoadData()
     {
         isLoading = true;
+        LoadYear=Year;
+        LoadMonth = Month;
         DaysInMonth = DateTime.DaysInMonth(Year, Month);
         MonthDayes = new DateTime(Year, Month, 1);
         // جلب البيانات الأصلية من الـ API
-        var records = await AttendanceRecordApi.GetGenerateMonthlyAttendance(Year,Month); 
+        var records = await AttendanceRecordApi.GetGeneratedMonthlyAttendance(Year,Month); 
 
         // تحويل البيانات الأصلية إلى ViewModel
         EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
@@ -150,6 +300,75 @@ else if (EmployeeList.Any())
         isLoading = false;
     }
 
+    private async Task GenerateAttRecord()
+    {
+        isLoading = true;
+        GenerateAttendanceRequest request = new GenerateAttendanceRequest
+        {
+            Year = Year,
+            Month = Month,
+            HolidayCode = LeaveTypes.FirstOrDefault(lt => lt.EnName == "W")?.Id??null,
+        };
+        var res = await AttendanceRecordApi.GenrateMonthlyAttendance(request);
+        if (res.Success)
+        {
+            await LoadData(); // إعادة تحميل البيانات بعد إنشاء اللوائح
+            // DaysInMonth = DateTime.DaysInMonth(Year, Month);
+            // MonthDayes = new DateTime(Year, Month, 1);
+
+            // // تحويل البيانات الأصلية إلى ViewModel
+            // EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
+        }
+        else
+        {
+            MudSnackbar.Add("فشلت عملية إنشاء لوائح الدوام !", Severity.Error);
+        }
+        isLoading = false;
+    }
+
+    private async Task LockAttRecord(bool Lock=true)
+    {
+        isLoading = true;
+        GenerateAttendanceRequest request = new GenerateAttendanceRequest
+        {
+            Year = Year,
+            Month = Month,
+            Lock = Lock
+        };
+        var res = await AttendanceRecordApi.LockMonthlyAttendance(request);
+        if (res.Success)
+        {
+            await LoadData(); // إعادة تحميل البيانات بعد إغلاق اللوائح
+            MudSnackbar.Add("تم إغلاق لوائح الدوام بنجاح", Severity.Success);
+        }
+        else
+        {
+            MudSnackbar.Add("فشلت عملية إغلاق لوائح الدوام !", Severity.Error);
+        }
+        isLoading = false;
+    }
+
+    private async Task ApplyVacation()
+    {
+        DateTime dayToVac = new DateTime(Year, Month, DayNoToVac);
+        if(dayToVac.DayOfWeek==DayOfWeek.Friday)
+        {
+            MudSnackbar.Add("لا يمكن تعميم يوم إجازة على الموظفين يوم الجمعة ", Severity.Error);
+            return;
+        }
+        foreach (var emp in EmployeeList)
+        {
+            var day = emp.Days.FirstOrDefault(d => d.DayNumber == DayNoToVac);
+            if (day is not null)
+            {
+                day.IsAttendant = false;
+                day.DescId = VacationTypeId;
+            }
+        }
+        MudSnackbar.Add("تم تعميم يوم الإجازة على جميع الموظفين", Severity.Success);
+        StateHasChanged();
+    }
+
     #region Mapper Methods (التحويل بين قاعدة البيانات والواجهة)
 
     private EmployeeAttendanceVM MapToViewModel(AttendanceRecord record, int daysInMonth)
@@ -159,7 +378,7 @@ else if (EmployeeList.Any())
             EmployeeId = record.EmployeeId,
             EmployeeName = record.Employee?.Name ?? record.Employee?.EnName ?? "غير معروف",
             CenterName = record.Center?.Name??"",
-            OriginalRecord = record
+            OriginalRecord = record,
         };
 
         var type = typeof(AttendanceRecord);
@@ -172,7 +391,8 @@ else if (EmployeeList.Any())
             {
                 DayNumber = i,
                 IsAttendant = isAttendantProp?.GetValue(record) as bool?,
-                DescId = descProp?.GetValue(record) as long?
+                DescId = descProp?.GetValue(record) as long?,
+                IsLocked = record.IsLocked??false
             });
         }
         return vm;
@@ -184,7 +404,7 @@ else if (EmployeeList.Any())
 
         record.Center = null; // تجنب إرسال بيانات المركز لتجنب مشاكل التتبع في EF Core
         record.Employee = null; // تجنب إرسال بيانات الموظف لتجنب مشاكل التتبع في EF Core
-
+        record.IsLocked = vm.OriginalRecord.IsLocked; // تحديث حالة القفل إذا كانت موجودة في الـ ViewModel
         var type = typeof(AttendanceRecord);
 
         foreach (var day in vm.Days)
@@ -203,10 +423,10 @@ else if (EmployeeList.Any())
 }
 
 <!-- كلاس بسيط لمحاكاة أنواع الإجازات -->
-@code {
+@* @code {
     public class LookupValue
     {
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }
-}
+} *@

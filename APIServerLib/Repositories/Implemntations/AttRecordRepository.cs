@@ -1,8 +1,9 @@
-using SharedLib.Entities;
-using APIServerLib.Repositories.Interfaces;
-using SharedLib.Responses;
-using Microsoft.EntityFrameworkCore;
 using APIServerLib.Data;
+using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.EntityFrameworkCore;
+using SharedLib.Entities;
+using SharedLib.Responses;
 
 namespace APIServerLib.Repositories.Implemntations
 {
@@ -15,7 +16,7 @@ namespace APIServerLib.Repositories.Implemntations
             _context = context;
         }
 
-        public async Task<int> GenerateMonthlyAttendanceAsync(int year, int month, long holidayCode)
+        public async Task<int> GenerateMonthlyAttendanceAsync(int year, int month, long? holidayCode)
         {
             // 1. تحديد بداية ونهاية الشهر
             var monthStart = new DateOnly(year, month, 1);
@@ -97,7 +98,7 @@ namespace APIServerLib.Repositories.Implemntations
              .FirstOrDefault()?.CenterId;
         }
 
-        private void FillDaysLogic(AttendanceRecord record, int year, int month, int daysInMonth, long holidayCode)
+        private void FillDaysLogic(AttendanceRecord record, int year, int month, int daysInMonth, long? holidayCode)
         {
             for (int day = 1; day <= daysInMonth; day++)
             {
@@ -107,7 +108,7 @@ namespace APIServerLib.Repositories.Implemntations
                 // إذا كانت جمعة، نضع كود العطلة
                 if (isFriday)
                 {
-                    SetPropertyByDay(record, day, holidayCode);
+                    SetPropertyByDay(record, day, holidayCode??0);
                 }
             }
         }
@@ -165,6 +166,23 @@ namespace APIServerLib.Repositories.Implemntations
             // حفظ التعديلات دفعة واحدة
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task LockAttendanceRecordsAsync(int year, int month, bool Lock=true)
+        {
+            //var recordsToLock = await _context.AttendanceRecord
+            //    .Where(r => r.Date.Year == year && r.Date.Month == month && !(r.IsLocked??false))
+            //    .ToListAsync();
+            //foreach (var record in recordsToLock)
+            //{
+            //    record.IsLocked = true;
+            //}
+            //await _context.SaveChangesAsync();
+
+
+            await _context.AttendanceRecord
+              .Where(r => r.Date == new DateOnly(year, month, 1) && r.IsLocked !=Lock)
+              .ExecuteUpdateAsync(s => s.SetProperty(r => r.IsLocked, Lock));
         }
     }
 }

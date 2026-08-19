@@ -51,13 +51,13 @@ namespace APIServer.Controllers
         }
         #endregion
 
-        [HttpPost("generate")]
-        public async Task<IActionResult> GenerateMonthlyAttendance([FromBody] GenerateAttendanceRequest request)
+        [HttpPost()]
+        public async Task<GeneralResponse> GenerateMonthlyAttendance([FromBody] GenerateAttendanceRequest request)
         {
             // تحقق مبدئي من صحة التواريخ
             if (request.Year < 2000 || request.Month < 1 || request.Month > 12)
             {
-                return BadRequest("بيانات السنة أو الشهر غير صالحة.");
+                return new GeneralResponse(false, "بيانات السنة أو الشهر غير صالحة.");
             }
 
             try
@@ -75,47 +75,60 @@ namespace APIServer.Controllers
                 //Count = generatedCount
                 );
 
-                return Ok(response);
+                return response;
             }
             catch (Exception ex)
             {
                 // يفضل تسجيل الخطأ هنا باستخدام ILogger
-                return StatusCode(500, $"حدث خطأ داخلي أثناء توليد اللوائح: {ex.Message}");
+                return new GeneralResponse(false, $"حدث خطأ داخلي أثناء توليد اللوائح: {ex.Message}");
             }
         }
 
 
         [HttpGet("{year}/{month}")]
-        public async Task<IActionResult> GetCenterAttendance(int year, int month)
+        public async Task<List<AttendanceRecord>> GetCenterAttendance(int year, int month)
         {
             var centerId = await CurrentCenterId();
-            var records = await _repository.GetAttendanceByCenterAsync(centerId, year, month);
+            List<AttendanceRecord> records = await _repository.GetAttendanceByCenterAsync(centerId, year, month);
 
             if (records == null || !records.Any())
-                return NotFound("لا توجد سجلات دوام لهذا المركز في الشهر المحدد.");
+                return new List<AttendanceRecord>();// "لا توجد سجلات دوام لهذا المركز في الشهر المحدد.");
 
             // لتجنب مشكلة الـ Circular Reference عند إرسال البيانات كـ JSON
             // يمكنك استخدام DTO، أو استخدام خيارات JSON لتجاهل الـ Reference Cycles
-            return Ok(records);
+            return records;
         }
 
         [HttpPut()]
         public async Task<GeneralResponse> UpdateAttendance([FromBody] List<AttendanceRecord> records)
         {
             if (records == null || !records.Any())
-                return new GeneralResponse(true,"لم يتم إرسال أي بيانات للتحديث.",0);
+                return new GeneralResponse(true, "لم يتم إرسال أي بيانات للتحديث.", 0);
 
             try
             {
                 var result = await _repository.UpdateAttendanceRecordsAsync(records);
-                return new GeneralResponse(true, "تم حفظ التعديلات بنجاح." ,0);
+                return new GeneralResponse(true, "تم حفظ التعديلات بنجاح.", 0);
             }
             catch (Exception ex)
             {
-                return new GeneralResponse(true, $"حدث خطأ أثناء الحفظ: {ex.Message}",0);
+                return new GeneralResponse(true, $"حدث خطأ أثناء الحفظ: {ex.Message}", 0);
             }
         }
 
+        [HttpPost("lock")]
+        public async Task<GeneralResponse> LockAttendance(GenerateAttendanceRequest request)
+        {
+            try
+            {
+                await _repository.LockAttendanceRecordsAsync(request.Year, request.Month, request.Lock??true);
+                return new GeneralResponse(true, "تم قفل سجلات الدوام لهذا الشهر بنجاح.", 0);
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse(false, $"حدث خطأ أثناء القفل: {ex.Message}", 0);
+            }
 
+        }
     }
 }

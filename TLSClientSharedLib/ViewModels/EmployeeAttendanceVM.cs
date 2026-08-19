@@ -36,5 +36,6 @@ namespace TLSClientSharedLib.ViewModels
         }
 
         public long? DescId { get; set; }
+        public bool IsLocked { get; set; }
     }
 }

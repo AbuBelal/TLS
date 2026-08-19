@@ -8,6 +8,7 @@ namespace SharedLib.DTOs
     {
         public int Year { get; set; }
         public int Month { get; set; }
-        public long HolidayCode { get; set; }
+        public long? HolidayCode { get; set; }
+        public bool? Lock { get; set; } = true;
     }
 }

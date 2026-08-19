@@ -114,5 +114,7 @@ namespace SharedLib.Entities
 
         public bool? Day31_IsAttendant { get; set; } = null;
         public long? Day31_Desc { get; set; } = null;
+
+        public bool? IsLocked { get; set; } = false;
     }
 }

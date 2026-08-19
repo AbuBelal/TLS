@@ -67,6 +67,7 @@ namespace SharedLib.Fixed
         public const string Mesure2 = "Mesure2";
         public const string Mesure3 = "Mesure3";
         public const string Mesure4 = "Mesure4";
+        public const string Vacation = "Vacation";
 
     }
     public static class GlobalData
