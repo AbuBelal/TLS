@@ -22,5 +22,8 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.AttendanceRecord.LockMonthlyAttendance)]
         Task<GeneralResponse> LockMonthlyAttendance(GenerateAttendanceRequest request);
 
+        [Post(ApiUrls.AttendanceRecord.Export)]
+        Task<HttpResponseMessage> Export(GenerateAttendanceRequest request);
+
     }
 }

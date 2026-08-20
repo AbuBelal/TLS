@@ -6,26 +6,157 @@
 
 <h3>إدارة دوام المركز - مدير المركز</h3>
 <hr />
+<!-- شريط أدوات موحد: الفلترة، العمليات، تعميم الإجازات، والتصدير -->
+<div class="d-flex flex-nowrap align-items-center gap-2 bg-light p-2 rounded-3 shadow-sm mb-4 border overflow-x-auto" style="min-height: 56px;">
 
-<!-- أدوات الفلترة -->
-<div class="row mb-4">
-    <div class="col-md-2">
-        <label>السنة</label>
-        <input type="number" class="form-control" @bind="Year" />
+    <!-- 1. حقول السنة والشهر -->
+    <div class="d-flex align-items-center gap-1">
+        <label class="fw-bold text-muted small mb-0 text-nowrap">السنة:</label>
+        <input type="number" class="form-control form-control-sm text-center" style="width: 80px;" @bind="Year" />
     </div>
-    <div class="col-md-2">
-        <label>الشهر</label>
-        <input type="number" class="form-control" @bind="Month" />
+    <div class="d-flex align-items-center gap-1">
+        <label class="fw-bold text-muted small mb-0 ms-1 text-nowrap">الشهر:</label>
+        <input type="number" class="form-control form-control-sm text-center" style="width: 60px;" @bind="Month" />
     </div>
-    <div class="col-md-6 d-flex align-items-end">
-        <button class="btn btn-primary" @onclick="LoadData">جلب اللوائح</button>
-        <button class="btn btn-success ms-2" @onclick="SaveChanges" disabled="@(!EmployeeList.Any())">حفظ التعديلات</button>
-        <AuthorizeView Roles="@AppRoles.Admin">
-            <button class="btn btn-info ml-2" @onclick="GenerateAttRecord">إنشاء / تحديث لوائح الدوام</button>
-            <button class="btn btn-danger ml-2 " @onclick="@(()=>LockAttRecord(true))">إغلاق لوائح الداوم </button>
-            <button class="btn btn-success " @onclick="@(()=>LockAttRecord(false))">فتح لوائح الداوم </button>
-        </AuthorizeView>
+
+    <!-- فاصل بصري -->
+    <div class="vr mx-1 text-secondary opacity-25"></div>
+
+    <!-- 2. الأزرار الأساسية -->
+    <button class="btn btn-sm btn-primary d-flex align-items-center gap-1 text-nowrap" @onclick="LoadData">
+        <i class="bi bi-cloud-download"></i> <span class="d-none d-md-inline">جلب</span>
+    </button>
+    <button class="btn btn-sm btn-success d-flex align-items-center gap-1 text-nowrap" @onclick="SaveChanges" disabled="@(!EmployeeList.Any())">
+        <i class="bi bi-check-circle"></i> <span class="d-none d-md-inline">حفظ</span>
+    </button>
+
+    <AuthorizeView Roles="@AppRoles.Admin">
+        <!-- فاصل بصري -->
+        <div class="vr mx-1 text-secondary opacity-25"></div>
+
+        <!-- 3. أزرار الإدارة (مجمعة في كتل واحدة لتوفير المساحة) -->
+        <div class="btn-group shadow-sm">
+            <button class="btn btn-sm btn-info d-flex align-items-center gap-1 text-nowrap ml-1" @onclick="GenerateAttRecord" title="إنشاء / تحديث">
+                <i class="bi bi-arrow-repeat"></i> <span class=" d-xl-inline">تحديث اللوائح</span>
+            </button>
+            <button class="btn btn-sm btn-danger d-flex align-items-center gap-1 text-nowrap ml-1" @onclick="@(() => LockAttRecord(true))" title="إغلاق">
+                <i class="bi bi-lock-fill"></i> <span class="d-none d-lg-inline">إغلاق</span>
+            </button>
+            <button class="btn btn-sm btn-success d-flex align-items-center gap-1 text-nowrap" @onclick="@(() => LockAttRecord(false))" title="فتح">
+                <i class="bi bi-unlock-fill"></i> <span class="d-none d-lg-inline">فتح</span>
+            </button>
+        </div>
+
+        @if (EmployeeList.Any())
+        {
+            <!-- فاصل بصري -->
+            <div class="vr mx-1 text-secondary opacity-25"></div>
+
+            <!-- 4. وحدة تعميم الإجازة (Widget مضغوط) -->
+            <div class="input-group input-group-sm flex-nowrap shadow-sm" style="width: auto;">
+                <span class="input-group-text bg-white text-secondary" title="تعميم إجازة">
+                    <i class="bi bi-calendar-event"></i>
+                </span>
+                <input type="number" class="form-control text-center ml-1" placeholder="يوم" style="min-width: 55px; max-width: 60px;" @bind="DayNoToVac" min="1" max="@DaysInMonth" title="رقم اليوم" />
+
+                @if (LeaveTypes is not null && LeaveTypes.Any())
+                {
+                    <select class="form-select text-truncate ml-1" style="min-width: 200px; max-width: 150px;" @bind="VacationTypeId" title="نوع الإجازة">
+                        <option value="-1">-- النوع --</option>
+                        @foreach (var leaveType in LeaveTypes)
+                        {
+                            <option value="@leaveType.Id">@(leaveType.EnName+" - "+leaveType.Name)</option>
+                        }
+                    </select>
+                }
+                <button class="btn btn-warning d-flex align-items-center gap-1 px-2 text-nowrap" @onclick="ApplyVacation" title="تطبيق على الجميع">
+                    <i class="bi bi-check2-all"></i> <span class="d-xxl-inline">تطبيق</span>
+                </button>
+            </div>
+        }
+
+        <!-- 5. زر التصدير (يُدفع لأقصى اليسار تلقائياً بفضل ms-auto) -->
+        <button class="btn btn-sm btn-white border d-flex align-items-center gap-2 ms-auto bg-white text-nowrap shadow-sm"
+                @onclick="Export"
+                disabled="@isExporting">
+            @if (isExporting)
+            {
+                <span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>
+                <span class="small d-none d-md-inline">تصدير...</span>
+            }
+            else
+            {
+                <i class="bi bi-file-earmark-excel-fill text-success fs-6"></i>
+                <span class="fw-semibold small d-none d-md-inline">تصدير</span>
+            }
+        </button>
+    </AuthorizeView>
+</div>
+@* <!-- شريط أدوات الفلترة والعمليات -->
+<div class="d-flex flex-wrap align-items-center gap-2 bg-light p-2 rounded-3 shadow-sm mb-4 border">
+
+    <!-- حقول السنة والشهر (مضغوطة) -->
+    <div class="d-flex align-items-center gap-2">
+        <label class="fw-bold text-nowrap mb-0 text-muted small">السنة:</label>
+        <input type="number" class="form-control form-control-sm text-center" style="width: 80px;" @bind="Year" />
     </div>
+
+    <div class="d-flex align-items-center gap-2">
+        <label class="fw-bold text-nowrap mb-0 text-muted small ms-2">الشهر:</label>
+        <input type="number" class="form-control form-control-sm text-center" style="width: 70px;" @bind="Month" />
+    </div>
+
+    <!-- فاصل بصري -->
+    <div class="vr mx-2 d-none d-md-block text-secondary opacity-25"></div>
+
+    <!-- الأزرار الأساسية -->
+    <button class="btn btn-sm btn-primary d-flex align-items-center gap-2" @onclick="LoadData">
+        <i class="bi bi-cloud-download"></i>
+        <span>جلب</span>
+    </button>
+
+    <button class="btn btn-sm btn-success d-flex align-items-center gap-2" @onclick="SaveChanges" disabled="@(!EmployeeList.Any())">
+        <i class="bi bi-check-circle"></i>
+        <span>حفظ</span>
+    </button>
+
+    <AuthorizeView Roles="@AppRoles.Admin">
+        <!-- فاصل بصري -->
+        <div class="vr mx-1 d-none d-md-block text-secondary opacity-25"></div>
+
+        <!-- أزرار الإدارة -->
+        <button class="btn btn-sm btn-outline-info d-flex align-items-center gap-1" @onclick="GenerateAttRecord">
+            <i class="bi bi-arrow-repeat"></i>
+            <span class="d-none d-xl-inline">إنشاء / تحديث</span> <!-- يظهر النص فقط في الشاشات الكبيرة لتوفير المساحة -->
+        </button>
+
+        <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" @onclick="@(() => LockAttRecord(true))">
+            <i class="bi bi-lock-fill"></i>
+            <span class="d-none d-lg-inline">إغلاق</span>
+        </button>
+
+        <button class="btn btn-sm btn-outline-success d-flex align-items-center gap-1" @onclick="@(() => LockAttRecord(false))">
+            <i class="bi bi-unlock-fill"></i>
+            <span class="d-none d-lg-inline">فتح</span>
+        </button>
+
+        <!-- زر التصدير يُدفع لأقصى اليسار تلقائياً -->
+        <button class="btn btn-sm btn-white border d-flex align-items-center gap-2 ms-auto bg-white"
+                @onclick="Export"
+                disabled="@isExporting">
+
+            @if (isExporting)
+            {
+                <span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>
+                <span class="small">جاري التصدير...</span>
+            }
+            else
+            {
+                <i class="bi bi-file-earmark-excel-fill text-success"></i>
+                <span class="fw-semibold small">تصدير</span>
+            }
+        </button>
+    </AuthorizeView>
 </div>
 
 <AuthorizeView Roles="@AppRoles.Admin">
@@ -68,7 +199,7 @@
 
     </div>
 }
-</AuthorizeView>
+</AuthorizeView> *@
 
 
 @if (isLoading)
@@ -237,7 +368,7 @@ else
     private DateTime MonthDayes ;
     private int Year = DateTime.Now.Year;
     private int Month = DateTime.Now.Month;
-
+    private bool isExporting = false;
     private long VacationTypeId=-1;
     private int DayNoToVac=0;
 
@@ -412,6 +543,35 @@ else
     }
 
     #endregion
+
+    private async Task Export()
+    {
+        if (isExporting) return;
+        isExporting = true;
+        GenerateAttendanceRequest request = new GenerateAttendanceRequest
+        {
+            Year = Year,
+            Month = Month,
+        };
+
+        try
+        {
+            var response = await AttendanceRecordApi.Export(request);
+            if (response.IsSuccessStatusCode)
+                await ExcelDownloader.DownloadFromResponse(response, "موظفون_مفلتر_باللغة_الانجليزية.xlsx");
+            else
+                MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            MudSnackbar.Add($"خطأ: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExporting= false;
+            StateHasChanged();
+        }
+    }
 }
 
 <!-- كلاس بسيط لمحاكاة أنواع الإجازات -->

@@ -117,7 +117,7 @@
                                             
                                             <!-- Manage Details Component -->
                                                 <button class="btn btn-sm btn-outline-primary" title="إدخال تفاصيل الأنشطة" @onclick="() => 
-                                                    NavigateToEdit(reports.Where(r=>r.CenterId==item.Id && r.WReportId==WRId).FirstOrDefault()?.Id??0,WRId)">
+                                                    NavigateToEdit(reports.Where(r=>r.CenterId==item.Id && r.WReportId==WRId).FirstOrDefault()?.Id??0,WRId,item.Id)">
                                                 <i class="bi bi-list-check"></i> التفاصيل
                                             </button>
                                             &nbsp;&nbsp;
@@ -245,9 +245,9 @@
     {
         NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{WRId}/{reportId}");
     }
-    private void NavigateToEdit(long wrd ,long wr)
+    private void NavigateToEdit(long wrd, long wr, long CenterId)
     {
-        NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{wrd}/{wr}");
+        NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{wrd}/{wr}/{CenterId}");
     }
 
     private class Manager

@@ -1,10 +1,12 @@
 ﻿using APIServerLib.Repositories.Implemntations;
 using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SharedLib.DTOs;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using SharedLib.Responses;
 using System.Security.Claims;
 
@@ -19,13 +21,15 @@ namespace APIServer.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly AuditLogService _auditLogService;
+        private readonly ILookupValueRepository _lookupValueRepository;
 
-        public AttRecordController(IAttRecordRepository repository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService)
+        public AttRecordController(IAttRecordRepository repository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService, ILookupValueRepository lookupValueRepositor)
         {
             _repository = repository;
             _userRepository = UserRepository;
             _employeeRepository = EmployeeRepository;
             _auditLogService = auditLogService;
+            _lookupValueRepository = lookupValueRepositor;
         }
 
         #region CurUser CurEmp Details
@@ -129,6 +133,26 @@ namespace APIServer.Controllers
                 return new GeneralResponse(false, $"حدث خطأ أثناء القفل: {ex.Message}", 0);
             }
 
+        }
+
+
+        [HttpPost("export")]
+        public async Task<IActionResult> ExportAttRec(GenerateAttendanceRequest request)
+        {
+            var centerId = await CurrentCenterId();
+            List<AttendanceRecord> records = await _repository.GetAttendanceByCenterAsync(centerId, request.Year, request.Month);
+
+            var lookupvalue = await _lookupValueRepository.GetByLookupType(LookupTypes.Vacation);
+            var CurMonthDaysNo = DateTime.DaysInMonth(request.Year, request.Month);
+            var bytes = AttendanceRecExportService.GenerateExcel(records, lookupvalue, "Att", CurMonthDaysNo);
+
+            var fileName = $"لوائح دوام_{request.Year} - {request.Month}.xlsx";
+
+            //await _auditLogService.LogAsync("Read", "Employee", "", $"تصدير الموظفين حسب التصفية: {fileName}");
+
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
         }
     }
 }

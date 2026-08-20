@@ -1,7 +1,7 @@
 ﻿
 
 @attribute [Route(PagesUris.WReportsDetailsPages.Add)]
-@attribute [Route(PagesUris.WReportsDetailsPages.Edit + "/{Id:long}/{wr:long}")]
+@attribute [Route(PagesUris.WReportsDetailsPages.Edit + "/{Id:long}/{wr:long}/{CenterId:long}")]
 
 @using SharedLib.Entities
 @using TLSWeb.Pages.WReport.Components
@@ -96,6 +96,8 @@
 @code {
     [Parameter] public long Id { get; set; }
     [Parameter] public long wr { get; set; }
+    [Parameter] public long CenterId { get; set; }
+
     bool Saving = false;
     bool ReadOnly = true;
     WReport wReport=new ();
@@ -120,6 +122,7 @@
         }
         else
         {
+            Model.CenterId = CenterId;
             Model.WReportId = wr;
             wReport = await WReportApi.GetById(wr);
             ReadOnly = !wReport.IsActive;
@@ -163,6 +166,7 @@
             if (response.Success)
             {
                 Id = response.ReturnId;
+                MudSnackbar.Add("تم حفظ التقرير بنجاح", Severity.Success);
                 NavManager.NavigateTo(PagesUris.WReportsPages.Manage);
             }
         }
