@@ -92,114 +92,7 @@
         </button>
     </AuthorizeView>
 </div>
-@* <!-- شريط أدوات الفلترة والعمليات -->
-<div class="d-flex flex-wrap align-items-center gap-2 bg-light p-2 rounded-3 shadow-sm mb-4 border">
 
-    <!-- حقول السنة والشهر (مضغوطة) -->
-    <div class="d-flex align-items-center gap-2">
-        <label class="fw-bold text-nowrap mb-0 text-muted small">السنة:</label>
-        <input type="number" class="form-control form-control-sm text-center" style="width: 80px;" @bind="Year" />
-    </div>
-
-    <div class="d-flex align-items-center gap-2">
-        <label class="fw-bold text-nowrap mb-0 text-muted small ms-2">الشهر:</label>
-        <input type="number" class="form-control form-control-sm text-center" style="width: 70px;" @bind="Month" />
-    </div>
-
-    <!-- فاصل بصري -->
-    <div class="vr mx-2 d-none d-md-block text-secondary opacity-25"></div>
-
-    <!-- الأزرار الأساسية -->
-    <button class="btn btn-sm btn-primary d-flex align-items-center gap-2" @onclick="LoadData">
-        <i class="bi bi-cloud-download"></i>
-        <span>جلب</span>
-    </button>
-
-    <button class="btn btn-sm btn-success d-flex align-items-center gap-2" @onclick="SaveChanges" disabled="@(!EmployeeList.Any())">
-        <i class="bi bi-check-circle"></i>
-        <span>حفظ</span>
-    </button>
-
-    <AuthorizeView Roles="@AppRoles.Admin">
-        <!-- فاصل بصري -->
-        <div class="vr mx-1 d-none d-md-block text-secondary opacity-25"></div>
-
-        <!-- أزرار الإدارة -->
-        <button class="btn btn-sm btn-outline-info d-flex align-items-center gap-1" @onclick="GenerateAttRecord">
-            <i class="bi bi-arrow-repeat"></i>
-            <span class="d-none d-xl-inline">إنشاء / تحديث</span> <!-- يظهر النص فقط في الشاشات الكبيرة لتوفير المساحة -->
-        </button>
-
-        <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" @onclick="@(() => LockAttRecord(true))">
-            <i class="bi bi-lock-fill"></i>
-            <span class="d-none d-lg-inline">إغلاق</span>
-        </button>
-
-        <button class="btn btn-sm btn-outline-success d-flex align-items-center gap-1" @onclick="@(() => LockAttRecord(false))">
-            <i class="bi bi-unlock-fill"></i>
-            <span class="d-none d-lg-inline">فتح</span>
-        </button>
-
-        <!-- زر التصدير يُدفع لأقصى اليسار تلقائياً -->
-        <button class="btn btn-sm btn-white border d-flex align-items-center gap-2 ms-auto bg-white"
-                @onclick="Export"
-                disabled="@isExporting">
-
-            @if (isExporting)
-            {
-                <span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>
-                <span class="small">جاري التصدير...</span>
-            }
-            else
-            {
-                <i class="bi bi-file-earmark-excel-fill text-success"></i>
-                <span class="fw-semibold small">تصدير</span>
-            }
-        </button>
-    </AuthorizeView>
-</div>
-
-<AuthorizeView Roles="@AppRoles.Admin">
-@if (EmployeeList.Any())
-{
-    <div class="d-flex align-items-center flex-wrap gap-3 p-3 mb-4 bg-light border rounded-3 shadow-sm">
-
-        <!-- العنوان / الأيقونة -->
-        <span class="fw-bold text-secondary text-nowrap mb-0">
-            <i class="bi bi-calendar-event me-1"></i> تعميم إجازة:
-        </span>
-
-        <!-- حقل اليوم -->
-        <div class="input-group input-group-sm" style="width: 140px;">
-            <span class="input-group-text bg-white text-muted">اليوم</span>
-            <input type="number" class="form-control" placeholder="1-31" @bind="DayNoToVac" min="1" max="@DaysInMonth" />
-        </div>
-
-        <!-- حقل نوع الإجازة -->
-        @if (LeaveTypes is not null && LeaveTypes.Any())
-        {
-            <div class="input-group input-group-sm" style="max-width: 250px;">
-                <span class="input-group-text bg-white text-muted">النوع</span>
-                <select class="form-select" @bind="VacationTypeId">
-                    <option value="-1">-- اختر --</option>
-                    @foreach (var leaveType in LeaveTypes)
-                    {
-                        <option value="@leaveType.Id">@($"{leaveType.EnName} - {leaveType.Name}")</option>
-                    }
-                </select>
-            </div>
-        }
-
-        <!-- زر التطبيق (يأخذ باقي المساحة ليدفع نفسه لليسار أو يبقى بجانبهم حسب الشاشة) -->
-        <div class="ms-auto">
-            <button class="btn btn-warning btn-sm text-body px-3 shadow-sm text-nowrap" @onclick="ApplyVacation">
-                <i class="bi bi-check2-all me-1"></i> تطبيق على الجميع
-            </button>
-        </div>
-
-    </div>
-}
-</AuthorizeView> *@
 
 
 @if (isLoading)
@@ -324,7 +217,7 @@ else
                 <table class="table table-hover align-middle text-center mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="py-3 text-muted fw-semibold">الرمز (عربي)</th>
+                            <th class="py-3 text-muted fw-semibold"> شرح الإجازة </th>
                             <th class="py-3 text-muted fw-semibold">الرمز (إنجليزي)</th>
                         </tr>
                     </thead>
@@ -376,7 +269,7 @@ else
     private int LoadMonth = DateTime.Now.Month;
 
     private int DaysInMonth = 31;
-    private bool isLoading = false;
+    private bool isLoading = true;
 
     // قائمة الموظفين (الـ ViewModel) التي سيتم عرضها في الجدول
     private List<EmployeeAttendanceVM> EmployeeList = new();
@@ -386,8 +279,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        LeaveTypes = await LookupValueApi.GetByValueType("Vacation");
         await LoadData();
+        LeaveTypes = await LookupValueApi.GetByValueType("Vacation");
     }
 
     private async Task LoadData()
@@ -553,12 +446,12 @@ else
             Year = Year,
             Month = Month,
         };
-
+        string FileName = $"لوائح داوم شهر {Month}-{Year}.xlsx";
         try
         {
             var response = await AttendanceRecordApi.Export(request);
             if (response.IsSuccessStatusCode)
-                await ExcelDownloader.DownloadFromResponse(response, "موظفون_مفلتر_باللغة_الانجليزية.xlsx");
+                await ExcelDownloader.DownloadFromResponse(response, FileName);
             else
                 MudSnackbar.Add("فشل تصدير الملف", Severity.Error);
         }

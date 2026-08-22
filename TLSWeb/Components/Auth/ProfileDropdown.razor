@@ -43,6 +43,11 @@
         {
             UserName = user.Identity.Name!;
             UserEmail = user.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value!;
+            var userprofile = await UserService.GetCurrentUserProfileAsync();
+
+            await UserDataService.ClearUserDataAsync();
+            await UserDataService.SaveUserDataAsync(userprofile);
+            var x = await UserDataService.GetUserDataAsync();
         }
     }
 

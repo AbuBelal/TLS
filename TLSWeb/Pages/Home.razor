@@ -35,19 +35,19 @@
     async void LoadData()
     {
         // username = await UserService.GetCurrentUserProfileAsync().ContinueWith(t => t.Result.Role);
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        // var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
 
-        if (user.IsInRole("Admin"))
-        {
-            // منطق خاص بالأدمن
-            Console.WriteLine("المستخدم هو أدمن");
-        }
-        else
-        {
-            // منطق للمستخدمين الآخرين
-            Console.WriteLine("المستخدم ليس أدمن");
-        }
+        // if (user.IsInRole("Admin"))
+        // {
+        //     // منطق خاص بالأدمن
+        //     Console.WriteLine("المستخدم هو أدمن");
+        // }
+        // else
+        // {
+        //     // منطق للمستخدمين الآخرين
+        //     Console.WriteLine("المستخدم ليس أدمن");
+        // }
     }
 
     async void addRole()

@@ -31,6 +31,8 @@ namespace TLSWeb.Helpers
             builder.Services.AddScoped<ExcelDownloadService>();
 
             builder.Services.AddMudServices();
+            builder.Services.AddScoped<IUserDataService, UserDataService>();
+
 
             builder.Services.AddHttpClient("Auth", options =>
                 options.BaseAddress = new Uri(ApiUrls.BaseUrl)

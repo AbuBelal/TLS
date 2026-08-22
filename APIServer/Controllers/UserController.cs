@@ -53,6 +53,7 @@ namespace APIServer.Controllers
             profile.UserName = user.UserName;
             profile.UserId = user.Id;
             profile.EmployeeId = user1.EmployeeId;
+            profile.EmployeeIdNo = user1.Employee?.EmpId;
             profile.EmployeeName = user1.Employee?.Name != null ? user.Employee?.Name : null;
             if (profile.EmployeeId is not null)
             {

@@ -101,7 +101,7 @@ public static class AttendanceRecExportService
 
             int currentHeadersCount = headers.Count();
             var itemType = AttendanceRecList[i].GetType();
-
+            int XCount = 0;
             for (int Col = currentHeadersCount + 1; Col < MonthDaysNo + currentHeadersCount + 1; Col++)
             {
                 int dayIndex = Col - currentHeadersCount;
@@ -119,6 +119,7 @@ public static class AttendanceRecExportService
                     if (IsAttValue != null && (bool)IsAttValue == true)
                     {
                         ws.Cell(row, Col).Value = "X";
+                        XCount++;
                     }
                     else
                         if (DescpropertyInfo != null)
@@ -132,16 +133,16 @@ public static class AttendanceRecExportService
                                 long descValueLong = (long)DescValue;
                                 string VacChar= LookupList.FirstOrDefault(l => l.Id == descValueLong)?.EnName ?? "";
                                 ws.Cell(row, Col).Value = VacChar;
-                                switch (VacChar)
-                                {
-                                    case "W": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#F8F9FA"); break;
-                                    case "H": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#CFE2FF"); break;
-                                    case "A": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#D1E7DD"); break;
-                                    case "V": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFF3CD"); break;
-                                    case "M": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#E2D9F3"); break;
-                                default:
-                                        break;
-                                }
+                                //switch (VacChar)
+                                //{
+                                //    case "W": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#F8F9FA"); break;
+                                //    case "H": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#CFE2FF"); break;
+                                //    case "A": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#D1E7DD"); break;
+                                //    case "V": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFF3CD"); break;
+                                //    case "M": ws.Cell(row, Col).Style.Fill.BackgroundColor = XLColor.FromHtml("#E2D9F3"); break;
+                                //default:
+                                //        break;
+                                //}
                                
                             }
                         }
@@ -149,6 +150,11 @@ public static class AttendanceRecExportService
                     ws.Cell(row, Col).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                 }
             }
+
+            var TotalCell = ws.Cell(row, MonthDaysNo + headers.Count() + 1);
+            TotalCell.Value = XCount;
+            TotalCell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            TotalCell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
 
             var rowRange = ws.Range(row, 1, row, MonthDaysNo + currentHeadersCount + 1);
             rowRange.Style.Fill.BackgroundColor = rowBg;

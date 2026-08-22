@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using System.Globalization;
 using TLSWeb;
 using TLSWeb.Helpers;
-
+using Blazored.Storage;
+using Blazored.LocalStorage;
 
 var culture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -13,11 +14,13 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddBlazoredLocalStorage();
+
 //if (app.Environment.IsDevelopment())
 //{
 //}
-    //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-    AddAppServices.AddCommonServices(builder);
+AddAppServices.AddCommonServices(builder);
 
 await builder.Build().RunAsync();
