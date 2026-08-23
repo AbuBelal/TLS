@@ -1,0 +1,58 @@
+﻿@using TLSClientSharedLib.ViewModels
+@using SharedLib.Entities
+
+<td class="p-1 align-middle @CellClass" >
+    @if (Day.IsLocked)
+    { 
+        <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
+            @if (Day.IsAttendant ?? false)
+            {
+                <span class="badge bg-success rounded-pill px-2" style="font-size: 0.75rem;">X</span>
+            }
+            else
+            {
+                @if (LeaveTypesDict.TryGetValue(Day.DescId??-1, out var desc) && !string.IsNullOrEmpty(desc))
+                {
+                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.75rem;">@desc</span>
+                }
+                else
+                {
+                    <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                }
+            }
+        </div> 
+    }
+    else
+    {
+         <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
+            <!-- Checkbox للحضور -->
+            <input class="form-check-input custom-checkbox-x m-0 shadow-none"
+                   type="checkbox"
+                   @bind="Day.IsAttendant"
+                   disabled="@(Day.DescId > -1)"
+                   id="chk_@(EmployeeId)_@(Day.DayNumber)">
+
+            <!-- Dropdown لنوع الإجازة -->
+            <select class="compact-select text-secondary"
+                    @bind="Day.DescId"
+                    disabled="@(Day.IsAttendant == true)">
+                <option value="-1">-</option>
+                @foreach (var leaveType in LeaveTypesList)
+                {
+                    <option value="@leaveType.Id" title="@leaveType.Name">@leaveType.EnName</option>
+                }
+            </select>
+        </div> 
+    }
+</td>
+
+@code {
+    [Parameter] public DayVM Day { get; set; } // استبدل DayModel باسم الكلاس الخاص بك
+    [Parameter] public long EmployeeId { get; set; }
+    [Parameter] public bool IsFriday { get; set; }
+    [Parameter] public Dictionary<long, string> LeaveTypesDict { get; set; }
+    [Parameter] public List<LookupValue> LeaveTypesList { get; set; } // استبدل LeaveTypeModel بالكلاس الخاص بك
+
+    private string CellClass => IsFriday ? "weekend-bg" : "";
+
+}

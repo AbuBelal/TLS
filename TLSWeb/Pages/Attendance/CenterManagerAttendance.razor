@@ -2,6 +2,7 @@
 
 @using TLSClientSharedLib.ViewModels
 @using TLSWeb.Components
+@using TLSWeb.Pages.Attendance.Components
 
 
 <h3>إدارة دوام المركز - مدير المركز</h3>
@@ -136,7 +137,77 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var emp in EmployeeList)
+                     @foreach (var emp in EmployeeList)
+                     {
+                            <tr>
+                            <td class="sticky-col bg-white px-3 py-2 align-middle">
+                                <div class="d-flex flex-column justify-content-center">
+
+                                    <!-- الصف الأول: اسم الموظف وزر التكرار -->
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <!-- اسم الموظف -->
+                                        <div class="fw-bold text-dark text-truncate me-2" style="max-width: 140px;" title="@emp.EmployeeName">
+                                            @emp.EmployeeName
+                                        </div>
+
+                                        <!-- زر التكرار -->
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                style="width: 28px; height: 28px; background-color: #f8f9fa;"
+                                                title="تكرار اليوم الأول على جميع أيام الشهر"
+                                                @onclick="() => CopyFirstDayToAll(emp)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- الصف الثاني: اسم المركز -->
+                                    <div class="text-muted d-flex align-items-center" style="font-size: 0.75rem;">
+                                        <!-- أيقونة صغيرة للمركز (اختياري، تعطي شكلاً احترافياً) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-geo-alt-fill me-1" viewBox="0 0 16 16">
+                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                                        </svg>
+                                        <span class="text-truncate" style="max-width: 150px;" title="@emp.CenterName">
+                                            @emp.CenterName
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </td>
+                               @*  <td class="sticky-col bg-white px-3">
+                                    <div class="fw-bold text-dark text-truncate" style="max-width: 150px;" title="@emp.EmployeeName">
+                                        @emp.EmployeeName
+                                    </div>
+
+                                <!-- زر التكرار -->
+                                <button type="button"
+                                        class="btn btn-sm btn-light shadow-none p-1 ms-2 text-primary"
+                                        title="تكرار اليوم الأول على جميع أيام الشهر"
+                                        @onclick="() => CopyFirstDayToAll(emp)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                    </svg>
+                                </button>
+
+                                    <div class="text-muted" style="font-size: 0.8rem;">@emp.CenterName</div>
+                                </td> *@
+
+                                @foreach (var day in emp.Days)
+                                {  
+         
+                                     <DayCell Day="day" 
+                                             EmployeeId="emp.EmployeeId" 
+                                             IsFriday="_fridayDays.Contains(day.DayNumber)"
+                                             LeaveTypesDict="_leaveTypesDict"
+                                             LeaveTypesList="LeaveTypes" /> 
+                                
+                                }
+                            </tr>
+                     }
+                    @* @foreach (var emp in EmployeeList)
                     {
                         <tr>
                             <td class="sticky-col bg-white  px-3">
@@ -148,7 +219,9 @@ else
 
                             @foreach (var day in emp.Days)
                             {
-                                bool isFriday = new DateTime(LoadYear, LoadMonth, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
+
+
+                                 bool isFriday = new DateTime(LoadYear, LoadMonth, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
                                 string cellClass = isFriday ? "weekend-bg" : "";
 
                                 <td class="p-1 align-middle @cellClass">
@@ -196,9 +269,9 @@ else
                                         </div>
                                     }
                                 </td>
-                            }
+                            } 
                         </tr>
-                    }
+                    }*@
                 </tbody>
             </table>
         </div>
@@ -271,6 +344,11 @@ else
     private int DaysInMonth = 31;
     private bool isLoading = true;
 
+    // 1. تحويل الإجازات إلى قاموس (Dictionary) للبحث السريع (O(1)) بدلاً من (O(N))
+    private Dictionary<long, string> _leaveTypesDict;
+    // 2. تخزين أيام الجمعة مسبقاً لتجنب استخدام DateTime داخل الـ Loop
+    private HashSet<int> _fridayDays = new HashSet<int>();
+
     // قائمة الموظفين (الـ ViewModel) التي سيتم عرضها في الجدول
     private List<EmployeeAttendanceVM> EmployeeList = new();
 
@@ -279,6 +357,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+
         await LoadData();
         LeaveTypes = await LookupValueApi.GetByValueType("Vacation");
     }
@@ -288,6 +367,18 @@ else
         isLoading = true;
         LoadYear=Year;
         LoadMonth = Month;
+
+        _leaveTypesDict = LeaveTypes.ToDictionary(lt => lt.Id, lt => lt.EnName);
+        _fridayDays.Clear();
+        int daysInMonth = DateTime.DaysInMonth(LoadYear, LoadMonth);
+        for (int i = 1; i <= daysInMonth; i++)
+        {
+            if (new DateTime(LoadYear, LoadMonth, i).DayOfWeek == DayOfWeek.Friday)
+            {
+                _fridayDays.Add(i);
+            }
+        }
+
         DaysInMonth = DateTime.DaysInMonth(Year, Month);
         MonthDayes = new DateTime(Year, Month, 1);
         // جلب البيانات الأصلية من الـ API
@@ -383,6 +474,30 @@ else
         }
         MudSnackbar.Add("تم تعميم يوم الإجازة على جميع الموظفين", Severity.Success);
         StateHasChanged();
+    }
+
+    private void CopyFirstDayToAll(EmployeeAttendanceVM emp) // ⚠️ تأكد أن اسم الكلاس EmployeeModel يطابق ما تستخدمه
+    {
+        if (emp.Days == null || !emp.Days.Any()) return;
+
+        // الحصول على اليوم الأول (نفترض أن رقمه 1)
+        var firstDay = emp.Days.FirstOrDefault(d => d.DayNumber == 1)
+                    ?? emp.Days.OrderBy(d => d.DayNumber).First();
+
+        // أخذ قيم الحضور ونوع الإجازة من اليوم الأول
+        var targetAttendant = firstDay.IsAttendant;
+        var targetDescId = firstDay.DescId;
+
+        // تطبيق القيم على جميع أيام هذا الموظف
+        foreach (var day in emp.Days)
+        {
+            // لا نعدل اليوم الأول نفسه، ولا نعدل الأيام المغلقة (كأيام الجمعة مثلاً إذا كانت مغلقة)
+            if (day.DayNumber != firstDay.DayNumber && !day.IsLocked && !_fridayDays.Contains(day.DayNumber) && day.DescId==null)
+            {
+                day.IsAttendant = targetAttendant;
+                day.DescId = targetDescId;
+            }
+        }
     }
 
     #region Mapper Methods (التحويل بين قاعدة البيانات والواجهة)
