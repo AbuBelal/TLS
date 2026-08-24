@@ -4,7 +4,6 @@
 @using TLSWeb.Components
 @using TLSWeb.Pages.Attendance.Components
 
-
 <h3>إدارة دوام المركز - مدير المركز</h3>
 <hr />
 <!-- شريط أدوات موحد: الفلترة، العمليات، تعميم الإجازات، والتصدير -->
@@ -32,6 +31,28 @@
     </button>
 
     <AuthorizeView Roles="@AppRoles.Admin">
+        <!-- فاصل بصري -->
+        <div class="vr mx-1 text-secondary opacity-25"></div>
+
+        <!-- 1.5 حقول البحث والفلترة المضافة -->
+        <div class="d-flex align-items-center gap-1">
+            <label class="fw-bold text-muted small mb-0 ms-1 text-nowrap">الاسم:</label>
+            <input type="text" class="form-control form-control-sm" style="width: 140px;" placeholder="بحث بالاسم..." @bind="SearchName" @bind:event="oninput" />
+        </div>
+        <div class="d-flex align-items-center gap-1">
+            <label class="fw-bold text-muted small mb-0 ms-1 text-nowrap">المركز:</label>
+            <select class="form-select form-select-sm" style="width: 220px;" @bind="FilterCenter">
+                <option value="">-- جميع المراكز --</option>
+                @if (AllCenters != null)
+                {
+                    @foreach (var center in AllCenters)
+                    {
+                        <option value="@center.Name">@center.Name</option>
+                    }
+                }
+            </select>
+
+        </div>
         <!-- فاصل بصري -->
         <div class="vr mx-1 text-secondary opacity-25"></div>
 
@@ -66,7 +87,7 @@
                         <option value="-1">-- النوع --</option>
                         @foreach (var leaveType in LeaveTypes)
                         {
-                            <option value="@leaveType.Id">@(leaveType.EnName+" - "+leaveType.Name)</option>
+                            <option value="@leaveType.Id">@(leaveType.EnName + " - " + leaveType.Name)</option>
                         }
                     </select>
                 }
@@ -94,272 +115,127 @@
     </AuthorizeView>
 </div>
 
-
-
 @if (isLoading)
 {
-    @*  <div class="alert alert-info">جاري تحميل البيانات...</div> *@
     <LoadingComponent></LoadingComponent>
 }
-else
-    if (!EmployeeList.Any())
-    {
-        <div class="alert alert-warning d-flex align-items-center shadow-sm rounded-3 p-3 border-0 border-start border-warning border-4" role="alert">
-            <!-- أيقونة التحذير (SVG) -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-exclamation-triangle-fill ms-3 text-warning" viewBox="0 0 16 16">
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-            </svg>
-            <div>
-                <h6 class="alert-heading mb-1 fw-bold text-dark">لوائح الدوام غير متوفرة</h6>
-                <p class="mb-0 text-muted" style="font-size: 0.95rem;">
-                    عذراً، لوائح الدوام الخاصة بهذا الشهر لم يتم إصدارها بعد. يرجى التواصل مع الإدارة  للمتابعة.
-                </p>
-            </div>
+else if (!EmployeeList.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center shadow-sm rounded-3 p-3 border-0 border-start border-warning border-4" role="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-exclamation-triangle-fill ms-3 text-warning" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+        </svg>
+        <div>
+            <h6 class="alert-heading mb-1 fw-bold text-dark">لوائح الدوام غير متوفرة</h6>
+            <p class="mb-0 text-muted" style="font-size: 0.95rem;">
+                عذراً، لوائح الدوام الخاصة بهذا الشهر لم يتم إصدارها بعد. يرجى التواصل مع الإدارة  للمتابعة.
+            </p>
         </div>
-
-    }
-    else
-    {
-        <div class="table-attendance-container shadow-sm">
-            <table class="table table-bordered table-hover table-sm text-center  mb-0">
-                <thead>
+    </div>
+}
+else if (!FilteredEmployeeList.Any())
+{
+    <div class="alert alert-info d-flex align-items-center shadow-sm rounded-3 p-3 border-0 border-start border-info border-4" role="alert">
+        <i class="bi bi-search ms-3 fs-3 text-info"></i>
+        <div>
+            <h6 class="alert-heading mb-1 fw-bold text-dark">لا توجد نتائج</h6>
+            <p class="mb-0 text-muted" style="font-size: 0.95rem;">
+                لم يتم العثور على موظفين يطابقون معايير البحث والفلترة المدخلة.
+            </p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-attendance-container shadow-sm">
+        <table class="table table-bordered table-hover table-sm text-center  mb-0">
+            <thead>
+                <tr>
+                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 160px; padding: 12px;">اسم الموظف</th>
+                    @for (int i = 1; i <= DaysInMonth; i++)
+                    {
+                        <th class="sticky-header" style="min-width: 30px;">
+                            <span class="d-block" style="font-size: 1.1rem;">@i</span>
+                            <span style="font-size: 0.75rem; color: #adb5bd;">
+                                @(new DateTime(LoadYear, LoadMonth, i).ToString("ddd", new System.Globalization.CultureInfo("ar-AE")))
+                            </span>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int Serial = 0;
+                }
+                @foreach (var emp in FilteredEmployeeList) // <--- تم تغيير اللوب ليعتمد على القائمة المفلترة
+                {
+                    ++Serial;
                     <tr>
-                        <th class="sticky-corner text-white align-content-lg-start" style="min-width: 160px; padding: 12px;">اسم الموظف</th>
-                        @for (int i = 1; i <= DaysInMonth; i++)
-                        {
-                            <th class="sticky-header" style="min-width: 30px;">
-                                <span class="d-block" style="font-size: 1.1rem;">@i</span>
-                                <span style="font-size: 0.75rem; color: #adb5bd;">
-                                    @(new DateTime(LoadYear, LoadMonth, i).ToString("ddd", new System.Globalization.CultureInfo("ar-AE")))
-                                </span>
-                            </th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @{int Serial=0;}
-                     @foreach (var emp in EmployeeList)
-                     {
-                        ++Serial;
-                        <tr>
-                            <td class="sticky-col bg-white px-3 py-2 align-middle">
-                                <!-- حاوية رئيسية لترتيب العناصر: النصوص يميناً والأزرار يساراً -->
-                                <div class="d-flex align-items-center justify-content-between">
-
-                                    <!-- قسم النصوص: تمت إضافة position-relative هنا ليكون حاوية للرقم -->
-                                    <div class="d-flex flex-column justify-content-center overflow-hidden position-relative">
-
-                                        <!-- الرقم التسلسلي كخلفية (Watermark) -->
-                                        <div class="position-absolute fw-bold"
-                                             style="font-size: 3rem; color: rgba(200,0,0,0.2); right: 5px; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none;">
-                                             @Serial
-                                        </div>
-
-                                        <!-- حاوية النصوص (تم وضع z-index: 1 لتكون فوق الرقم التسلسلي) -->
-                                        <div class="position-relative" style="z-index: 1;">
-
-                                            <!-- الصف الأول: اسم الموظف -->
-                                            <div class="fw-bold text-dark text-truncate mb-1" style="max-width: 130px; font-size: 0.9rem;" title="@emp.EmployeeName">
-                                                @emp.EmployeeName
-                                            </div>
-
-                                            @if (!string.IsNullOrEmpty(emp.CenterName))
-                                            {
-                                                <!-- الصف الثاني: اسم المركز -->
-                                                <div class="text-muted d-flex align-items-center" style="font-size: 0.75rem;">
-                                                    <!-- أيقونة صغيرة للمركز -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-geo-alt-fill me-1 flex-shrink-0" viewBox="0 0 16 16">
-                                                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
-                                                    </svg>
-                                                    <span class="text-truncate" style="max-width: 120px;" title="@emp.CenterName">
-                                                        @emp.CenterName
-                                                    </span>
-                                                </div>
-                                            }
-                                        </div>
+                        <td class="sticky-col bg-white px-3 py-2 align-middle">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex flex-column justify-content-center overflow-hidden position-relative">
+                                    <div class="position-absolute fw-bold"
+                                         style="font-size: 3rem; color: rgba(200,0,0,0.2); right: 5px; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none;">
+                                        @Serial
                                     </div>
-
-                                    <!-- قسم الأزرار: على اليسار، مرتبة عمودياً ومضغوطة -->
-                                    <div class="d-flex flex-column position-relative flex-shrink-0" style="z-index: 10;">
-                                        <AuthorizeView Roles="@AppRoles.Admin">
-                                        <!-- الزر الأول الإضافي -->
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-danger border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
-                                                    style="width: 20px; height: 20px; background-color: #f8f9fa;"
-                                                    title="حذف"
-                                                    @onclick="() => DeleteFromAttRec(emp)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
-                                                </svg>
-                                            </button>
-
-                                        <!-- الزر الثاني الإضافي -->
-                                        @* <button type="button"
-                                                class="btn btn-sm btn-outline-info border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
-                                                style="width: 20px; height: 20px; background-color: #f8f9fa;"
-                                                title="إجراء 2"
-                                                    @onclick="() => MoveToCenter(emp)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-                                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
-                                            </svg>
-                                        </button> *@
-
-
-                                        </AuthorizeView>
-                                        <!-- زر التكرار الأصلي -->
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
-                                                style="width: 20px; height: 20px; background-color: #f8f9fa;"
-                                                title="تكرار اليوم الأول على جميع أيام الشهر"
-                                                @onclick="() => CopyFirstDayToAll(emp)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-                                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-                                            </svg>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-                            </td>
-
-                           @*  <td class="sticky-col bg-white px-3 py-2 align-middle">
-                                <div class="d-flex flex-column justify-content-center">
-
-                                    <!-- الصف الأول: اسم الموظف وزر التكرار -->
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <!-- اسم الموظف -->
-                                        <div class="fw-bold text-dark text-truncate me-2" style="max-width: 140px;" title="@emp.EmployeeName">
+                                    <div class="position-relative" style="z-index: 1;">
+                                        <div class="fw-bold text-dark text-truncate mb-1" style="max-width: 130px; font-size: 0.9rem;" title="@emp.EmployeeName">
                                             @emp.EmployeeName
                                         </div>
-
-                                        <!-- زر التكرار -->
-                                        <button type="button" 
-                                                class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                                                style="width: 28px; height: 28px; background-color: #f8f9fa;"
-                                                title="تكرار اليوم الأول على جميع أيام الشهر"
-                                                @onclick="() => CopyFirstDayToAll(emp)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-                                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                        @if (!string.IsNullOrEmpty(emp.CenterName))
+                                        {
+                                            <div class="text-muted d-flex align-items-center" style="font-size: 0.75rem;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-geo-alt-fill me-1 flex-shrink-0" viewBox="0 0 16 16">
+                                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                                                </svg>
+                                                <span class="text-truncate" style="max-width: 120px;" title="@emp.CenterName">
+                                                    @emp.CenterName
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column position-relative flex-shrink-0" style="z-index: 10;">
+                                    <AuthorizeView Roles="@AppRoles.Admin">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
+                                                style="width: 20px; height: 20px; background-color: #f8f9fa;"
+                                                title="حذف"
+                                                @onclick="() => DeleteFromAttRec(emp)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
                                             </svg>
                                         </button>
-                                    </div>
-
-                                    <!-- الصف الثاني: اسم المركز -->
-                                    <div class="text-muted d-flex align-items-center" style="font-size: 0.75rem;">
-                                        <!-- أيقونة صغيرة للمركز (اختياري، تعطي شكلاً احترافياً) -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-geo-alt-fill me-1" viewBox="0 0 16 16">
-                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                                    </AuthorizeView>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
+                                            style="width: 20px; height: 20px; background-color: #f8f9fa;"
+                                            title="تكرار اليوم الأول على جميع أيام الشهر"
+                                            @onclick="() => CopyFirstDayToAll(emp)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                            <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                                         </svg>
-                                        <span class="text-truncate" style="max-width: 150px;" title="@emp.CenterName">
-                                            @emp.CenterName
-                                        </span>
-                                    </div>
-
-                                </div> 
-                            </td>*@
-                               @*  <td class="sticky-col bg-white px-3">
-                                    <div class="fw-bold text-dark text-truncate" style="max-width: 150px;" title="@emp.EmployeeName">
-                                        @emp.EmployeeName
-                                    </div>
-
-                                <!-- زر التكرار -->
-                                <button type="button"
-                                        class="btn btn-sm btn-light shadow-none p-1 ms-2 text-primary"
-                                        title="تكرار اليوم الأول على جميع أيام الشهر"
-                                        @onclick="() => CopyFirstDayToAll(emp)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-                                        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-                                    </svg>
-                                </button>
-
-                                    <div class="text-muted" style="font-size: 0.8rem;">@emp.CenterName</div>
-                                </td> *@
-
-                                @foreach (var day in emp.Days)
-                                {  
-         
-                                     <DayCell Day="day" 
-                                             EmployeeId="emp.EmployeeId" 
-                                             IsFriday="_fridayDays.Contains(day.DayNumber)"
-                                             LeaveTypesDict="_leaveTypesDict"
-                                             LeaveTypesList="LeaveTypes" /> 
-                                
-                                }
-                            </tr>
-                     }
-                    @* @foreach (var emp in EmployeeList)
-                    {
-                        <tr>
-                            <td class="sticky-col bg-white  px-3">
-                                <div class="fw-bold text-dark text-truncate" style="max-width: 150px;" title="@emp.EmployeeName">
-                                    @emp.EmployeeName
+                                    </button>
                                 </div>
-                                <div class="text-muted" style="font-size: 0.8rem;">@emp.CenterName</div>
-                            </td>
+                            </div>
+                        </td>
+                        @foreach (var day in emp.Days)
+                        {
+                            <DayCell Day="day"
+                                     EmployeeId="emp.EmployeeId"
+                                     IsFriday="_fridayDays.Contains(day.DayNumber)"
+                                     LeaveTypesDict="_leaveTypesDict"
+                                     LeaveTypesList="LeaveTypes" />
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 
-                            @foreach (var day in emp.Days)
-                            {
-
-
-                                 bool isFriday = new DateTime(LoadYear, LoadMonth, day.DayNumber).DayOfWeek == DayOfWeek.Friday;
-                                string cellClass = isFriday ? "weekend-bg" : "";
-
-                                <td class="p-1 align-middle @cellClass">
-                                    @if (day.IsLocked)
-                                    {
-                                        <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
-                                            @if (day.IsAttendant ?? false)
-                                            {
-                                                <span class="badge bg-success rounded-pill px-2" style="font-size: 0.75rem;">X</span>
-                                            }
-                                            else
-                                            {
-                                                string Desc = LeaveTypes.FirstOrDefault(lt => lt.Id == day.DescId)?.EnName;
-                                                if (string.IsNullOrEmpty(Desc))
-                                                {
-                                                    <span class="text-muted" style="font-size: 0.85rem;">-</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.75rem;">@Desc</span>
-                                                }
-                                            }
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
-                                            <!-- Checkbox للحضور -->
-                                            <input class="form-check-input custom-checkbox-x m-0 shadow-none"
-                                                   type="checkbox"
-                                                   @bind="day.IsAttendant"
-                                                   disabled="@(day.DescId > -1)"
-                                                   id="chk_@(emp.EmployeeId)_@(day.DayNumber)">
-
-                                            <!-- Dropdown لنوع الإجازة -->
-                                            <select class="compact-select text-secondary"
-                                                    @bind="day.DescId"
-                                                    disabled="@(day.IsAttendant == true)">
-                                                <option value="-1">-</option>
-                                                @foreach (var leaveType in LeaveTypes)
-                                                {
-                                                    <option value="@leaveType.Id" title="@leaveType.Name">@leaveType.EnName</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    }
-                                </td>
-                            } 
-                        </tr>
-                    }*@
-                </tbody>
-            </table>
-        </div>
-    }
-
+<!-- (باقي كود الـ HTML الخاص بدليل الإجازات والديالوج يبقى كما هو) -->
 <div>
     @if (LeaveTypes != null && LeaveTypes.Any())
     {
@@ -378,18 +254,18 @@ else
                         </tr>
                     </thead>
                     <tbody>
-                         <tr>
-                                <td class="py-3">
-                                    <span class="badge bg-success text-dark px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.9rem;">
-                                        حضور
-                                    </span>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
-                                        X
-                                    </span>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="py-3">
+                                <span class="badge bg-success text-dark px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.9rem;">
+                                    حضور
+                                </span>
+                            </td>
+                            <td class="py-3">
+                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                                    X
+                                </span>
+                            </td>
+                        </tr>
 
                         @foreach (var leaveType in LeaveTypes)
                         {
@@ -414,21 +290,17 @@ else
 </div>
 
 
-
-@* Dialogs *@
-
 <DialogMsg IsOpen="@isDeleteDialogOpen" Title="تأكيد الحذف" Message="@dialogMessage"
            OnConfirmed="ConfirmDeleteDialog" OnCancel="CancelDeleteDialog" DialogType="danger"
            Icon="bi-exclamation-triangle" />
 
-
 @code {
-    private DateTime MonthDayes ;
+    private DateTime MonthDayes;
     private int Year = DateTime.Now.Year;
     private int Month = DateTime.Now.Month;
     private bool isExporting = false;
-    private long VacationTypeId=-1;
-    private int DayNoToVac=0;
+    private long VacationTypeId = -1;
+    private int DayNoToVac = 0;
 
     private int LoadYear = DateTime.Now.Year;
     private int LoadMonth = DateTime.Now.Month;
@@ -436,25 +308,30 @@ else
     private int DaysInMonth = 31;
     private bool isLoading = true;
 
-    // 1. تحويل الإجازات إلى قاموس (Dictionary) للبحث السريع (O(1)) بدلاً من (O(N))
+    // خصائص البحث والفلترة الجديدة
+    private string SearchName { get; set; } = string.Empty;
+    private string FilterCenter { get; set; } = string.Empty;
+
     private Dictionary<long, string> _leaveTypesDict;
-    // 2. تخزين أيام الجمعة مسبقاً لتجنب استخدام DateTime داخل الـ Loop
     private HashSet<int> _fridayDays = new HashSet<int>();
 
-    // قائمة الموظفين (الـ ViewModel) التي سيتم عرضها في الجدول
     private List<EmployeeAttendanceVM> EmployeeList = new();
-
-    // قائمة أنواع الإجازات (من المفترض جلبها من الـ API)
     private List<LookupValue> LeaveTypes = new();
-
+    private List<Center> AllCenters = new();
+    // القائمة المفلترة التي سيتم عرضها في الواجهة
+    private IEnumerable<EmployeeAttendanceVM> FilteredEmployeeList => EmployeeList.Where(e =>
+        (string.IsNullOrWhiteSpace(SearchName) || (e.EmployeeName != null && e.EmployeeName.Contains(SearchName, StringComparison.OrdinalIgnoreCase))) &&
+        (string.IsNullOrWhiteSpace(FilterCenter) || (e.CenterName != null && e.CenterName.Contains(FilterCenter, StringComparison.OrdinalIgnoreCase)))
+    );
 
     bool isDialogOpen = false;
     bool isDeleteDialogOpen = false;
     string dialogMessage = "هل أنت متأكد ؟";
     private EmployeeAttendanceVM EmployeToDelete;
+
     protected override async Task OnInitializedAsync()
     {
-
+        AllCenters = await CenterApi.GetAll();
         await LoadData();
         LeaveTypes = await LookupValueApi.GetByValueType("Vacation");
     }
@@ -462,7 +339,7 @@ else
     private async Task LoadData()
     {
         isLoading = true;
-        LoadYear=Year;
+        LoadYear = Year;
         LoadMonth = Month;
 
         _leaveTypesDict = LeaveTypes.ToDictionary(lt => lt.Id, lt => lt.EnName);
@@ -478,11 +355,14 @@ else
 
         DaysInMonth = DateTime.DaysInMonth(Year, Month);
         MonthDayes = new DateTime(Year, Month, 1);
-        // جلب البيانات الأصلية من الـ API
-        var records = await AttendanceRecordApi.GetGeneratedMonthlyAttendance(Year,Month); 
 
-        // تحويل البيانات الأصلية إلى ViewModel
+        var records = await AttendanceRecordApi.GetGeneratedMonthlyAttendance(Year, Month);
+
         EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
+
+        // مسح نصوص البحث عند تحميل بيانات جديدة
+        SearchName = string.Empty;
+        FilterCenter = string.Empty;
 
         isLoading = false;
     }
@@ -491,13 +371,12 @@ else
     {
         isLoading = true;
 
-        // تحويل الـ ViewModel للبيانات الأصلية لإرسالها
+        // عند الحفظ، نقوم بحفظ كل السجلات وليس فقط المفلترة
         var recordsToUpdate = EmployeeList.Select(e => MapToEntity(e)).ToList();
 
-        var response = await AttendanceRecordApi.Update(recordsToUpdate); 
+        var response = await AttendanceRecordApi.Update(recordsToUpdate);
         if (response.Success)
         {
-            // يمكنك إضافة SweetAlert هنا لإشعار المستخدم بالنجاح
             MudSnackbar.Add("تم حفظ البيانات بنجاح", Severity.Success);
         }
 
@@ -511,17 +390,12 @@ else
         {
             Year = Year,
             Month = Month,
-            HolidayCode = LeaveTypes.FirstOrDefault(lt => lt.EnName == "W")?.Id??null,
+            HolidayCode = LeaveTypes.FirstOrDefault(lt => lt.EnName == "W")?.Id ?? null,
         };
         var res = await AttendanceRecordApi.GenrateMonthlyAttendance(request);
         if (res.Success)
         {
-            await LoadData(); // إعادة تحميل البيانات بعد إنشاء اللوائح
-            // DaysInMonth = DateTime.DaysInMonth(Year, Month);
-            // MonthDayes = new DateTime(Year, Month, 1);
-
-            // // تحويل البيانات الأصلية إلى ViewModel
-            // EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
+            await LoadData();
         }
         else
         {
@@ -530,7 +404,7 @@ else
         isLoading = false;
     }
 
-    private async Task LockAttRecord(bool Lock=true)
+    private async Task LockAttRecord(bool Lock = true)
     {
         isLoading = true;
         GenerateAttendanceRequest request = new GenerateAttendanceRequest
@@ -542,7 +416,7 @@ else
         var res = await AttendanceRecordApi.LockMonthlyAttendance(request);
         if (res.Success)
         {
-            await LoadData(); // إعادة تحميل البيانات بعد إغلاق اللوائح
+            await LoadData();
             MudSnackbar.Add("تم إغلاق لوائح الدوام بنجاح", Severity.Success);
         }
         else
@@ -555,12 +429,15 @@ else
     private async Task ApplyVacation()
     {
         DateTime dayToVac = new DateTime(Year, Month, DayNoToVac);
-        if(dayToVac.DayOfWeek==DayOfWeek.Friday)
+        if (dayToVac.DayOfWeek == DayOfWeek.Friday)
         {
             MudSnackbar.Add("لا يمكن تعميم يوم إجازة على الموظفين يوم الجمعة ", Severity.Error);
             return;
         }
-        foreach (var emp in EmployeeList)
+
+        // تطبيق الإجازة على القائمة المفلترة فقط إن أردت، أو جميع الموظفين
+        // تم استخدام FilteredEmployeeList لتطبيق الإجازة على الموظفين المعروضين فقط
+        foreach (var emp in FilteredEmployeeList)
         {
             var day = emp.Days.FirstOrDefault(d => d.DayNumber == DayNoToVac);
             if (day is not null)
@@ -569,27 +446,23 @@ else
                 day.DescId = VacationTypeId;
             }
         }
-        MudSnackbar.Add("تم تعميم يوم الإجازة على جميع الموظفين", Severity.Success);
+        MudSnackbar.Add("تم تعميم يوم الإجازة", Severity.Success);
         StateHasChanged();
     }
 
-    private void CopyFirstDayToAll(EmployeeAttendanceVM emp) // ⚠️ تأكد أن اسم الكلاس EmployeeModel يطابق ما تستخدمه
+    private void CopyFirstDayToAll(EmployeeAttendanceVM emp)
     {
         if (emp.Days == null || !emp.Days.Any()) return;
 
-        // الحصول على اليوم الأول (نفترض أن رقمه 1)
         var firstDay = emp.Days.FirstOrDefault(d => d.DayNumber == 1)
                     ?? emp.Days.OrderBy(d => d.DayNumber).First();
 
-        // أخذ قيم الحضور ونوع الإجازة من اليوم الأول
         var targetAttendant = firstDay.IsAttendant;
         var targetDescId = firstDay.DescId;
 
-        // تطبيق القيم على جميع أيام هذا الموظف
         foreach (var day in emp.Days)
         {
-            // لا نعدل اليوم الأول نفسه، ولا نعدل الأيام المغلقة (كأيام الجمعة مثلاً إذا كانت مغلقة)
-            if (day.DayNumber != firstDay.DayNumber && !day.IsLocked && !_fridayDays.Contains(day.DayNumber) && day.DescId==null)
+            if (day.DayNumber != firstDay.DayNumber && !day.IsLocked && !_fridayDays.Contains(day.DayNumber) && day.DescId == null)
             {
                 day.IsAttendant = targetAttendant;
                 day.DescId = targetDescId;
@@ -600,9 +473,8 @@ else
     private async Task DeleteFromAttRec(EmployeeAttendanceVM Emp)
     {
         EmployeToDelete = Emp;
-        dialogMessage = $"هل أنت متأكد من حذف لوتئح داوم الموظف / {EmployeToDelete.EmployeeName} من هذا الشهر ؟";
+        dialogMessage = $"هل أنت متأكد من حذف لوائح داوم الموظف / {EmployeToDelete.EmployeeName} من هذا الشهر ؟";
         isDeleteDialogOpen = true;
-        //StateHasChanged();
         return;
     }
 
@@ -610,6 +482,7 @@ else
     {
         var x = Emp;
     }
+
     private void CancelDeleteDialog()
     {
         isDeleteDialogOpen = false;
@@ -622,7 +495,7 @@ else
         {
             Year = Year,
             Month = Month,
-            CenterId=EmployeToDelete.OriginalRecord.CenterId,
+            CenterId = EmployeToDelete.OriginalRecord.CenterId,
             EmployeeId = EmployeToDelete.EmployeeId
         };
         var response = await AttendanceRecordApi.DeleteEmpAttRec(request);
@@ -636,16 +509,14 @@ else
         else MudSnackbar.Add(response.Message, Severity.Error);
     }
 
-
-    #region Mapper Methods (التحويل بين قاعدة البيانات والواجهة)
-
+    #region Mapper Methods
     private EmployeeAttendanceVM MapToViewModel(AttendanceRecord record, int daysInMonth)
     {
         var vm = new EmployeeAttendanceVM
         {
             EmployeeId = record.EmployeeId,
             EmployeeName = record.Employee?.Name ?? record.Employee?.EnName ?? "غير معروف",
-            CenterName = record.Center?.Name??"",
+            CenterName = record.Center?.Name ?? "",
             OriginalRecord = record,
         };
 
@@ -660,7 +531,7 @@ else
                 DayNumber = i,
                 IsAttendant = isAttendantProp?.GetValue(record) as bool?,
                 DescId = descProp?.GetValue(record) as long?,
-                IsLocked = record.IsLocked??false
+                IsLocked = record.IsLocked ?? false
             });
         }
         return vm;
@@ -670,9 +541,9 @@ else
     {
         var record = vm.OriginalRecord;
 
-        record.Center = null; // تجنب إرسال بيانات المركز لتجنب مشاكل التتبع في EF Core
-        record.Employee = null; // تجنب إرسال بيانات الموظف لتجنب مشاكل التتبع في EF Core
-        record.IsLocked = vm.OriginalRecord.IsLocked; // تحديث حالة القفل إذا كانت موجودة في الـ ViewModel
+        record.Center = null;
+        record.Employee = null;
+        record.IsLocked = vm.OriginalRecord.IsLocked;
         var type = typeof(AttendanceRecord);
 
         foreach (var day in vm.Days)
@@ -686,7 +557,6 @@ else
 
         return record;
     }
-
     #endregion
 
     private async Task Export()
@@ -713,17 +583,8 @@ else
         }
         finally
         {
-            isExporting= false;
+            isExporting = false;
             StateHasChanged();
         }
     }
 }
-
-<!-- كلاس بسيط لمحاكاة أنواع الإجازات -->
-@* @code {
-    public class LookupValue
-    {
-        public long Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-    }
-} *@
