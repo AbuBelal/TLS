@@ -154,5 +154,19 @@ namespace APIServer.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);
         }
+
+        [HttpDelete("DeleteEmpAttRec")]
+        public async Task<GeneralResponse> DeleteEmployeeAttendanceRecords(AttRecoRequest request)
+        {
+            try
+            {
+                var result = await _repository.DeleteEmployeeAttendanceRecordsAsync(request);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse(false, $"حدث خطأ أثناء الحذف: {ex.Message}", 0);
+            }
+        }
     }
 }

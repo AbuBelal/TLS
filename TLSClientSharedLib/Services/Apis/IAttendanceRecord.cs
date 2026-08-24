@@ -25,5 +25,8 @@ namespace TLSClientSharedLib.Services.Apis
         [Post(ApiUrls.AttendanceRecord.Export)]
         Task<HttpResponseMessage> Export(GenerateAttendanceRequest request);
 
+        [Delete(ApiUrls.AttendanceRecord.DeleteEmpAttRec)]
+        Task<GeneralResponse> DeleteEmpAttRec([Body] AttRecoRequest request);
+
     }
 }

@@ -281,6 +281,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
             student = await StudentApi.GetById(Id); 
             WhatsappNo01 = WhatsAppHelper.GetWhatsAppLink(student.Mobile);
             WhatsappNo02 = WhatsAppHelper.GetWhatsAppLink(student.Mobile, "", "972");
+            CheckCivilId();
         }
 
         // جلب البيانات للمنسدلات من الـ API

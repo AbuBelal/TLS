@@ -137,10 +137,93 @@ else
                     </tr>
                 </thead>
                 <tbody>
+                    @{int Serial=0;}
                      @foreach (var emp in EmployeeList)
                      {
-                            <tr>
+                        ++Serial;
+                        <tr>
                             <td class="sticky-col bg-white px-3 py-2 align-middle">
+                                <!-- حاوية رئيسية لترتيب العناصر: النصوص يميناً والأزرار يساراً -->
+                                <div class="d-flex align-items-center justify-content-between">
+
+                                    <!-- قسم النصوص: تمت إضافة position-relative هنا ليكون حاوية للرقم -->
+                                    <div class="d-flex flex-column justify-content-center overflow-hidden position-relative">
+
+                                        <!-- الرقم التسلسلي كخلفية (Watermark) -->
+                                        <div class="position-absolute fw-bold"
+                                             style="font-size: 3rem; color: rgba(200,0,0,0.2); right: 5px; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none;">
+                                             @Serial
+                                        </div>
+
+                                        <!-- حاوية النصوص (تم وضع z-index: 1 لتكون فوق الرقم التسلسلي) -->
+                                        <div class="position-relative" style="z-index: 1;">
+
+                                            <!-- الصف الأول: اسم الموظف -->
+                                            <div class="fw-bold text-dark text-truncate mb-1" style="max-width: 130px; font-size: 0.9rem;" title="@emp.EmployeeName">
+                                                @emp.EmployeeName
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(emp.CenterName))
+                                            {
+                                                <!-- الصف الثاني: اسم المركز -->
+                                                <div class="text-muted d-flex align-items-center" style="font-size: 0.75rem;">
+                                                    <!-- أيقونة صغيرة للمركز -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-geo-alt-fill me-1 flex-shrink-0" viewBox="0 0 16 16">
+                                                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                                                    </svg>
+                                                    <span class="text-truncate" style="max-width: 120px;" title="@emp.CenterName">
+                                                        @emp.CenterName
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- قسم الأزرار: على اليسار، مرتبة عمودياً ومضغوطة -->
+                                    <div class="d-flex flex-column position-relative flex-shrink-0" style="z-index: 10;">
+                                        <AuthorizeView Roles="@AppRoles.Admin">
+                                        <!-- الزر الأول الإضافي -->
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
+                                                    style="width: 20px; height: 20px; background-color: #f8f9fa;"
+                                                    title="حذف"
+                                                    @onclick="() => DeleteFromAttRec(emp)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+                                                </svg>
+                                            </button>
+
+                                        <!-- الزر الثاني الإضافي -->
+                                        @* <button type="button"
+                                                class="btn btn-sm btn-outline-info border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
+                                                style="width: 20px; height: 20px; background-color: #f8f9fa;"
+                                                title="إجراء 2"
+                                                    @onclick="() => MoveToCenter(emp)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                                            </svg>
+                                        </button> *@
+
+
+                                        </AuthorizeView>
+                                        <!-- زر التكرار الأصلي -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary border-0 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 p-0"
+                                                style="width: 20px; height: 20px; background-color: #f8f9fa;"
+                                                title="تكرار اليوم الأول على جميع أيام الشهر"
+                                                @onclick="() => CopyFirstDayToAll(emp)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                            </svg>
+                                        </button>
+
+                                    </div>
+
+                                </div>
+                            </td>
+
+                           @*  <td class="sticky-col bg-white px-3 py-2 align-middle">
                                 <div class="d-flex flex-column justify-content-center">
 
                                     <!-- الصف الأول: اسم الموظف وزر التكرار -->
@@ -174,8 +257,8 @@ else
                                         </span>
                                     </div>
 
-                                </div>
-                            </td>
+                                </div> 
+                            </td>*@
                                @*  <td class="sticky-col bg-white px-3">
                                     <div class="fw-bold text-dark text-truncate" style="max-width: 150px;" title="@emp.EmployeeName">
                                         @emp.EmployeeName
@@ -330,6 +413,15 @@ else
     }
 </div>
 
+
+
+@* Dialogs *@
+
+<DialogMsg IsOpen="@isDeleteDialogOpen" Title="تأكيد الحذف" Message="@dialogMessage"
+           OnConfirmed="ConfirmDeleteDialog" OnCancel="CancelDeleteDialog" DialogType="danger"
+           Icon="bi-exclamation-triangle" />
+
+
 @code {
     private DateTime MonthDayes ;
     private int Year = DateTime.Now.Year;
@@ -355,6 +447,11 @@ else
     // قائمة أنواع الإجازات (من المفترض جلبها من الـ API)
     private List<LookupValue> LeaveTypes = new();
 
+
+    bool isDialogOpen = false;
+    bool isDeleteDialogOpen = false;
+    string dialogMessage = "هل أنت متأكد ؟";
+    private EmployeeAttendanceVM EmployeToDelete;
     protected override async Task OnInitializedAsync()
     {
 
@@ -499,6 +596,46 @@ else
             }
         }
     }
+
+    private async Task DeleteFromAttRec(EmployeeAttendanceVM Emp)
+    {
+        EmployeToDelete = Emp;
+        dialogMessage = $"هل أنت متأكد من حذف لوتئح داوم الموظف / {EmployeToDelete.EmployeeName} من هذا الشهر ؟";
+        isDeleteDialogOpen = true;
+        //StateHasChanged();
+        return;
+    }
+
+    private async Task MoveToCenter(EmployeeAttendanceVM Emp)
+    {
+        var x = Emp;
+    }
+    private void CancelDeleteDialog()
+    {
+        isDeleteDialogOpen = false;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDeleteDialog()
+    {
+        var request = new AttRecoRequest
+        {
+            Year = Year,
+            Month = Month,
+            CenterId=EmployeToDelete.OriginalRecord.CenterId,
+            EmployeeId = EmployeToDelete.EmployeeId
+        };
+        var response = await AttendanceRecordApi.DeleteEmpAttRec(request);
+        isDeleteDialogOpen = false;
+        if (response.Success)
+        {
+            EmployeeList.RemoveAll(r => r.OriginalRecord.EmployeeId == EmployeToDelete.EmployeeId && r.OriginalRecord.CenterId == EmployeToDelete.OriginalRecord.CenterId);
+            StateHasChanged();
+            MudSnackbar.Add(response.Message, Severity.Success);
+        }
+        else MudSnackbar.Add(response.Message, Severity.Error);
+    }
+
 
     #region Mapper Methods (التحويل بين قاعدة البيانات والواجهة)
 

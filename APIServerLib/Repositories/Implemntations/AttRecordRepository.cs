@@ -2,6 +2,7 @@ using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
+using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Responses;
 
@@ -183,6 +184,29 @@ namespace APIServerLib.Repositories.Implemntations
             await _context.AttendanceRecord
               .Where(r => r.Date == new DateOnly(year, month, 1) && r.IsLocked !=Lock)
               .ExecuteUpdateAsync(s => s.SetProperty(r => r.IsLocked, Lock));
+        }
+        public async Task<GeneralResponse> DeleteEmployeeAttendanceRecordsAsync(AttRecoRequest request)
+        {
+            var recordsToDelete = await _context.AttendanceRecord.Include(a=>a.Employee)
+                .Where(r => r.EmployeeId == request.EmployeeId && r.Date.Month==request.Month && r.Date.Year==request.Year && r.CenterId==request.CenterId)
+                .ToListAsync();
+
+            if (!recordsToDelete.Any())
+            {
+                return new GeneralResponse
+                (
+                     false,
+                     "لا يوجد سجل يمكن حذفه."
+                );
+            }
+            _context.AttendanceRecord.RemoveRange(recordsToDelete);
+            await _context.SaveChangesAsync();
+
+            return new GeneralResponse
+            (
+                 true,
+                 $"تم حذف سجل الحضور بنجاح للموظف/ {recordsToDelete.First().Employee?.Name} "
+            );
         }
     }
 }

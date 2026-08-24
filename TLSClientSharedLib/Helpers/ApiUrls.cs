@@ -259,6 +259,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GenerateMonthlyAttendance = PriorUrl;
             public const string LockMonthlyAttendance = PriorUrl+ "/lock";
             public const string Export = PriorUrl + "/export";
+            public const string DeleteEmpAttRec = PriorUrl + "/DeleteEmpAttRec";
         }
     }
 }
