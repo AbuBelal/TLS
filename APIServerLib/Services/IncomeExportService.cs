@@ -22,7 +22,7 @@ public static class IncomeReportExportService
         // ══════════════════════════════════════════════════════
         //  الصف الأول: عنوان التقرير (مدمج)
         // ══════════════════════════════════════════════════════
-        int totalCols = 6;
+        int totalCols = 7;
         int headerRow = 1;
         var headers = new[]
         {

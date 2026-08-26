@@ -88,7 +88,7 @@
                                             
                                             <AuthorizeView Roles="@AppRoles.User">
                                             <!-- Manage Details Component -->
-                                                <button class="btn btn-sm btn-outline-primary" title="إدخال تفاصيل الأنشطة" @onclick="() => NavigateToEdit(item.WReportDetails?.FirstOrDefault()?.Id ??0,item.Id)">
+                                                <button class="btn btn-sm btn-outline-primary" title="إدخال تفاصيل الأنشطة" @onclick="() => NavigateToEdit(item.WReportDetails?.FirstOrDefault()?.Id ??0,item.Id,userProfile.CenterId??0)">
                                                 <i class="bi bi-list-check"></i> التفاصيل
                                             </button>
                                             &nbsp;&nbsp;
@@ -204,12 +204,14 @@ Icon="bi-exclamation-triangle" />
     bool isDeleteDialogOpen = false;
     string dialogMessage = "هل أنت متأكد من حذف التقرير الأسبوعي ؟";
     long reportIdToDelete = 0;
-
+    UserProfileDto? userProfile;
 
     private enum ModalMode { Create, Edit, View }
 
     protected override async Task OnInitializedAsync()
     {
+        var userdata = await UserDataService.GetUserDataAsync();
+        userProfile = userdata;
         await LoadReports();
     }
 
@@ -317,9 +319,11 @@ Icon="bi-exclamation-triangle" />
     {
         NavManager.NavigateTo($"{PagesUris.WReportsPages.CentersManage}/{reportId}");
     }
-    private void NavigateToEdit(long wrd ,long wr)
+    private void NavigateToEdit(long wrd ,long wr , long CenterId)
     {
-        NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{wrd}/{wr}");
+
+        //user
+        NavManager.NavigateTo($"{PagesUris.WReportsDetailsPages.Edit}/{wrd}/{wr}/{CenterId}");
     }
     private void NavigateToSummery(long wr)
     {
