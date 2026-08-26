@@ -12,6 +12,7 @@ namespace TLSClientSharedLib.ViewModels
         public string CenterName { get; set; } = string.Empty;
         public List<DayVM> Days { get; set; } = new List<DayVM>();
 
+        public int DaysCount => Days.Count(x=>x.IsAttendant??false);
         // نحتفظ بالنسخة الأصلية لنحدث عليها عند الحفظ
         public AttendanceRecord OriginalRecord { get; set; }
     }

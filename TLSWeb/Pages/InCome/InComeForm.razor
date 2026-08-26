@@ -45,9 +45,21 @@
                                     <i class="bi bi-tag me-1 text-success"></i>
                                     اسم الوارد <span class="text-danger">*</span>
                                 </label>
-                                <InputText class="form-control form-control-lg" 
-                                           @bind-Value="model.Name" 
+                                <InputText class="form-control form-control-lg"
+                                           list="itemsDatalist"
+                                           @bind-Value="model.Name"
                                            placeholder="أدخل اسم الوارد" />
+
+                                <!-- القائمة المخفية للإكمال التلقائي -->
+                                <datalist id="itemsDatalist">
+                                    @if (AllItems != null)
+                                    {
+                                        @foreach (var item in AllItems)
+                                        {
+                                            <option value="@item"></option>
+                                        }
+                                    }
+                                </datalist>
                                 <ValidationMessage For="@(() => model.Name)" class="text-danger small mt-1" />
                             </div>
 
@@ -164,7 +176,7 @@
     private bool isLoading = true;
     private bool isSaving = false;
     private bool showCalculator = false;
-
+    private List<string> AllItems;
     private bool IsEdit => Id > 0;
 
     protected override async Task OnInitializedAsync()
@@ -180,6 +192,9 @@
             model.Date = DateOnly.FromDateTime(DateTime.Now);
             isLoading = false;
         }
+
+        var Items = await InComeApi.GetAll();
+        AllItems = Items.Select(i => i.Name).Distinct().ToList();
     }
 
     private async Task LoadCentersAsync()

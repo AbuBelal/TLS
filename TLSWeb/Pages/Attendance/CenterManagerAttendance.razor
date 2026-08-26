@@ -37,7 +37,7 @@
         <!-- 1.5 حقول البحث والفلترة المضافة -->
         <div class="d-flex align-items-center gap-1">
             <label class="fw-bold text-muted small mb-0 ms-1 text-nowrap">الاسم:</label>
-            <input type="text" class="form-control form-control-sm" style="width: 140px;" placeholder="بحث بالاسم..." @bind="SearchName" @bind:event="oninput" />
+            <input type="text" class="form-control form-control-sm" style="width: 140px;" placeholder="بحث بالاسم..." @bind="SearchName" />@* @bind:event="oninput" *@
         </div>
         <div class="d-flex align-items-center gap-1">
             <label class="fw-bold text-muted small mb-0 ms-1 text-nowrap">المركز:</label>
@@ -161,6 +161,7 @@ else
                             </span>
                         </th>
                     }
+                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 30px; padding: 12px;">الحضور</th>
                 </tr>
             </thead>
             <tbody>
@@ -228,6 +229,11 @@ else
                                      LeaveTypesDict="_leaveTypesDict"
                                      LeaveTypesList="LeaveTypes" />
                         }
+                        <td class="p-1 align-middle" >
+                            <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
+                                    <span class="badge bg-success rounded-pill px-2" style="font-size: 0.75rem;">@emp.DaysCount</span>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -309,8 +315,29 @@ else
     private bool isLoading = true;
 
     // خصائص البحث والفلترة الجديدة
-    private string SearchName { get; set; } = string.Empty;
-    private string FilterCenter { get; set; } = string.Empty;
+    // private string SearchName { get; set; } = string.Empty;
+    // private string FilterCenter { get; set; } = string.Empty;
+    private string _searchName = string.Empty;
+    private string SearchName
+    {
+        get => _searchName;
+        set
+        {
+            _searchName = value;
+            ApplyFilter();
+        }
+    }
+
+    private string _filterCenter = string.Empty;
+    private string FilterCenter
+    {
+        get => _filterCenter;
+        set
+        {
+            _filterCenter = value;
+            ApplyFilter();
+        }
+    }
 
     private Dictionary<long, string> _leaveTypesDict;
     private HashSet<int> _fridayDays = new HashSet<int>();
@@ -319,15 +346,28 @@ else
     private List<LookupValue> LeaveTypes = new();
     private List<Center> AllCenters = new();
     // القائمة المفلترة التي سيتم عرضها في الواجهة
-    private IEnumerable<EmployeeAttendanceVM> FilteredEmployeeList => EmployeeList.Where(e =>
-        (string.IsNullOrWhiteSpace(SearchName) || (e.EmployeeName != null && e.EmployeeName.Contains(SearchName, StringComparison.OrdinalIgnoreCase))) &&
-        (string.IsNullOrWhiteSpace(FilterCenter) || (e.CenterName != null && e.CenterName.Contains(FilterCenter, StringComparison.OrdinalIgnoreCase)))
-    );
+    private List<EmployeeAttendanceVM> FilteredEmployeeList = new();
+    // private IEnumerable<EmployeeAttendanceVM> FilteredEmployeeList => EmployeeList.Where(e =>
+    //     (string.IsNullOrWhiteSpace(SearchName) || (e.EmployeeName != null && e.EmployeeName.Contains(SearchName, StringComparison.OrdinalIgnoreCase))) &&
+    //     (string.IsNullOrWhiteSpace(FilterCenter) || (e.CenterName != null && e.CenterName.Contains(FilterCenter, StringComparison.OrdinalIgnoreCase)))
+    // );
 
     bool isDialogOpen = false;
     bool isDeleteDialogOpen = false;
     string dialogMessage = "هل أنت متأكد ؟";
     private EmployeeAttendanceVM EmployeToDelete;
+
+    // في أعلى الكلاس، قم بتخزين الخصائص مرة واحدة فقط في الذاكرة
+    private static readonly System.Reflection.PropertyInfo[] AttendantProps = Enumerable.Range(1, 31)
+        .Select(i => typeof(AttendanceRecord).GetProperty($"Day{i:D2}_IsAttendant"))
+    .ToArray();
+
+    private static readonly System.Reflection.PropertyInfo[] DescProps = Enumerable.Range(1, 31)
+        .Select(i => typeof(AttendanceRecord).GetProperty($"Day{i:D2}_Desc"))
+    .ToArray();
+
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -363,9 +403,19 @@ else
         // مسح نصوص البحث عند تحميل بيانات جديدة
         SearchName = string.Empty;
         FilterCenter = string.Empty;
-
+        ApplyFilter();
         isLoading = false;
     }
+
+
+    private void ApplyFilter()
+    {
+        FilteredEmployeeList = EmployeeList.Where(e =>
+            (string.IsNullOrWhiteSpace(SearchName) || (e.EmployeeName != null && e.EmployeeName.Contains(SearchName, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrWhiteSpace(FilterCenter) || (e.CenterName != null && e.CenterName.Contains(FilterCenter, StringComparison.OrdinalIgnoreCase)))
+        ).ToList();
+    }
+
 
     private async Task SaveChanges()
     {
@@ -480,7 +530,7 @@ else
 
     private async Task MoveToCenter(EmployeeAttendanceVM Emp)
     {
-        var x = Emp;
+       // var x = Emp;
     }
 
     private void CancelDeleteDialog()
@@ -523,14 +573,14 @@ else
         var type = typeof(AttendanceRecord);
         for (int i = 1; i <= daysInMonth; i++)
         {
-            var isAttendantProp = type.GetProperty($"Day{i:D2}_IsAttendant");
-            var descProp = type.GetProperty($"Day{i:D2}_Desc");
+            // var isAttendantProp = type.GetProperty($"Day{i:D2}_IsAttendant");
+            // var descProp = type.GetProperty($"Day{i:D2}_Desc");
 
             vm.Days.Add(new DayVM
             {
                 DayNumber = i,
-                IsAttendant = isAttendantProp?.GetValue(record) as bool?,
-                DescId = descProp?.GetValue(record) as long?,
+                IsAttendant = AttendantProps[i - 1]?.GetValue(record) as bool?,
+                DescId = DescProps[i - 1]?.GetValue(record) as long?,
                 IsLocked = record.IsLocked ?? false
             });
         }

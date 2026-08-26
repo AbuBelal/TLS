@@ -166,8 +166,8 @@ namespace APIServer.Controllers
         [HttpPost("export-Income-Balance")]
         public async Task<IActionResult> ExportIncomeBalance()
         {
-            var report = await _repository.GetIncomeReportByDateRangeAsync(null, null);
-            var bytes = IncomeReportExportService.GenerateExcel(report, " تقرير أرصدة الواردات");
+            var report = await _repository.GetAllAsync();
+            var bytes = IncomeReportExportService.GenerateExcel(report.ToList(), " تقرير أرصدة الواردات");
             var fileName = $"تقرير-رصيد-الواردات{DateTime.Now.ToString("yyyy-MM-dd")}.xlsx";
 
             await _auditLogService.LogAsync("Read", "Export Income Balance Report", "", $"تصدير تقرير أرصدة الواردات: {fileName}");

@@ -11,7 +11,91 @@ public static class IncomeReportExportService
     /// <summary>
     /// يُنشئ ملف Excel من قائمة التقارير اليومية ويُعيده كـ byte[]
     /// </summary>
-    public static byte[] GenerateExcel(List<IncomeReportDto> reports, string sheetTitle)
+    public static byte[] GenerateExcel(List<InCome> reports, string sheetTitle)
+    {
+        using var wb = new XLWorkbook();
+        var ws = wb.AddWorksheet("تقرير الوارد");
+
+        // ── إعداد اتجاه RTL للورقة ─────────────────────────────
+        ws.RightToLeft = true;
+
+        // ══════════════════════════════════════════════════════
+        //  الصف الأول: عنوان التقرير (مدمج)
+        // ══════════════════════════════════════════════════════
+        int totalCols = 6;
+        int headerRow = 1;
+        var headers = new[]
+        {
+            ("#",           5),//1
+            ("المركز", 20),//4
+            ("الصنف", 20),//4
+            ("التاريخ", 15),//3
+            ("الكمية",  11),//2
+            ("المستلم", 20),//5
+            ("ملاحظات", 40),//5
+        };
+
+        for (int c = 0; c < headers.Length; c++)
+        {
+            var cell = ws.Cell(headerRow, c + 1);
+            cell.Value = headers[c].Item1;
+            cell.Style.Font.Bold      = true;
+            cell.Style.Font.FontSize  = 11;
+            cell.Style.Font.FontColor = XLColor.White;
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#00658E");
+            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            cell.Style.Alignment.Vertical   = XLAlignmentVerticalValues.Center;
+            cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            cell.Style.Border.OutsideBorderColor = XLColor.FromHtml("#005577");
+            ws.Column(c + 1).Width = headers[c].Item2;
+        }
+        ws.Row(headerRow).Height = 22;
+
+        // ══════════════════════════════════════════════════════
+        //  بيانات التقرير
+        // ══════════════════════════════════════════════════════
+        reports = reports.OrderBy(r => r.Center.SortOrder).ThenBy(r=>r.Date).ToList();
+        for (int i = 0; i < reports.Count; i++)
+        {
+            var report = reports[i];
+            int row = headerRow + 1 + i;
+            bool isEven = i % 2 == 0;
+
+            var rowBg = isEven
+                ? XLColor.FromHtml("#FFFFFF")
+                : XLColor.FromHtml("#F0F8FF");
+
+            // قيم الخلايا
+            ws.Cell(row, 1).Value = (i+1).ToString();
+            ws.Cell(row, 2).Value = report.Center.Name;
+            ws.Cell(row, 3).Value = report.Name;
+            ws.Cell(row, 4).Value = report.Date.ToString("dd/MM/yyyy");
+            ws.Cell(row, 5).Value = report.Qnty;
+            ws.Cell(row, 6).Value = report.RecipientName;
+            ws.Cell(row, 7).Value = report.Comments;
+            
+
+            // تنسيق الصف كاملاً
+            var rowRange = ws.Range(row, 1, row, totalCols);
+            rowRange.Style.Fill.BackgroundColor = rowBg;
+            rowRange.Style.Font.FontSize = 11;
+            rowRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            rowRange.Style.Border.OutsideBorderColor = XLColor.FromHtml("#DDDDDD");
+            rowRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            rowRange.Style.Border.InsideBorderColor = XLColor.FromHtml("#EEEEEE");
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  تجميد الصفوف العلوية عند التمرير
+        // ══════════════════════════════════════════════════════
+        ws.SheetView.FreezeRows(headerRow);
+
+        // ── تحويل إلى bytes ────────────────────────────────────
+        using var ms = new MemoryStream();
+        wb.SaveAs(ms);
+        return ms.ToArray();
+    }
+    public static byte[] GenerateExcelSum(List<IncomeReportDto> reports, string sheetTitle)
     {
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("التقرير اليومي");
