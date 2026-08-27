@@ -88,21 +88,23 @@
                             </datalist>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-white"><i class="bi bi-shop text-muted"></i></span>
-                            <select class="form-select" @bind="SearchCenter">
-                                <option value="">-- جميع المراكز --</option>
-                                @if (AllCenters != null)
-                                {
-                                    @foreach (var center in AllCenters)
+                    <AuthorizeView Roles="@AppRoles.Admin">
+                        <div class="col-md-4">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white"><i class="bi bi-shop text-muted"></i></span>
+                                <select class="form-select" @bind="SearchCenter">
+                                    <option value="">-- جميع المراكز --</option>
+                                    @if (AllCenters != null)
                                     {
-                                        <option value="@center">@center</option>
+                                        @foreach (var center in AllCenters)
+                                        {
+                                            <option value="@center">@center</option>
+                                        }
                                     }
-                                }
-                            </select>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                    </AuthorizeView>
                     @* <div class="col-md-4 d-flex align-items-center">
                         <small class="text-muted ms-2">
                             * يتم الفلترة تلقائياً عند الانتهاء من الكتابة (النقر خارج الحقل أو Enter)

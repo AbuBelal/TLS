@@ -189,9 +189,18 @@ else
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-geo-alt-fill me-1 flex-shrink-0" viewBox="0 0 16 16">
                                                     <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
                                                 </svg>
-                                                <span class="text-truncate" style="max-width: 120px;" title="@emp.CenterName">
+                                                <AuthorizeView Roles="@AppRoles.Admin">
+                                                    @*  <span class="text-truncate" style="max-width: 120px;" title="@emp.CenterName">
                                                     @emp.CenterName
-                                                </span>
+                                                </span> *@
+                                                    <select class="compact-select text-secondary" style="width: 120px;" @bind="@emp.CenterName">
+
+                                                        @foreach (var center in AllCenters)
+                                                        {
+                                                            <option value="@center.Name">@center.Name</option>
+                                                        }
+                                                    </select>
+                                                </AuthorizeView>
                                             </div>
                                         }
                                     </div>
@@ -594,6 +603,7 @@ else
         record.Center = null;
         record.Employee = null;
         record.IsLocked = vm.OriginalRecord.IsLocked;
+        record.CenterId = AllCenters.FirstOrDefault(c => c.Name == vm.CenterName)?.Id ?? vm.OriginalRecord.CenterId;
         var type = typeof(AttendanceRecord);
 
         foreach (var day in vm.Days)
