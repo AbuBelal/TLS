@@ -51,6 +51,14 @@
     background-color: #212529 !important;
     border-left: 2px solid #495057;
 }
+.sticky-corner-Red {
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 15;
+    background-color: firebrick !important;
+    border-left: 2px solid #495057;
+}
 
 /* تنسيقات الجدول والمحتوى */
 .weekend-bg {

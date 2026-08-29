@@ -9,6 +9,9 @@ using SharedLib.Entities;
 using SharedLib.Fixed;
 using SharedLib.Responses;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace APIServer.Controllers
 {
@@ -90,17 +93,32 @@ namespace APIServer.Controllers
 
 
         [HttpGet("{year}/{month}")]
-        public async Task<List<AttendanceRecord>> GetCenterAttendance(int year, int month)
+        public async Task<List<AttendanceRecordDto>> GetCenterAttendance(int year, int month)
         {
             var centerId = await CurrentCenterId();
-            List<AttendanceRecord> records = await _repository.GetAttendanceByCenterAsync(centerId, year, month);
+            var records = await _repository.GetAttendanceByCenterAsync(centerId, year, month);
 
             if (records == null || !records.Any())
-                return new List<AttendanceRecord>();// "لا توجد سجلات دوام لهذا المركز في الشهر المحدد.");
+                return new List<AttendanceRecordDto>();// "لا توجد سجلات دوام لهذا المركز في الشهر المحدد.");
 
-            // لتجنب مشكلة الـ Circular Reference عند إرسال البيانات كـ JSON
-            // يمكنك استخدام DTO، أو استخدام خيارات JSON لتجاهل الـ Reference Cycles
-            return records;
+            var Dto = records.Select(r => (new AttRecMappers()).ToDTO(r)).ToList();
+            //var options = new JsonSerializerOptions
+            //{
+            //    ReferenceHandler = ReferenceHandler.IgnoreCycles
+            //};
+
+            //// 2. تحويل البيانات إلى نص JSON
+            //string jsonString = JsonSerializer.Serialize(Dto, options);
+
+            //// 3. حساب الحجم بالبايت والكيلوبايت
+            //int sizeInBytes = Encoding.UTF8.GetByteCount(jsonString);
+            //double sizeInKb = sizeInBytes / 1024.0;
+            //double sizeInMb = sizeInKb / 1024.0;
+
+            //// يمكنك طباعة الحجم في الـ Console أو تسجيله (Log)
+            //Console.WriteLine($"Data Size: {sizeInBytes} Bytes | {sizeInKb:F2} KB | {sizeInMb:F2} MB");
+            ////
+            return Dto;
         }
 
         [HttpPut()]
@@ -140,7 +158,7 @@ namespace APIServer.Controllers
         public async Task<IActionResult> ExportAttRec(GenerateAttendanceRequest request)
         {
             var centerId = await CurrentCenterId();
-            List<AttendanceRecord> records = await _repository.GetAttendanceByCenterAsync(centerId, request.Year, request.Month);
+            var records = await _repository.GetAttendanceByCenterAsync(centerId, request.Year, request.Month);
 
             var lookupvalue = await _lookupValueRepository.GetByLookupType(LookupTypes.Vacation);
             var CurMonthDaysNo = DateTime.DaysInMonth(request.Year, request.Month);

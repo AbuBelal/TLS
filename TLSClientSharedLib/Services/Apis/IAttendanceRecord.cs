@@ -11,7 +11,7 @@ namespace TLSClientSharedLib.Services.Apis
     public interface IAttendanceRecordApi
     {
         [Get(ApiUrls.AttendanceRecord.GetGeneratedMonthlyAttendance)]
-        Task<List<AttendanceRecord>> GetGeneratedMonthlyAttendance(int year, int month);
+        Task<List<AttendanceRecordDto>> GetGeneratedMonthlyAttendance(int year, int month);
 
         [Put(ApiUrls.AttendanceRecord.Update)]
         Task<GeneralResponse> Update(List<AttendanceRecord> records);

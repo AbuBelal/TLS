@@ -130,11 +130,12 @@ namespace APIServerLib.Repositories.Implemntations
             if (centerId == 0)
             {
                 // جلب السجلات مع بيانات الموظف لعرض اسمه في الواجهة
-                return await _context.AttendanceRecord
+                return  await _context.AttendanceRecord
                     .Include(a => a.Employee)
                     .Include(c=>c.Center)
                     .Where(a => a.Date.Year == year && a.Date.Month == month)
                     .OrderBy(c=>c.Center.SortOrder)
+                    //.Select(r=> (new AttRecMappers()).ToDTO(r))
                     .ToListAsync();
             }
             else
@@ -144,6 +145,7 @@ namespace APIServerLib.Repositories.Implemntations
                     .Include(a => a.Employee)
                     //.Include(c => c.Center)
                     .Where(a => a.CenterId == centerId && a.Date.Year == year && a.Date.Month == month)
+                    //.Select(r => (new AttRecMappers()).ToDTO(r))
                     .ToListAsync();
             }
         }

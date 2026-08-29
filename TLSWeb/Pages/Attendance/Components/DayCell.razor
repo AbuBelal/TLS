@@ -35,6 +35,7 @@
             <!-- Dropdown لنوع الإجازة -->
             <select class="compact-select text-secondary"
                     @bind="Day.DescId"
+                    style="@((Day.IsAttendant!=true && Day.DescId !=null &&Day.DescId !=LeaveTypesList.First(x=>x.EnName== "W").Id && Day.DescId != -1) ? "background-color: #d4edda;" : "")"
                     disabled="@(Day.IsAttendant == true)">
                 <option value="-1">-</option>
                 @foreach (var leaveType in LeaveTypesList)

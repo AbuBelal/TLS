@@ -1,6 +1,7 @@
 ﻿using SharedLib.Entities;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace TLSClientSharedLib.ViewModels
@@ -13,12 +14,14 @@ namespace TLSClientSharedLib.ViewModels
         public List<DayVM> Days { get; set; } = new List<DayVM>();
 
         public int DaysCount => Days.Count(x=>x.IsAttendant??false);
+        public int EmptyDaysCount => Days.Count(x=>x.IsAttendant is null && x.DescId is null); 
         // نحتفظ بالنسخة الأصلية لنحدث عليها عند الحفظ
         public AttendanceRecord OriginalRecord { get; set; }
     }
 
     public class DayVM
     {
+        public int Serial { get; set; } = 0;
         public int DayNumber { get; set; }
 
         private bool? _isAttendant;
@@ -31,7 +34,7 @@ namespace TLSClientSharedLib.ViewModels
                 // ذكاء برمجي: إذا كان حاضراً، نقوم بتفريغ نوع الإجازة تلقائياً
                 if (value == true)
                 {
-                    DescId = null;
+                    DescId = null; 
                 }
             }
         }

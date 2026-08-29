@@ -161,23 +161,23 @@ else
                             </span>
                         </th>
                     }
-                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 30px; padding: 12px;">الحضور</th>
+                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 20px; padding: 12px;">الحضور</th>
+                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 20px; padding: 12px;">غير مدخل</th>
                 </tr>
             </thead>
             <tbody>
                 @{
                     int Serial = 0;
                 }
-                @foreach (var emp in FilteredEmployeeList) // <--- تم تغيير اللوب ليعتمد على القائمة المفلترة
-                {
-                    ++Serial;
+               
+                <Virtualize Items="@FilteredEmployeeList.ToList()" Context="emp">
                     <tr>
                         <td class="sticky-col bg-white px-3 py-2 align-middle">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex flex-column justify-content-center overflow-hidden position-relative">
                                     <div class="position-absolute fw-bold"
                                          style="font-size: 3rem; color: rgba(200,0,0,0.2); right: 5px; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none;">
-                                        @Serial
+                                        @(FilteredEmployeeList.IndexOf(emp) + 1)
                                     </div>
                                     <div class="position-relative" style="z-index: 1;">
                                         <div class="fw-bold text-dark text-truncate mb-1" style="max-width: 130px; font-size: 0.9rem;" title="@emp.EmployeeName">
@@ -190,9 +190,6 @@ else
                                                     <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
                                                 </svg>
                                                 <AuthorizeView Roles="@AppRoles.Admin">
-                                                    @*  <span class="text-truncate" style="max-width: 120px;" title="@emp.CenterName">
-                                                    @emp.CenterName
-                                                </span> *@
                                                     <select class="compact-select text-secondary" style="width: 120px;" @bind="@emp.CenterName">
 
                                                         @foreach (var center in AllCenters)
@@ -243,8 +240,14 @@ else
                                     <span class="badge bg-success rounded-pill px-2" style="font-size: 0.75rem;">@emp.DaysCount</span>
                             </div>
                         </td>
+                        <td class="p-1 align-middle" >
+                            <div class="d-flex flex-column align-items-center justify-content-center cell-gap">
+                                    <span class="badge bg-warning rounded-pill px-2" style="font-size: 0.75rem;">@emp.EmptyDaysCount</span>
+                            </div>
+                        </td>
                     </tr>
-                }
+                
+                </Virtualize>
             </tbody>
         </table>
     </div>
@@ -368,11 +371,11 @@ else
 
     // في أعلى الكلاس، قم بتخزين الخصائص مرة واحدة فقط في الذاكرة
     private static readonly System.Reflection.PropertyInfo[] AttendantProps = Enumerable.Range(1, 31)
-        .Select(i => typeof(AttendanceRecord).GetProperty($"Day{i:D2}_IsAttendant"))
+        .Select(i => typeof(AttendanceRecordDto).GetProperty($"Day{i:D2}_IsAttendant"))
     .ToArray();
 
     private static readonly System.Reflection.PropertyInfo[] DescProps = Enumerable.Range(1, 31)
-        .Select(i => typeof(AttendanceRecord).GetProperty($"Day{i:D2}_Desc"))
+        .Select(i => typeof(AttendanceRecordDto).GetProperty($"Day{i:D2}_Desc"))
     .ToArray();
 
 
@@ -407,7 +410,25 @@ else
 
         var records = await AttendanceRecordApi.GetGeneratedMonthlyAttendance(Year, Month);
 
+
         EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
+
+        var options = new System.Text.Json.JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        };
+
+        // 2. تحويل البيانات إلى نص JSON
+        string jsonString = System.Text.Json.JsonSerializer.Serialize(EmployeeList, options);
+
+        // 3. حساب الحجم بالبايت والكيلوبايت
+        int sizeInBytes = System.Text.Encoding.UTF8.GetByteCount(jsonString);
+        double sizeInKb = sizeInBytes / 1024.0;
+        double sizeInMb = sizeInKb / 1024.0;
+
+        // يمكنك طباعة الحجم في الـ Console أو تسجيله (Log)
+        Console.WriteLine($"Data Size: {sizeInBytes} Bytes | {sizeInKb:F2} KB | {sizeInMb:F2} MB");
+
 
         // مسح نصوص البحث عند تحميل بيانات جديدة
         SearchName = string.Empty;
@@ -569,15 +590,20 @@ else
     }
 
     #region Mapper Methods
-    private EmployeeAttendanceVM MapToViewModel(AttendanceRecord record, int daysInMonth)
+    private EmployeeAttendanceVM MapToViewModel(AttendanceRecordDto record, int daysInMonth)
     {
+        
         var vm = new EmployeeAttendanceVM
         {
+            
             EmployeeId = record.EmployeeId,
-            EmployeeName = record.Employee?.Name ?? record.Employee?.EnName ?? "غير معروف",
-            CenterName = record.Center?.Name ?? "",
-            OriginalRecord = record,
+            EmployeeName = record.EmployeeName,
+            CenterName = record.CenterName,
+            OriginalRecord = (new AttRecMappers()).ToEntity(record),
         };
+
+        // record.Center = null;
+        // record.Employee = null;
 
         var type = typeof(AttendanceRecord);
         for (int i = 1; i <= daysInMonth; i++)
