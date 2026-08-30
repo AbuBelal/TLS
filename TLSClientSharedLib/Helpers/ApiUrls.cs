@@ -261,5 +261,16 @@ namespace TLSClientSharedLib.Helpers
             public const string Export = PriorUrl + "/export";
             public const string DeleteEmpAttRec = PriorUrl + "/DeleteEmpAttRec";
         }
-    }
+
+        public static class AppSettingsApiUls
+        {
+            private const string PriorUrl = "/api/AppSettings";
+            public const string GetAll = PriorUrl;
+            public const string GetByKey = PriorUrl + "/{key}";
+            public const string GetByCategory = PriorUrl + "/category/{category}";
+            public const string Add = PriorUrl;
+            public const string Update = PriorUrl + "/{id}";
+            public const string DeleteById = PriorUrl + "/{id}";
+        }
+     }
 }

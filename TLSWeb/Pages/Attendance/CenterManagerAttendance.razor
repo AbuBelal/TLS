@@ -151,7 +151,7 @@ else
         <table class="table table-bordered table-hover table-sm text-center  mb-0">
             <thead>
                 <tr>
-                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 160px; padding: 12px;">اسم الموظف</th>
+                    <th class="sticky-corner text-white align-content-lg-start" style="min-width: 170px; padding: 12px;">اسم الموظف</th>
                     @for (int i = 1; i <= DaysInMonth; i++)
                     {
                         <th class="sticky-header" style="min-width: 30px;">
@@ -180,7 +180,7 @@ else
                                         @(FilteredEmployeeList.IndexOf(emp) + 1)
                                     </div>
                                     <div class="position-relative" style="z-index: 1;">
-                                        <div class="fw-bold text-dark text-truncate mb-1" style="max-width: 130px; font-size: 0.9rem;" title="@emp.EmployeeName">
+                                        <div class="fw-bold text-dark text-truncate mb-1" style="max-width: 160px; font-size: 0.9rem;" title="@emp.EmployeeName">
                                             @emp.EmployeeName
                                         </div>
                                         @if (!string.IsNullOrEmpty(emp.CenterName))

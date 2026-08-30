@@ -79,7 +79,7 @@
                                 <ValidationMessage For="@(() => model.CenterId)" class="text-danger small mt-1" />
                             </div>
 
-                            @* المبلغ مع الحاسبة *@
+                            @* الكمية مع الحاسبة *@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">
                                     <i class="bi bi-currency-exchange me-1 text-success"></i>
@@ -88,7 +88,7 @@
                                 <div class="input-group input-group-lg">
                                     <InputNumber class="form-control text-end fw-bold fs-5" 
                                                  @bind-Value="model.Qnty" 
-                                                 step="0.01"
+                                                 step="1.0"
                                                  placeholder="0" />
                                     <button type="button" 
                                             class="btn btn-outline-success" 

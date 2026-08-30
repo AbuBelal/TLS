@@ -16,6 +16,7 @@ namespace APIServerLib.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<Center> Centers { get; set; }
         public DbSet<LookupValue> LookupValues { get; set; }
+        public DbSet<AppSetting> AppSetting { get; set; }
 
         // جداول الربط (Many-to-Many)
         public DbSet<EmpCenter> EmpCenters { get; set; }

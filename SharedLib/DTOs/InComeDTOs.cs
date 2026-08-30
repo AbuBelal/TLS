@@ -28,7 +28,7 @@ namespace SharedLib.DTOs
         [Required]
     DateOnly Date,
 
-        [Range(0, double.MaxValue, ErrorMessage = "المبلغ يجب أن يكون موجباً")]
+      
     decimal Qnty,
 
         [Required(ErrorMessage = "يجب اختيار المركز")]
@@ -68,7 +68,6 @@ namespace SharedLib.DTOs
         public long CenterId { get; set; }
 
         [Required(ErrorMessage = "الكمية مطلوبة")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "الكمية يجب أن تكون أكبر من صفر")]
         public decimal Qnty { get; set; }
 
         [Required(ErrorMessage = "التاريخ مطلوب")]
