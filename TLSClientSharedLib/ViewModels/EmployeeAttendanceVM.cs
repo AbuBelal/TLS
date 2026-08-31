@@ -14,7 +14,7 @@ namespace TLSClientSharedLib.ViewModels
         public List<DayVM> Days { get; set; } = new List<DayVM>();
 
         public int DaysCount => Days.Count(x=>x.IsAttendant??false);
-        public int EmptyDaysCount => Days.Count(x=>x.IsAttendant is null && x.DescId is null); 
+        public int EmptyDaysCount => Days.Count(x=>(x.IsAttendant is null || x.IsAttendant==false) && (x.DescId is null || x.DescId==-1)); 
         // نحتفظ بالنسخة الأصلية لنحدث عليها عند الحفظ
         public AttendanceRecord OriginalRecord { get; set; }
     }
