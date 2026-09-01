@@ -144,8 +144,16 @@ namespace TLSWeb.Helpers
          }).AddHttpMessageHandler<CookieHandler>();
 
 
+         builder.Services.AddRefitClient<IAppSettingsApi>()
+         .ConfigureHttpClient(c =>
+         {
+             c.BaseAddress = new Uri(ApiUrls.BaseUrl);
+         }).AddHttpMessageHandler<CookieHandler>();
+
+
             //services.AddTransient<CookieHandler>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserSettingsService, UserSettingservice>();
 
             //services.AddAuthentication("Cookies")
             //.AddCookie("Cookies", options =>

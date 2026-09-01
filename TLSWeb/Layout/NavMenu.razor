@@ -306,6 +306,11 @@
 
                 <div class="pr-10 mt-0.5 space-y-0.5" style="animation: slideDown 0.2s ease">
                     <AuthorizeView Roles="@AppRoles.Admin">
+                        <a href="@PagesUris.SettingsPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
+                            <span>الإعدادات</span>
+                        </a>
+
                         <a href="@PagesUris.Admin.EditCenters" class="@SubLinkClass" @onclick="CloseSidebar">
                             <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                             <span>المراكز</span>
@@ -315,6 +320,7 @@
                             <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>
                             <span>ترفيع الطلاب</span>
                         </a>
+
                     </AuthorizeView>
                     <a href="@PagesUris.AttendanceRecordPages.Manage" class="@SubLinkClass" @onclick="CloseSidebar">
                         <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>

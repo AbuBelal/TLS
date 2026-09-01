@@ -101,5 +101,11 @@
             public const string PriorUrl = "attendance";
             public const string Manage = PriorUrl + "/Manage";
         }
+
+        public static class SettingsPages
+        {
+            public const string PriorUrl = "Settings";
+            public const string Manage = PriorUrl;
+        }
     }
 }

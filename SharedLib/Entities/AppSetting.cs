@@ -13,5 +13,6 @@ namespace SharedLib.Entities
         public bool? SettingValueBool { get; set; }
         public string? Category { get; set; }
         public DateTime LastModified { get; set; } = DateTime.UtcNow;
+        public int? SortOrder { get; set; } = 0;
     }
 }

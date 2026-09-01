@@ -1,0 +1,246 @@
+﻿@attribute [Route(PagesUris.SettingsPages.Manage)]
+@using TLSWeb.Components
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>إعدادات النظام لمراكز التعليم</h3>
+        <button class="btn btn-primary" @onclick="PrepareForAdd">إضافة إعداد جديد</button>
+    </div>
+
+    @if (isLoading)
+    {
+        <LoadingComponent />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>المفتاح (Key)</th>
+                        <th>القيمة النصية</th>
+                        <th>الحالة المنطقية</th>
+                        <th>التصنيف</th>
+                        <th>آخر تعديل</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (settings != null && settings.Any())
+                    {
+                        foreach (var setting in settings)
+                        {
+                            <tr>
+                                <td><strong>@setting.SettingKey</strong></td>
+                                <td class="text-truncate" style="max-width: 200px;">
+                                    @(string.IsNullOrEmpty(setting.SettingValueStr) ? "-" : setting.SettingValueStr)
+                                </td>
+                                <td>
+                                    @if (setting.SettingValueBool.HasValue)
+                                    {
+                                        <span class="badge @(setting.SettingValueBool.Value ? "bg-success" : "bg-danger")">
+                                            @(setting.SettingValueBool.Value ? "مفعل (True)" : "معطل (False)")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td><span class="badge bg-secondary">@setting.Category</span></td>
+                                <td>@setting.LastModified.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => PrepareForEdit(setting)">تعديل</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteSetting(setting.Id.ToString())">حذف</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center">لا توجد إعدادات محفوظة حالياً.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (showForm)
+    {
+        <div class="card mt-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                @(isEditMode ? "تعديل إعداد" : "إضافة إعداد جديد")
+            </div>
+            <div class="card-body">
+                <EditForm Model="currentSetting" OnValidSubmit="SaveSetting">
+                    <DataAnnotationsValidator />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">مفتاح الخاصية</label>
+                            <InputText class="form-control" @bind-Value="currentSetting.SettingKey" disabled="@isEditMode" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">التصنيف</label>
+                            <InputText class="form-control" @bind-Value="currentSetting.Category" placeholder="" />
+                        </div>
+
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">القيمة النصية</label>
+                            <InputTextArea class="form-control" @bind-Value="currentSetting.SettingValueStr" rows="2" />
+                            <small class="text-muted">استخدم هذا الحقل للنصوص أو الروابط أو إعدادات JSON.</small>
+                        </div>
+
+                        @* <div class="col-md-4 mb-3">
+                            <label class="form-label">القيمة المنطقية</label>
+                            <InputSelect class="form-select" @bind-Value="currentSetting.SettingValueBool">
+                                <option value="">-- غير محدد --</option>
+                                <option value="true">مفعل (True)</option>
+                                <option value="false">معطل (False)</option>
+                            </InputSelect>
+                            <small class="text-muted">استخدم هذا الحقل لتفعيل/تعطيل الميزات.</small>
+                        </div> *@
+                        <div class="col-md-4 mb-3 d-flex flex-column justify-content-center">
+                            <label class="form-label text-transparent d-none d-md-block">&nbsp;</label> <!-- للحفاظ على المحاذاة مع الحقول الأخرى -->
+                            <div class="form-check form-switch fs-5">
+                                <!-- استخدمنا form-switch لشكل زر تفعيل أجمل، يمكنك إزالتها لمربع عادي -->
+                                <input class="form-check-input" type="checkbox" id="settingBoolCheck"
+                                       @bind:get="currentSetting.SettingValueBool ?? false"
+                                       @bind:set="value => currentSetting.SettingValueBool = value">
+                                <label class="form-check-label fs-6 mt-1" for="settingBoolCheck">
+                                    القيمة المنطقية
+                                </label>
+                            </div>
+                            <small class="text-muted mt-1">استخدم هذا الحقل لتفعيل/تعطيل الميزات.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">الترتيب</label>
+                        <InputNumber class="form-control" @bind-Value="currentSetting.SortOrder" />
+                        @* <small class="text-muted">استخدم هذا الحقل للنصوص أو الروابط أو إعدادات JSON.</small> *@
+                    </div>
+                    <div class="text-end mt-2">
+                        <button type="button" class="btn btn-secondary me-2" @onclick="CloseForm">إلغاء</button>
+                        <button type="submit" class="btn btn-success">حفظ البيانات</button>
+                    </div>
+                    @if(isSavingLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" style="width:3rem;height:3rem" role="status">
+                                <span class="visually-hidden">جاري التحميل...</span>
+                            </div>
+                            <p class="mt-3 text-muted small">جاري تحميل البيانات ...</p>
+                        </div>
+                    }
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<AppSetting> settings = new();
+    private AppSetting currentSetting = new();
+
+    private bool isLoading = true;
+    private bool isSavingLoading = false;
+    private bool showForm = false;
+    private bool isEditMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSettings();
+    }
+
+    private async Task LoadSettings()
+    {
+        isLoading = true;
+        try
+        {
+            settings = await AppSettingsApi.GetAll();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading settings: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void PrepareForAdd()
+    {
+        currentSetting = new AppSetting();
+        isEditMode = false;
+        showForm = true;
+    }
+
+    private void PrepareForEdit(AppSetting setting)
+    {
+        currentSetting = new AppSetting
+        {
+            Id = setting.Id,
+            SettingKey = setting.SettingKey,
+            SettingValueStr = setting.SettingValueStr,
+            SettingValueBool = setting.SettingValueBool,
+            Category = setting.Category
+        };
+        isEditMode = true;
+        showForm = true;
+    }
+
+    private async Task SaveSetting()
+    {
+        isSavingLoading = true;
+        try
+        {
+            if (isEditMode)
+            {
+                await AppSettingsApi.Update(currentSetting);
+            }
+            else
+            {
+                // الخادم سيقوم بتحديث LastModified، لا حاجة لإرسالها من العميل هنا
+                await AppSettingsApi.Add(currentSetting);
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving setting: {ex.Message}");
+        }
+        finally
+        {
+            await LoadSettings();
+            CloseForm();
+            isSavingLoading = false;
+        }
+    }
+
+    private async Task DeleteSetting(string id)
+    {
+        try
+        {
+            await AppSettingsApi.DeleteById(id);
+            await LoadSettings();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting setting: {ex.Message}");
+        }
+    }
+
+    private void CloseForm()
+    {
+        showForm = false;
+        currentSetting = new AppSetting();
+    }
+
+    
+
+}

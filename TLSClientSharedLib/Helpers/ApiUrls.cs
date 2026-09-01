@@ -269,7 +269,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetByKey = PriorUrl + "/{key}";
             public const string GetByCategory = PriorUrl + "/category/{category}";
             public const string Add = PriorUrl;
-            public const string Update = PriorUrl + "/{id}";
+            public const string Update = PriorUrl;
             public const string DeleteById = PriorUrl + "/{id}";
         }
      }

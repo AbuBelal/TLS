@@ -70,11 +70,21 @@ namespace SharedLib.Fixed
         public const string Vacation = "Vacation";
 
     }
-    public static class AppSettings
+    public static class AppSettingsCategories
     {
-        public const string AppName = "AreaData";
+        public const string AreaData = "AreaData";
 
     }
+
+    public static class RequiredAppSettings
+    {
+        public const string AreaNameAr = "إسم المنطقة";
+        public const string AreaNameEn = "Area Name";
+        public const string CanAddEmployes = "يمكن لمديري المراكز إضافة موظفين";
+        public const string CanDelEmployes = "يمكن لمديري المراكز حذف موظفين";
+    }
+
+
     public static class GlobalData
     {
         // تعريف القاموس كـ static و readonly

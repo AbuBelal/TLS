@@ -43,11 +43,9 @@ public class AppSettingsController(IAppSettingsRepository repository) : Controll
         return CreatedAtAction(nameof(GetByKey), new { key = createdSetting.SettingKey }, createdSetting);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] AppSetting setting)
+    [HttpPut()]
+    public async Task<IActionResult> Update(AppSetting setting)
     {
-        if (id != setting.Id) return BadRequest("المعرف غير متطابق.");
-
         await repository.UpdateAsync(setting);
         return NoContent();
     }

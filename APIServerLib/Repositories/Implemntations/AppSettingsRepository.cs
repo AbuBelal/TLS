@@ -1,9 +1,13 @@
 ﻿using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace APIServerLib.Repositories.Implemntations
@@ -12,12 +16,13 @@ namespace APIServerLib.Repositories.Implemntations
     {
         public async Task<IEnumerable<AppSetting>> GetAllAsync()
         {
-            return await context.AppSetting.AsNoTracking().ToListAsync();
+            await AddRequiredKeys();
+            return await context.AppSettings.AsNoTracking().OrderBy(x=>x.SortOrder).ToListAsync();
         }
 
         public async Task<IEnumerable<AppSetting>> GetByCategoryAsync(string category)
         {
-            return await context.AppSetting
+            return await context.AppSettings
                 .AsNoTracking()
                 .Where(s => s.Category == category)
                 .ToListAsync();
@@ -25,7 +30,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<AppSetting?> GetByKeyAsync(string key)
         {
-            return await context.AppSetting
+            return await context.AppSettings
                 .FirstOrDefaultAsync(s => s.SettingKey == key);
         }
 
@@ -38,19 +43,20 @@ namespace APIServerLib.Repositories.Implemntations
             }
 
             setting.LastModified = DateTime.UtcNow;
-            await context.AppSetting.AddAsync(setting);
+            await context.AppSettings.AddAsync(setting);
             await context.SaveChangesAsync();
             return setting;
         }
 
         public async Task UpdateAsync(AppSetting setting)
         {
-            var existingSetting = await context.AppSetting.FindAsync(setting.Id);
+            var existingSetting = await context.AppSettings.FindAsync(setting.Id);
             if (existingSetting != null)
             {
                 existingSetting.SettingValueStr = setting.SettingValueStr;
                 existingSetting.SettingValueBool = setting.SettingValueBool;
                 existingSetting.Category = setting.Category;
+                existingSetting.SortOrder = setting.SortOrder;
                 existingSetting.LastModified = DateTime.UtcNow;
 
                 await context.SaveChangesAsync();
@@ -59,10 +65,48 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task DeleteAsync(Guid id)
         {
-            var setting = await context.AppSetting.FindAsync(id);
+            var setting = await context.AppSettings.FindAsync(id);
             if (setting != null)
             {
-                context.AppSetting.Remove(setting);
+                context.AppSettings.Remove(setting);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        private async Task AddRequiredKeys()
+        {
+            List<AppSetting> requiredSettings = new List<AppSetting>();
+
+            var fields = typeof(RequiredAppSettings).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+
+            foreach (var field in fields)
+            {
+                string propertyName=string.Empty;
+                string propertyValue= string.Empty;
+
+                if (field.IsLiteral && !field.IsInitOnly)
+                {
+                     propertyName = field.Name; 
+                     propertyValue = (string)field.GetValue(null); 
+
+                    //Console.WriteLine($"Key: {propertyName}, Value: {propertyValue}");
+                }
+
+                if (!context.AppSettings.Any(x => x.SettingKey == propertyValue))
+                {
+                    var newSetting = new AppSetting
+                    {
+                        SettingKey = propertyValue,
+                        SettingValueStr = "",
+                        Category = SharedLib.Fixed.AppSettingsCategories.AreaData
+                    };
+                    requiredSettings.Add(newSetting);
+                }
+            }
+
+            if (requiredSettings.Count > 0)
+            {
+                await context.AppSettings.AddRangeAsync(requiredSettings);
                 await context.SaveChangesAsync();
             }
         }
