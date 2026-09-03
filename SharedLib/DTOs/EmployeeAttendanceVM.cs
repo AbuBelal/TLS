@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SharedLib.DTOs
+namespace TLSClientSharedLib.ViewModels
 {
     public class EmployeeAttendanceVM
     {

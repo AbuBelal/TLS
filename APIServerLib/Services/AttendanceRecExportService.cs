@@ -7,12 +7,12 @@ namespace APIServerLib.Services;
 
 public static class AttendanceRecExportService
 {
-    public static byte[] GenerateExcel(List<AttendanceRecord> AttendanceRecList,List<LookupValue> LookupList,string sheetTitle,int MonthDaysNo)
+    public static byte[] GenerateExcel(List<AttendanceRecord> AttendanceRecList,List<LookupValue> LookupList,string sheetTitle,int MonthDaysNo, string AreaNameEn)
     {
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Staff");
        // ws.RightToLeft = true;
-
+    
         const int totalCols = 9;
 
         int headerRow = 1;
@@ -89,7 +89,7 @@ public static class AttendanceRecExportService
             ws.Cell(row, c++).Value = "";
             ws.Cell(row, c++).Value = "";
             ws.Cell(row, c++).Value = AttendanceRecList[i].Center?.EnName;
-            ws.Cell(row, c++).Value = "";
+            ws.Cell(row, c++).Value = AreaNameEn;//AreaName
 
 
 

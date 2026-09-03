@@ -28,5 +28,8 @@ namespace TLSClientSharedLib.Services.Apis
         [Delete(ApiUrls.AttendanceRecord.DeleteEmpAttRec)]
         Task<GeneralResponse> DeleteEmpAttRec([Body] AttRecoRequest request);
 
+        [Get(ApiUrls.AttendanceRecord.GetSummeries)]
+        Task<List<AttRecSummery>> GetSummeries(int year, int month);
+
     }
 }

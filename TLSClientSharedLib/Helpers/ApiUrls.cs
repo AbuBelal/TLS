@@ -260,6 +260,7 @@ namespace TLSClientSharedLib.Helpers
             public const string LockMonthlyAttendance = PriorUrl+ "/lock";
             public const string Export = PriorUrl + "/export";
             public const string DeleteEmpAttRec = PriorUrl + "/DeleteEmpAttRec";
+            public const string GetSummeries = PriorUrl + "/Summeries/{Year}/{Month}";
         }
 
         public static class AppSettingsApiUls

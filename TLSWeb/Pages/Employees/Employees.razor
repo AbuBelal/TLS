@@ -6,10 +6,20 @@
             <i class="bi bi-person-badge-fill me-2 text-primary"></i>إدارة الموظفين
         </h3>
         <div class="d-flex gap-2" dir="rtl">
-        <button class="btn btn-primary shadow-sm" @onclick="OpenAddPage">
-            <i class="bi bi-plus-circle me-1"></i> إضافة موظف جديد
-        </button>
-
+            @if (appSetting?.FirstOrDefault(x => x.SettingKey == SharedLib.Fixed.RequiredAppSettings.CanAddEmployes)?.SettingValueBool == true)
+            {
+                <button class="btn btn-primary shadow-sm" @onclick="OpenAddPage">
+                    <i class="bi bi-plus-circle me-1"></i> إضافة موظف جديد
+                </button>
+            }
+            else
+            {
+                <AuthorizeView Roles="@AppRoles.Admin">
+                <button class="btn btn-primary shadow-sm" @onclick="OpenAddPage">
+                    <i class="bi bi-plus-circle me-1"></i> إضافة موظف جديد
+                </button>
+                </AuthorizeView>
+            }
             @* ── زر التصدير مع Dropdown ── *@
             <div class="position-relative" @onclick:stopPropagation="true">
                 <button class="btn btn-success shadow-sm d-flex align-items-center gap-2"
@@ -243,9 +253,20 @@
                                        @*  <button class="btn btn-outline-primary" @onclick="@(() => OpenEditPage(employee.Id))">
                                             <i class="bi bi-pencil-square"></i> تعديل
                                         </button> *@
-                                        <button class="btn btn-outline-danger" @onclick="@(() => ConfirmDelete(employee))">
-                                            <i class="bi bi-trash"></i> حذف
-                                        </button>
+                                        @if (appSetting?.FirstOrDefault(x => x.SettingKey == SharedLib.Fixed.RequiredAppSettings.CanAddEmployes)?.SettingValueBool == true)
+                                        {
+                                            <button class="btn btn-outline-danger" @onclick="@(() => ConfirmDelete(employee))">
+                                                <i class="bi bi-trash"></i> حذف
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <AuthorizeView Roles="@AppRoles.Admin">
+                                                <button class="btn btn-outline-danger" @onclick="@(() => ConfirmDelete(employee))">
+                                                    <i class="bi bi-trash"></i> حذف
+                                                </button>
+                                            </AuthorizeView>
+                                        }
                                     </div>
                                 </td>
                             </tr>

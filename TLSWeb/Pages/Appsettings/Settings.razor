@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>إعدادات النظام لمراكز التعليم</h3>
-        <button class="btn btn-primary" @onclick="PrepareForAdd">إضافة إعداد جديد</button>
+        @* <button class="btn btn-primary" @onclick="PrepareForAdd">إضافة إعداد جديد</button> *@
     </div>
 
     @if (isLoading)
@@ -164,7 +164,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading settings: {ex.Message}");
+            // Console.WriteLine($"Error loading settings: {ex.Message}");
         }
         finally
         {
@@ -187,6 +187,7 @@
             SettingKey = setting.SettingKey,
             SettingValueStr = setting.SettingValueStr,
             SettingValueBool = setting.SettingValueBool,
+            SortOrder = setting.SortOrder,
             Category = setting.Category
         };
         isEditMode = true;
@@ -212,13 +213,13 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving setting: {ex.Message}");
+            // Console.WriteLine($"Error saving setting: {ex.Message}");
         }
         finally
         {
-            await LoadSettings();
             CloseForm();
             isSavingLoading = false;
+            await LoadSettings();
         }
     }
 

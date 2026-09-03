@@ -25,14 +25,15 @@ namespace APIServer.Controllers
         private readonly IEmployeeRepository _employeeRepository;
         private readonly AuditLogService _auditLogService;
         private readonly ILookupValueRepository _lookupValueRepository;
-
-        public AttRecordController(IAttRecordRepository repository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService, ILookupValueRepository lookupValueRepositor)
+        private readonly IAppSettingsRepository _appSettings;
+        public AttRecordController(IAttRecordRepository repository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService, ILookupValueRepository lookupValueRepositor,IAppSettingsRepository appSettings)
         {
             _repository = repository;
             _userRepository = UserRepository;
             _employeeRepository = EmployeeRepository;
             _auditLogService = auditLogService;
             _lookupValueRepository = lookupValueRepositor;
+            _appSettings = appSettings;
         }
 
         #region CurUser CurEmp Details
@@ -159,10 +160,11 @@ namespace APIServer.Controllers
         {
             var centerId = await CurrentCenterId();
             var records = await _repository.GetAttendanceByCenterAsync(centerId, request.Year, request.Month);
-
+            var  appSettings = await _appSettings.GetAllAsync();
             var lookupvalue = await _lookupValueRepository.GetByLookupType(LookupTypes.Vacation);
             var CurMonthDaysNo = DateTime.DaysInMonth(request.Year, request.Month);
-            var bytes = AttendanceRecExportService.GenerateExcel(records, lookupvalue, "Att", CurMonthDaysNo);
+            var bytes = AttendanceRecExportService.GenerateExcel(records, lookupvalue, "Att", 
+                CurMonthDaysNo ,appSettings?.FirstOrDefault(x=>x.SettingKey==SharedLib.Fixed.RequiredAppSettings.AreaNameEn)?.SettingValueStr??"");
 
             var fileName = $"لوائح دوام_{request.Year} - {request.Month}.xlsx";
 
@@ -185,6 +187,17 @@ namespace APIServer.Controllers
             {
                 return new GeneralResponse(false, $"حدث خطأ أثناء الحذف: {ex.Message}", 0);
             }
+        }
+
+        [HttpGet("Summeries/{year}/{month}")]
+        public async Task<List<AttRecSummery>> GetAttendanceSummery(int year, int month)
+        {
+            var Summeries = await _repository.GetAttendanceSummaryAsync(year, month);
+
+            if (Summeries == null || !Summeries.Any())
+                return new List<AttRecSummery>();
+
+            return Summeries;
         }
     }
 }

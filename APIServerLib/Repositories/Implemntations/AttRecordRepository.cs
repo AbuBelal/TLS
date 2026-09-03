@@ -1,10 +1,14 @@
 using APIServerLib.Data;
 using APIServerLib.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
 using SharedLib.Entities;
 using SharedLib.Responses;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using TLSClientSharedLib.ViewModels;
 
 namespace APIServerLib.Repositories.Implemntations
 {
@@ -127,6 +131,7 @@ namespace APIServerLib.Repositories.Implemntations
 
         public async Task<List<AttendanceRecord>> GetAttendanceByCenterAsync(long centerId, int year, int month)
         {
+            
             if (centerId == 0)
             {
                 // جلب السجلات مع بيانات الموظف لعرض اسمه في الواجهة
@@ -148,6 +153,7 @@ namespace APIServerLib.Repositories.Implemntations
                     //.Select(r => (new AttRecMappers()).ToDTO(r))
                     .ToListAsync();
             }
+            
         }
 
         public async Task<bool> UpdateAttendanceRecordsAsync(List<AttendanceRecord>? updatedRecords)
@@ -209,6 +215,113 @@ namespace APIServerLib.Repositories.Implemntations
                  true,
                  $"تم حذف سجل الحضور بنجاح للموظف/ {recordsToDelete.First().Employee?.Name} "
             );
+        }
+
+        // في أعلى الكلاس، قم بتخزين الخصائص مرة واحدة فقط في الذاكرة
+        private static readonly System.Reflection.PropertyInfo[] AttendantProps = Enumerable.Range(1, 31)
+            .Select(i => typeof(AttendanceRecordDto).GetProperty($"Day{i:D2}_IsAttendant"))
+        .ToArray();
+
+        private static readonly System.Reflection.PropertyInfo[] DescProps = Enumerable.Range(1, 31)
+            .Select(i => typeof(AttendanceRecordDto).GetProperty($"Day{i:D2}_Desc"))
+        .ToArray();
+
+        public async Task<List<AttRecSummery>> GetAttendanceSummaryAsync(int year, int month)
+        {
+            int DaysInMonth = DateTime.DaysInMonth(year, month);
+            var AllAttRec =await GetAttendanceByCenterAsync(0, year, month);
+            var Dto = AllAttRec.Select(r => (new AttRecMappers()).ToDTO(r)).ToList();
+            var EmployeeList = Dto.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
+            List<AttRecSummery> summaries = new List<AttRecSummery>();
+            var Centers = await _context.Centers.ToListAsync();
+            foreach (var center in Centers)
+            {
+                AttRecSummery Summery = new AttRecSummery();
+                Summery.CenterId = center.Id;
+                Summery.CenterId = center.Id;
+                Summery.CenterId = center.Id;
+                Summery.CenterId = center.Id;
+                Summery.CenterId = center.Id;
+
+                summaries.Add(new AttRecSummery
+                {
+                    CenterId = center.Id,
+                    CenterName = center.Name,
+                    Date = new DateOnly(year, month, 1),
+                    TotalEmployees = EmployeeList.Count(e => e.OriginalRecord.CenterId == center.Id),
+                    AttRecCompleted = EmployeeList.Count(e => e.OriginalRecord.CenterId == center.Id && e.EmptyDaysCount==0),
+                    //AttRecPartialCompleted = EmployeeList.Count(e => e.OriginalRecord.CenterId == center.Id && e.EmptyDaysCount>0)
+                });
+
+            }
+
+
+            return summaries;
+        }
+        private  int CountEnterdDays(AttendanceRecord Rec)
+        {
+            int EnteredDaye = 0;
+
+            if (Rec == null) return EnteredDaye;
+
+            PropertyInfo[] properties = Rec.GetType().GetProperties();
+
+            foreach (PropertyInfo prop in properties)
+            {
+                if (prop.Name.StartsWith("Day") && prop.Name.EndsWith("_IsAttendant") && prop.PropertyType == typeof(bool?))
+                {
+                    object? value = prop.GetValue(Rec);
+
+                    if (value != null && (bool)value == true)
+                    {
+                        EnteredDaye++;
+                    }
+                }
+                else
+                if (prop.Name.StartsWith("Day") && prop.Name.EndsWith("_Desc") && prop.PropertyType == typeof(long?))
+                {
+                    object? value = prop.GetValue(Rec);
+
+                    if (value != null && (long)value>0)
+                    {
+                        EnteredDaye++;
+                    }
+                }
+            }
+
+            return EnteredDaye;
+        }
+
+        private EmployeeAttendanceVM MapToViewModel(AttendanceRecordDto record, int daysInMonth)
+        {
+
+            var vm = new EmployeeAttendanceVM
+            {
+
+                EmployeeId = record.EmployeeId,
+                EmployeeName = record.EmployeeName,
+                CenterName = record.CenterName,
+                OriginalRecord = (new AttRecMappers()).ToEntity(record),
+            };
+
+            // record.Center = null;
+            // record.Employee = null;
+
+            var type = typeof(AttendanceRecord);
+            for (int i = 1; i <= daysInMonth; i++)
+            {
+                // var isAttendantProp = type.GetProperty($"Day{i:D2}_IsAttendant");
+                // var descProp = type.GetProperty($"Day{i:D2}_Desc");
+
+                vm.Days.Add(new DayVM
+                {
+                    DayNumber = i,
+                    IsAttendant = AttendantProps[i - 1]?.GetValue(record) as bool?,
+                    DescId = DescProps[i - 1]?.GetValue(record) as long?,
+                    IsLocked = record.IsLocked ?? false
+                });
+            }
+            return vm;
         }
     }
 }

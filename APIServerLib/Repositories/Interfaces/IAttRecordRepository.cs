@@ -11,5 +11,6 @@ namespace APIServerLib.Repositories.Interfaces
         Task<bool> UpdateAttendanceRecordsAsync(List<AttendanceRecord> records);
         Task LockAttendanceRecordsAsync(int year, int month ,bool Lock = true);
         Task<GeneralResponse> DeleteEmployeeAttendanceRecordsAsync(AttRecoRequest request);
+        Task<List<AttRecSummery>> GetAttendanceSummaryAsync(int year, int month);
     }
 }

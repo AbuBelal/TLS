@@ -16,6 +16,7 @@ namespace APIServer.Controllers
         readonly IAttendanceRepository _attendanceRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUserRepository _userRepository;
+
         public AttendanceController(IAttendanceRepository attendanceRepository, IEmployeeRepository employeeRepository, IUserRepository userRepository)
         {
             _attendanceRepository = attendanceRepository;

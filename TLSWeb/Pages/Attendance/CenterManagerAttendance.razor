@@ -1,6 +1,5 @@
 ﻿@attribute [Route(PagesUris.AttendanceRecordPages.Manage)]
 
-@using TLSClientSharedLib.ViewModels
 @using TLSWeb.Components
 @using TLSWeb.Pages.Attendance.Components
 
@@ -253,6 +252,88 @@ else
     </div>
 }
 
+
+<AuthorizeView Roles="@AppRoles.Admin">
+<div class="card shadow-sm mt-4" dir="rtl">
+    <!-- ترويسة البطاقة -->
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-bold text-secondary">
+            <i class="bi bi-file-earmark-bar-graph me-2"></i> ملخص السجلات
+        </h5>
+        <button class="btn btn-sm btn-success d-flex align-items-center gap-2 text-nowrap" @onclick="GetSummeries">
+            <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">تحديث الملخص</span>
+        </button>
+    </div>
+
+    <!-- جسم البطاقة -->
+    <div class="card-body p-0">
+        @if (isLoadingSummeries)
+        {
+            <div class="p-5 text-center">
+                <LoadingComponent></LoadingComponent>
+            </div>
+        }
+        else if (summeries == null || !summeries.Any())
+        {
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                لا توجد بيانات لعرضها حالياً.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="px-4">اسم المركز</th>
+                            <th scope="col">عدد الموظفين</th>
+                            <th scope="col">السجلات المكتملة</th>
+                            <th scope="col">السجلات المكتملة جزئياً</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var summery in summeries)
+                        {
+                            <tr>
+                                <!-- تم تحديث هذه الخلية لتمييز المراكز -->
+                                <td class="align-items-center px-4 fw-semibold">
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (summery.AttRecPartialCompleted <= 0)
+                                        {
+                                            <i class="bi bi-patch-check-fill text-success fs-5" title="أكتملت بنجاح"></i>
+                                            <span class="text-success fw-bold">@summery.CenterName</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-primary">@summery.CenterName</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary rounded-pill px-3 py-2">
+                                        @summery.TotalEmployees
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        @summery.AttRecCompleted
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                        @summery.AttRecPartialCompleted
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+</AuthorizeView>
 <!-- (باقي كود الـ HTML الخاص بدليل الإجازات والديالوج يبقى كما هو) -->
 <div>
     @if (LeaveTypes != null && LeaveTypes.Any())
@@ -325,7 +406,8 @@ else
 
     private int DaysInMonth = 31;
     private bool isLoading = true;
-
+    private bool isLoadingSummeries = false;
+    private List<AttRecSummery> summeries = new();
     // خصائص البحث والفلترة الجديدة
     // private string SearchName { get; set; } = string.Empty;
     // private string FilterCenter { get; set; } = string.Empty;
@@ -408,8 +490,8 @@ else
         DaysInMonth = DateTime.DaysInMonth(Year, Month);
         MonthDayes = new DateTime(Year, Month, 1);
 
+        summeries = new();
         var records = await AttendanceRecordApi.GetGeneratedMonthlyAttendance(Year, Month);
-
 
         EmployeeList = records.Select(r => MapToViewModel(r, DaysInMonth)).ToList();
 
@@ -560,7 +642,7 @@ else
 
     private async Task MoveToCenter(EmployeeAttendanceVM Emp)
     {
-       // var x = Emp;
+        // var x = Emp;
     }
 
     private void CancelDeleteDialog()
@@ -592,10 +674,10 @@ else
     #region Mapper Methods
     private EmployeeAttendanceVM MapToViewModel(AttendanceRecordDto record, int daysInMonth)
     {
-        
+
         var vm = new EmployeeAttendanceVM
         {
-            
+
             EmployeeId = record.EmployeeId,
             EmployeeName = record.EmployeeName,
             CenterName = record.CenterName,
@@ -672,5 +754,12 @@ else
             isExporting = false;
             StateHasChanged();
         }
+    }
+
+    private async Task GetSummeries()
+    {
+        isLoadingSummeries = true;
+        summeries = await AttendanceRecordApi.GetSummeries(Year, Month);
+        isLoadingSummeries = false;
     }
 }

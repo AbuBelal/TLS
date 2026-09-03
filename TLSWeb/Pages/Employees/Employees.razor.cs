@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SharedLib.DTOs;
+using SharedLib.Entities;
 using System.Diagnostics.Metrics;
 using TLSWeb.Helpers;
 
@@ -37,6 +38,8 @@ public partial class Employees : ComponentBase
     private bool showExportMenu = false;
 
 
+    private List<AppSetting> appSetting;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
@@ -45,6 +48,7 @@ public partial class Employees : ComponentBase
     private async Task LoadDataAsync()
     {
         isLoading = true;
+        appSetting = await UserSettingsService.GetUserSettingsAsync();
         try
         {
             var request = new EmployeeFilterRequest
