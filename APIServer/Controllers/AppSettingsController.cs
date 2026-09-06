@@ -1,6 +1,7 @@
 ﻿using APIServerLib.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using SharedLib.Entities;
+using SharedLib.Responses;
 using System;
 using System.Threading.Tasks;
 
@@ -44,10 +45,10 @@ public class AppSettingsController(IAppSettingsRepository repository) : Controll
     }
 
     [HttpPut()]
-    public async Task<IActionResult> Update(AppSetting setting)
+    public async Task<GeneralResponse> Update(AppSetting setting)
     {
-        await repository.UpdateAsync(setting);
-        return NoContent();
+        var res = await repository.UpdateAsync(setting);
+        return res;
     }
 
     [HttpDelete("{id:guid}")]

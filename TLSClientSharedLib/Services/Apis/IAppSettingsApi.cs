@@ -23,7 +23,7 @@ namespace TLSClientSharedLib.Services.Apis
         Task<AppSetting> Add(AppSetting appSetting);
 
         [Put(ApiUrls.AppSettingsApiUls.Update)]
-        Task<AppSetting> Update(AppSetting appSetting);
+        Task<GeneralResponse> Update(AppSetting appSetting);
 
         [Delete(ApiUrls.AppSettingsApiUls.DeleteById)]
         Task DeleteById(string id);

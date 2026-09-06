@@ -42,13 +42,13 @@ public partial class Employees : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        appSetting = await UserSettingsService.GetUserSettingsAsync();
         await LoadDataAsync();
     }
 
     private async Task LoadDataAsync()
     {
         isLoading = true;
-        appSetting = await UserSettingsService.GetUserSettingsAsync();
         try
         {
             var request = new EmployeeFilterRequest

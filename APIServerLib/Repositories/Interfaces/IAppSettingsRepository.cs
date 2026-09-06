@@ -1,4 +1,5 @@
 ﻿using SharedLib.Entities;
+using SharedLib.Responses;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +12,7 @@ namespace APIServerLib.Repositories.Interfaces
         Task<IEnumerable<AppSetting>> GetByCategoryAsync(string category);
         Task<AppSetting?> GetByKeyAsync(string key);
         Task<AppSetting> AddAsync(AppSetting setting);
-        Task UpdateAsync(AppSetting setting);
+        Task<GeneralResponse> UpdateAsync(AppSetting setting);
         Task DeleteAsync(Guid id);
     }
 }

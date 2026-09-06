@@ -9,7 +9,7 @@ namespace SharedLib.Fixed
         public const string DebugBaseUrl = "https://localhost:7075";
         public enum RegionType { Debug,Test, North, WestMiddle, WestGaza }
         // حدد المنطقة هنا فقط
-        private const  RegionType CurrentRegion = RegionType.WestMiddle;
+        private const  RegionType CurrentRegion = RegionType.Debug;
 
         public static string SelectedBaseUrl => CurrentRegion switch
         {
@@ -70,10 +70,18 @@ namespace SharedLib.Fixed
         public const string Vacation = "Vacation";
 
     }
+    #region Settings
     public static class AppSettingsCategories
     {
-        public const string AreaData = "AreaData";
+        public const string AreaData = "بيانات المنطقة";
+        public const string Permissions = "الصلاحيات";
 
+    }
+    public class SettingConfig
+    {
+        public string Category { get; set; }=string.Empty;
+        public int SortOrder { get; set; } = 0; 
+        public short SettingType { get; set; } = 1; // 1=String, 2=Boolean, 3=Integer, 4=DateTime, 5=Decimal
     }
 
     public static class RequiredAppSettings
@@ -82,9 +90,23 @@ namespace SharedLib.Fixed
         public const string AreaNameEn = "Area Name";
         public const string CanAddEmployes = "يمكن لمديري المراكز إضافة موظفين";
         public const string CanDelEmployes = "يمكن لمديري المراكز حذف موظفين";
+        public const string CanAddStudents = "يمكن لمديري المراكز إضافة طلاب";
+        public const string CanDelStudents = "يمكن لمديري المراكز حذف طلاب";
+
+        // 2. استخدام الكلاس البسيط داخل القاموس
+        public static readonly Dictionary<string, SettingConfig> SettingsWithCategories = new()
+        {
+            { AreaNameAr, new SettingConfig { Category = AppSettingsCategories.AreaData , SortOrder=1,SettingType=1 } },
+            { AreaNameEn, new SettingConfig { Category = AppSettingsCategories.AreaData , SortOrder=2,SettingType=1  } },
+        
+            // لاحظ تغيير الفئة هنا لتكون منطقية
+            { CanAddEmployes, new SettingConfig { Category = AppSettingsCategories.Permissions , SortOrder=3,SettingType=2 } },
+            { CanDelEmployes, new SettingConfig { Category = AppSettingsCategories.Permissions, SortOrder=4 ,SettingType=2} },
+            { CanAddStudents, new SettingConfig { Category = AppSettingsCategories.Permissions , SortOrder=5,SettingType=2 } },
+            { CanDelStudents, new SettingConfig { Category = AppSettingsCategories.Permissions , SortOrder=6,SettingType=2 } },
+        };
     }
-
-
+    #endregion
     public static class GlobalData
     {
         // تعريف القاموس كـ static و readonly

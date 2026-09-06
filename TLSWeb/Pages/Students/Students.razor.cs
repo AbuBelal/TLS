@@ -39,9 +39,12 @@ public partial class Students : ComponentBase
     private bool isExportingAll = false;
     private bool showExportMenu = false;
 
+    private List<AppSetting> appSetting;
+
     // ====== دورة الحياة ======
     protected override async Task OnInitializedAsync()
     {
+        appSetting = await UserSettingsService.GetUserSettingsAsync();
         await LoadFilterOptions();
         await LoadData();
     }

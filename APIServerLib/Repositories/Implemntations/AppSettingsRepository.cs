@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SharedLib.Entities;
 using SharedLib.Fixed;
+using SharedLib.Responses;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -48,7 +49,7 @@ namespace APIServerLib.Repositories.Implemntations
             return setting;
         }
 
-        public async Task UpdateAsync(AppSetting setting)
+        public async Task<GeneralResponse> UpdateAsync(AppSetting setting)
         {
             var existingSetting = await context.AppSettings.FindAsync(setting.Id);
             if (existingSetting != null)
@@ -61,6 +62,7 @@ namespace APIServerLib.Repositories.Implemntations
 
                 await context.SaveChangesAsync();
             }
+            return new GeneralResponse(true, "تم عملية الحفظ بنجاح");
         }
 
         public async Task DeleteAsync(Guid id)
@@ -77,28 +79,45 @@ namespace APIServerLib.Repositories.Implemntations
         {
             List<AppSetting> requiredSettings = new List<AppSetting>();
 
-            var fields = typeof(RequiredAppSettings).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            //var fields = typeof(RequiredAppSettings).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
-            foreach (var field in fields)
+            //foreach (var field in fields)
+            //{
+            //    string propertyName=string.Empty;
+            //    string propertyValue= string.Empty;
+
+            //    if (field.IsLiteral && !field.IsInitOnly)
+            //    {
+            //         propertyName = field.Name; 
+            //         propertyValue = (string)field.GetValue(null); 
+
+            //        //Console.WriteLine($"Key: {propertyName}, Value: {propertyValue}");
+            //    }
+
+            //    if (!context.AppSettings.Any(x => x.SettingKey == propertyValue))
+            //    {
+            //        var newSetting = new AppSetting
+            //        {
+            //            SettingKey = propertyValue,
+            //            SettingValueStr = "",
+            //            Category = SharedLib.Fixed.AppSettingsCategories.AreaData
+            //        };
+            //        requiredSettings.Add(newSetting);
+            //    }
+            //}
+            ////////////
+            foreach (var item in RequiredAppSettings.SettingsWithCategories)
             {
-                string propertyName=string.Empty;
-                string propertyValue= string.Empty;
-
-                if (field.IsLiteral && !field.IsInitOnly)
-                {
-                     propertyName = field.Name; 
-                     propertyValue = (string)field.GetValue(null); 
-
-                    //Console.WriteLine($"Key: {propertyName}, Value: {propertyValue}");
-                }
-
-                if (!context.AppSettings.Any(x => x.SettingKey == propertyValue))
+                if (!context.AppSettings.Any(x=>x.SettingKey == item.Key))
                 {
                     var newSetting = new AppSetting
                     {
-                        SettingKey = propertyValue,
-                        SettingValueStr = "",
-                        Category = SharedLib.Fixed.AppSettingsCategories.AreaData
+                        SettingKey = item.Key,           // نأخذه من مفتاح القاموس
+                        Category = item.Value.Category,  // نأخذه من الكائن البسيط
+                        SettingValueStr = item.Value.SettingType == 1 ? "" : null,
+                        SettingValueBool = item.Value.SettingType==2 ? false : null,
+                        SortOrder = item.Value.SortOrder,
+                       
                     };
                     requiredSettings.Add(newSetting);
                 }

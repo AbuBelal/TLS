@@ -13,13 +13,13 @@
     }
     else
     {
-        <div class="table-responsive">
+       @*  <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>المفتاح (Key)</th>
-                        <th>القيمة النصية</th>
-                        <th>الحالة المنطقية</th>
+                        <th>الإعدادات</th>
+                        <th>القيمة</th>
+                        @* <th>الحالة المنطقية</th> *
                         <th>التصنيف</th>
                         <th>آخر تعديل</th>
                         <th>إجراءات</th>
@@ -32,26 +32,48 @@
                         {
                             <tr>
                                 <td><strong>@setting.SettingKey</strong></td>
-                                <td class="text-truncate" style="max-width: 200px;">
-                                    @(string.IsNullOrEmpty(setting.SettingValueStr) ? "-" : setting.SettingValueStr)
-                                </td>
-                                <td>
-                                    @if (setting.SettingValueBool.HasValue)
-                                    {
-                                        <span class="badge @(setting.SettingValueBool.Value ? "bg-success" : "bg-danger")">
-                                            @(setting.SettingValueBool.Value ? "مفعل (True)" : "معطل (False)")
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
+                               @*  @if (setting.SettingValueBool is null)
+                                {
+                                    <td class="text-truncate" style="max-width: 200px;">
+                                        @(string.IsNullOrEmpty(setting.SettingValueStr) ? "-" : setting.SettingValueStr)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @* @if (setting.SettingValueBool.HasValue)
+                                        { *
+                                            <span class="badge @(setting.SettingValueBool.Value ? "bg-success" : "bg-danger")">
+                                                @(setting.SettingValueBool.Value ? "مفعل (True)" : "معطل (False)")
+                                            </span>
+                                       @*  }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        } *
+                                    </td>
+                                } *
+                                @if (setting.SettingValueBool is null)
+                                {
+                                        <InputTextArea class="form-control" @bind-Value="setting.SettingValueStr" rows="2" />
+                                }
+                                else
+                                {
+                                        <div class="form-check form-switch fs-5">
+                                            <!-- استخدمنا form-switch لشكل زر تفعيل أجمل، يمكنك إزالتها لمربع عادي -->
+                                            <input class="form-check-input" type="checkbox" id="settingBoolCheck"
+                                                   @bind:get="setting.SettingValueBool ?? false"
+                                                   @bind:set="value => setting.SettingValueBool = value">
+                                          
+                                        </div>
+                                }
+
                                 <td><span class="badge bg-secondary">@setting.Category</span></td>
                                 <td>@setting.LastModified.ToString("yyyy-MM-dd HH:mm")</td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => PrepareForEdit(setting)">تعديل</button>
-                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteSetting(setting.Id.ToString())">حذف</button>
+                                    @* <button class="btn btn-sm btn-warning me-1" @onclick="() => PrepareForEdit(setting)">تعديل</button> *
+                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => Save(setting)">حفظ</button>
+                                    @* <button class="btn btn-sm btn-danger" @onclick="() => DeleteSetting(setting.Id.ToString())">حذف</button> *
                                 </td>
                             </tr>
                         }
@@ -60,6 +82,139 @@
                     {
                         <tr>
                             <td colspan="6" class="text-center">لا توجد إعدادات محفوظة حالياً.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div> *@
+
+
+        @* <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>الإعدادات</th>
+                        <th>القيمة</th>
+                        <th>التصنيف</th>
+                        <th>آخر تعديل</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (settings != null && settings.Any())
+                    {
+                        foreach (var setting in settings)
+                        {
+                            <tr>
+                                <td><strong>@setting.SettingKey</strong></td>
+
+                                <td>
+                                    @if (setting.SettingValueBool is null)
+                                    {
+                                        <textarea class="form-control" @bind="setting.SettingValueStr" rows="1"></textarea>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex justify-content-start align-items-center">
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" id="@($"settingSwitch_{setting.SettingKey}")"
+                                                       @bind:get="setting.SettingValueBool ?? false"
+                                                       @bind:set="value => setting.SettingValueBool = value">
+                                            </div>
+                                        </div>
+                                    }
+                                </td>
+
+                                <td><span class="badge bg-secondary">@setting.Category</span></td>
+
+                                <td>@setting.LastModified.ToString("yyyy-MM-dd HH:mm")</td>
+
+                                <td>
+                                    <button class="btn btn-sm btn-primary px-3" @onclick="() => Save(setting)">
+                                        حفظ
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <!-- تم تصحيح colspan ليكون 5 بدلاً من 6 -->
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">لا توجد إعدادات محفوظة حالياً.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div> *@
+
+
+
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <tbody>
+                    @if (settings != null && settings.Any())
+                    {
+                        var groupedSettings = settings.GroupBy(s => s.Category);
+
+                        foreach (var group in groupedSettings)
+                        {
+                            bool isCollapsed = collapsedCategories.Contains(group.Key);
+
+                            <tr class="table-secondary" style="cursor: pointer;" @onclick="() => ToggleCategory(group.Key)">
+                                <td colspan="3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0 fw-bold text-primary">
+                                            <i class="bi bi-folder2-open me-2"></i> @group.Key
+                                            <span class="badge bg-light text-dark ms-2 rounded-pill fs-7">@group.Count()</span>
+                                        </h6>
+                                        <i class="bi @(isCollapsed ? "bi-chevron-down" : "bi-chevron-up") text-secondary"></i>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            if (!isCollapsed)
+                            {
+                                foreach (var setting in group)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <strong>@setting.SettingKey</strong><br />
+                                            <small class="text-muted">آخر تعديل : @setting.LastModified.ToString("yyyy-MM-dd HH:mm")</small>
+                                        </td>
+
+                                        <td>
+                                            @if (setting.SettingValueBool is null)
+                                            {
+                                                <textarea class="form-control" @bind="setting.SettingValueStr" rows="1"></textarea>
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex justify-content-start align-items-center">
+                                                    <div class="form-check form-switch fs-5 mb-0">
+                                                        <input class="form-check-input" type="checkbox" id="@($"settingSwitch_{setting.SettingKey}")"
+                                                               @bind:get="setting.SettingValueBool ?? false"
+                                                               @bind:set="value => setting.SettingValueBool = value">
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            <button class="btn btn-sm btn-primary px-3" @onclick="() => Save(setting)">
+                                                حفظ
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">لا توجد إعدادات محفوظة حالياً.</td>
                         </tr>
                     }
                 </tbody>
@@ -87,35 +242,30 @@
                             <label class="form-label">التصنيف</label>
                             <InputText class="form-control" @bind-Value="currentSetting.Category" placeholder="" />
                         </div>
-
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">القيمة النصية</label>
-                            <InputTextArea class="form-control" @bind-Value="currentSetting.SettingValueStr" rows="2" />
-                            <small class="text-muted">استخدم هذا الحقل للنصوص أو الروابط أو إعدادات JSON.</small>
-                        </div>
-
-                        @* <div class="col-md-4 mb-3">
-                            <label class="form-label">القيمة المنطقية</label>
-                            <InputSelect class="form-select" @bind-Value="currentSetting.SettingValueBool">
-                                <option value="">-- غير محدد --</option>
-                                <option value="true">مفعل (True)</option>
-                                <option value="false">معطل (False)</option>
-                            </InputSelect>
-                            <small class="text-muted">استخدم هذا الحقل لتفعيل/تعطيل الميزات.</small>
-                        </div> *@
-                        <div class="col-md-4 mb-3 d-flex flex-column justify-content-center">
-                            <label class="form-label text-transparent d-none d-md-block">&nbsp;</label> <!-- للحفاظ على المحاذاة مع الحقول الأخرى -->
-                            <div class="form-check form-switch fs-5">
-                                <!-- استخدمنا form-switch لشكل زر تفعيل أجمل، يمكنك إزالتها لمربع عادي -->
-                                <input class="form-check-input" type="checkbox" id="settingBoolCheck"
-                                       @bind:get="currentSetting.SettingValueBool ?? false"
-                                       @bind:set="value => currentSetting.SettingValueBool = value">
-                                <label class="form-check-label fs-6 mt-1" for="settingBoolCheck">
-                                    القيمة المنطقية
-                                </label>
+                        @if (currentSetting.SettingValueBool is null)
+                        {
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">القيمة النصية</label>
+                                <InputTextArea class="form-control" @bind-Value="currentSetting.SettingValueStr" rows="2" />
+                                <small class="text-muted">استخدم هذا الحقل للنصوص أو الروابط أو إعدادات JSON.</small>
                             </div>
-                            <small class="text-muted mt-1">استخدم هذا الحقل لتفعيل/تعطيل الميزات.</small>
-                        </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 mb-3 d-flex flex-column justify-content-center">
+                                <label class="form-label text-transparent d-none d-md-block">&nbsp;</label> <!-- للحفاظ على المحاذاة مع الحقول الأخرى -->
+                                <div class="form-check form-switch fs-5">
+                                    <!-- استخدمنا form-switch لشكل زر تفعيل أجمل، يمكنك إزالتها لمربع عادي -->
+                                    <input class="form-check-input" type="checkbox" id="settingBoolCheck"
+                                    @bind:get="currentSetting.SettingValueBool ?? false"
+                                    @bind:set="value => currentSetting.SettingValueBool = value">
+                                    <label class="form-check-label fs-6 mt-1" for="settingBoolCheck">
+                                        القيمة المنطقية
+                                    </label>
+                                </div>
+                                <small class="text-muted mt-1">استخدم هذا الحقل لتفعيل/تعطيل الميزات.</small>
+                            </div>
+                        }
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">الترتيب</label>
@@ -149,6 +299,19 @@
     private bool isSavingLoading = false;
     private bool showForm = false;
     private bool isEditMode = false;
+    private HashSet<string> collapsedCategories = new HashSet<string>();
+
+    private void ToggleCategory(string category)
+    {
+        if (collapsedCategories.Contains(category))
+        {
+            collapsedCategories.Remove(category);
+        }
+        else
+        {
+            collapsedCategories.Add(category);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,7 +364,9 @@
         {
             if (isEditMode)
             {
-                await AppSettingsApi.Update(currentSetting);
+                var res = await AppSettingsApi.Update(currentSetting);
+                if (res.Success)
+                    MudSnackbar.Add(res.Message , Severity.Success);
             }
             else
             {
@@ -242,6 +407,21 @@
         currentSetting = new AppSetting();
     }
 
-    
 
+
+    private async Task Save(AppSetting setting)
+    {
+        isEditMode = true;
+        currentSetting = new AppSetting
+        {
+            Id = setting.Id,
+            SettingKey = setting.SettingKey,
+            SettingValueStr = setting.SettingValueStr,
+            SettingValueBool = setting.SettingValueBool,
+            SortOrder = setting.SortOrder,
+            Category = setting.Category
+        };
+        // var res= await AppSettingsApi.Update(currentSetting);
+        await SaveSetting();
+    }
 }
