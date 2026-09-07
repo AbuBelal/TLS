@@ -87,7 +87,7 @@ public static class AttendanceRecExportService
             ws.Cell(row, c++).Value = emp?.CivilId;
             ws.Cell(row, c++).Value = emp?.OrgJob?.EnName;
             ws.Cell(row, c++).Value = "";
-            ws.Cell(row, c++).Value = "";
+            ws.Cell(row, c++).Value = emp?.Job?.EnName;//title during emrgency
             ws.Cell(row, c++).Value = AttendanceRecList[i].Center?.EnName;
             ws.Cell(row, c++).Value = AreaNameEn;//AreaName
 

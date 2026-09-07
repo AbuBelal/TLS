@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AppSettingsController(IAppSettingsRepository repository) : ControllerBase
+public class AppSettingsController(IAppSettingsRepository repository, AuditLogService auditLogService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var settings = await repository.GetAllAsync();
+        //await auditLogService.LogAsync("Read", "الأعدادات", "", $"قراءة الأعدادات");
         return Ok(settings);
     }
 

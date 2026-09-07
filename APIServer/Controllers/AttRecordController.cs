@@ -77,6 +77,7 @@ namespace APIServer.Controllers
                     request.HolidayCode
                 );
 
+                await _auditLogService.LogAsync("Read", "AttendanceRecord", "", $"توليد سجلات الدوام لشهر {request.Month} من سنة {request.Year}. عدد السجلات المولدة: {generatedCount}");
                 var response = new GeneralResponse
                 (true,
                     $"تم إنشاء {generatedCount} سجل دوام بنجاح.", 0
@@ -103,22 +104,7 @@ namespace APIServer.Controllers
                 return new List<AttendanceRecordDto>();// "لا توجد سجلات دوام لهذا المركز في الشهر المحدد.");
 
             var Dto = records.Select(r => (new AttRecMappers()).ToDTO(r)).ToList();
-            //var options = new JsonSerializerOptions
-            //{
-            //    ReferenceHandler = ReferenceHandler.IgnoreCycles
-            //};
-
-            //// 2. تحويل البيانات إلى نص JSON
-            //string jsonString = JsonSerializer.Serialize(Dto, options);
-
-            //// 3. حساب الحجم بالبايت والكيلوبايت
-            //int sizeInBytes = Encoding.UTF8.GetByteCount(jsonString);
-            //double sizeInKb = sizeInBytes / 1024.0;
-            //double sizeInMb = sizeInKb / 1024.0;
-
-            //// يمكنك طباعة الحجم في الـ Console أو تسجيله (Log)
-            //Console.WriteLine($"Data Size: {sizeInBytes} Bytes | {sizeInKb:F2} KB | {sizeInMb:F2} MB");
-            ////
+            await _auditLogService.LogAsync("Read", "AttendanceRecord", "", $"عرض سجلات الدوام لشهر {month} من سنة {year}. عدد السجلات: {Dto.Count}");
             return Dto;
         }
 
@@ -131,6 +117,7 @@ namespace APIServer.Controllers
             try
             {
                 var result = await _repository.UpdateAttendanceRecordsAsync(records);
+                await _auditLogService.LogAsync("Update", "AttendanceRecord", "", $"تحديث سجلات الدوام. عدد السجلات المحدثة: {records.Count}");
                 return new GeneralResponse(true, "تم حفظ التعديلات بنجاح.", 0);
             }
             catch (Exception ex)
@@ -144,8 +131,18 @@ namespace APIServer.Controllers
         {
             try
             {
-                await _repository.LockAttendanceRecordsAsync(request.Year, request.Month, request.Lock??true);
-                return new GeneralResponse(true, "تم قفل سجلات الدوام لهذا الشهر بنجاح.", 0);
+                await _repository.LockAttendanceRecordsAsync(request.Year, request.Month, request.Lock ?? true);
+                if (request.Lock != true)
+                {
+                    await _auditLogService.LogAsync("Update", "AttendanceRecord", "", $"فتح سجلات الدوام لشهر {request.Month} من سنة {request.Year}.");
+                    return new GeneralResponse(true, "تم فتح سجلات الدوام لهذا الشهر بنجاح.", 0);
+                }
+                else
+                {
+                    await _auditLogService.LogAsync("Update", "AttendanceRecord", "", $"قفل سجلات الدوام لشهر {request.Month} من سنة {request.Year}.");
+                    return new GeneralResponse(true, "تم قفل سجلات الدوام لهذا الشهر بنجاح.", 0);
+                }
+               
             }
             catch (Exception ex)
             {
@@ -168,7 +165,7 @@ namespace APIServer.Controllers
 
             var fileName = $"لوائح دوام_{request.Year} - {request.Month}.xlsx";
 
-            //await _auditLogService.LogAsync("Read", "Employee", "", $"تصدير الموظفين حسب التصفية: {fileName}");
+            await _auditLogService.LogAsync("Export", "AttendanceRecord", "", $"تصدير سجلات الدوام لشهر {request.Month} من سنة {request.Year}. عدد السجلات: {records.Count}");
 
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -181,6 +178,7 @@ namespace APIServer.Controllers
             try
             {
                 var result = await _repository.DeleteEmployeeAttendanceRecordsAsync(request);
+                await _auditLogService.LogAsync("Delete", "AttendanceRecord", "", $"حذف سجلات الدوام للموظف {request.EmployeeId} لشهر {request.Month} من سنة {request.Year}. عدد السجلات المحذوفة: {result}");
                 return result;
             }
             catch (Exception ex)
@@ -196,7 +194,7 @@ namespace APIServer.Controllers
 
             if (Summeries == null || !Summeries.Any())
                 return new List<AttRecSummery>();
-
+            await _auditLogService.LogAsync("Read", "AttendanceRecord", "", $"عرض ملخصات الدوام لشهر {month} من سنة {year}. عدد الملخصات: {Summeries.Count}");
             return Summeries;
         }
     }

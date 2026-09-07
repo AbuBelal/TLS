@@ -56,6 +56,7 @@ namespace APIServer.Controllers
         {
             var items = await _repository.GetAllAsync();
             var dtos = items.Select(MapToDto);
+            await _auditLogService.LogAsync("Read", "Get All Incomes", "", $"تم جلب جميع الإيرادات: {dtos.Count()} إيراد");
             return Ok(dtos);
         }
 
@@ -64,7 +65,7 @@ namespace APIServer.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null) return NotFound(new { message = "الإيراد غير موجود" });
-
+            await _auditLogService.LogAsync("Read", "Get Income By Id", "", $"تم جلب الإيراد بالمعرف: {id}");
             return Ok(MapToDto(item));
         }
 
@@ -74,6 +75,7 @@ namespace APIServer.Controllers
             if (centerId == 0)
                 centerId = await CurrentCenterId();
             var items = await _repository.GetByCenterIdAsync(centerId);
+            await _auditLogService.LogAsync("Read", "Get Incomes By Center", "", $"تم جلب الإيرادات للمركز بالمعرف: {centerId}, عدد الإيرادات: {items.Count()}");
             return Ok(items.Select(MapToDto));
         }
 
@@ -86,6 +88,7 @@ namespace APIServer.Controllers
                 return BadRequest(new { message = "تاريخ البداية يجب أن يكون قبل تاريخ النهاية" });
 
             var items = await _repository.GetByDateRangeAsync(from, to);
+            await _auditLogService.LogAsync("Read", "Get Incomes By Date Range", "", $"تم جلب الإيرادات من {from} إلى {to}, عدد الإيرادات: {items.Count()}");
             return Ok(items.Select(MapToDto));
         }
 
@@ -149,7 +152,7 @@ namespace APIServer.Controllers
             });
 
             if (updated == null) return NotFound(new { message = "الوارد غير موجود" });
-
+            await _auditLogService.LogAsync("Update", "Update Income", "", $"تم تعديل الإيراد بالمعرف: {dto.Id}");
             return Ok(MapToDto(updated));
         }
 
@@ -159,7 +162,7 @@ namespace APIServer.Controllers
             var deleted = await _repository.DeleteAsync(id);
             if (!deleted) return new GeneralResponse (  false,  "الإيراد غير موجود" );
             //NotFound(new { message = "الإيراد غير موجود" });
-
+            await _auditLogService.LogAsync("Delete", "Delete Income", "", $"تم حذف الإيراد بالمعرف: {id}");
             return new GeneralResponse(true, "تم حذف الإيراد بنجاح");
         }
 
@@ -170,8 +173,7 @@ namespace APIServer.Controllers
             var bytes = IncomeReportExportService.GenerateExcel(report.ToList(), " تقرير أرصدة الواردات");
             var fileName = $"تقرير-رصيد-الواردات{DateTime.Now.ToString("yyyy-MM-dd")}.xlsx";
 
-            await _auditLogService.LogAsync("Read", "Export Income Balance Report", "", $"تصدير تقرير أرصدة الواردات: {fileName}");
-
+            await _auditLogService.LogAsync("Export", "Export Income Balance Report", "", $"تم تصدير تقرير أرصدة الواردات: {fileName}");
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);

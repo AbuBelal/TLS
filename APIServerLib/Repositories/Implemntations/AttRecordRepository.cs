@@ -138,6 +138,7 @@ namespace APIServerLib.Repositories.Implemntations
                 return  await _context.AttendanceRecord
                     .Include(a => a.Employee)
                     .Include(c=>c.Center)
+                    .Include(j=>j.Employee.Job)
                     .Where(a => a.Date.Year == year && a.Date.Month == month)
                     .OrderBy(c=>c.Center.SortOrder)
                     //.Select(r=> (new AttRecMappers()).ToDTO(r))
