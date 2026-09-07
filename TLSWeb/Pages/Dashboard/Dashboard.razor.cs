@@ -15,10 +15,16 @@ public partial class Dashboard : ComponentBase
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
+        CenterDashboardDto? localStats;
+        try
+        {
         if (!string.IsNullOrEmpty(userId))
-            Stats = await DashboardApi.Get();
+           Stats = await DashboardApi.Get();
+        }
+        catch (Exception ex)
+        {
+            //throw;
+        }
         
         IsLoading = false;
     }
