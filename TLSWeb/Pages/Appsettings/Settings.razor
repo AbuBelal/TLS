@@ -180,13 +180,19 @@
                                 {
                                     <tr>
                                         <td class="ps-4">
-                                            <strong>@setting.SettingKey</strong><br />
+                                            <strong>@setting.SettingKey</strong>
+                                            @if(setting.SettingKey==SharedLib.Fixed.RequiredAppSettings.YearBegin)
+                                            {
+                                               <span>  </span> <small>DD-MM-YYYY</small>
+                                            }
+                                            <br />
                                             <small class="text-muted">آخر تعديل : @setting.LastModified.ToString("yyyy-MM-dd HH:mm")</small>
                                         </td>
 
                                         <td>
                                             @if (setting.SettingValueBool is null)
                                             {
+                                                
                                                 <textarea class="form-control" @bind="setting.SettingValueStr" rows="1"></textarea>
                                             }
                                             else

@@ -9,7 +9,7 @@ namespace SharedLib.Fixed
         public const string DebugBaseUrl = "https://localhost:7075";
         public enum RegionType { Debug,Test, North, WestMiddle, WestGaza }
         // حدد المنطقة هنا فقط
-        private const  RegionType CurrentRegion = RegionType.Debug;
+        private const  RegionType CurrentRegion = RegionType.WestMiddle;
 
         public static string SelectedBaseUrl => CurrentRegion switch
         {
@@ -88,6 +88,9 @@ namespace SharedLib.Fixed
     {
         public const string AreaNameAr = "إسم المنطقة";
         public const string AreaNameEn = "Area Name";
+        public const string YearBegin = "بداية العام الدراسي";
+
+
         public const string CanAddEmployes = "يمكن لمديري المراكز إضافة موظفين";
         public const string CanDelEmployes = "يمكن لمديري المراكز حذف موظفين";
         public const string CanAddStudents = "يمكن لمديري المراكز إضافة طلاب";
@@ -98,6 +101,7 @@ namespace SharedLib.Fixed
         {
             { AreaNameAr, new SettingConfig { Category = AppSettingsCategories.AreaData , SortOrder=1,SettingType=1 } },
             { AreaNameEn, new SettingConfig { Category = AppSettingsCategories.AreaData , SortOrder=2,SettingType=1  } },
+            { YearBegin, new SettingConfig { Category = AppSettingsCategories.AreaData , SortOrder=3,SettingType=1  } },
         
             // لاحظ تغيير الفئة هنا لتكون منطقية
             { CanAddEmployes, new SettingConfig { Category = AppSettingsCategories.Permissions , SortOrder=3,SettingType=2 } },

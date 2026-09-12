@@ -127,16 +127,17 @@ else
 
     List<Employee> Managers;
     bool IsLoading = false;
-    bool ShowActiveCenters = false;
+    bool ShowActiveCenters = true;
     long SelectedShift = 0;
     private string searchText = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        DailyReports = await DailyReportApi.GetDailyReportForDate(SelectedDate); 
+        // DailyReports = await DailyReportApi.GetDailyReportForDate(SelectedDate); 
         DailyReportSrchRs = DailyReports;
         Managers = await EmployeeApi.GetAllManagers();
         WHoures = await LookupValueApi.GetByValueType(SharedLib.Fixed.LookupTypes.WHoures);
+        await OnDateChanged();
     }
 
     // private async Task SaveCenter(long CenterId)
@@ -153,6 +154,8 @@ else
     //             MudSnackbar.Add(response.Message, Severity.Error);
     //     }
     // }
+
+
     private async Task OnDateChanged()
     {
         DailyReports = null;

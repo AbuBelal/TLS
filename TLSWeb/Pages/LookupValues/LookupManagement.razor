@@ -6,7 +6,7 @@
 <div class="row mb-3">
     <div class="col-md-4">
         <label>الفلترة حسب النوع:</label>
-        <select class="form-control" @onchange="OnTypeFilterChanged">
+        <select class="form-control" @onchange="OnTypeFilterChanged" value="@selectedType">
             <option value="">-- عرض الكل --</option>
             @foreach (var type in distinctTypes)
             {
@@ -57,11 +57,15 @@
         filteredLookups = allLookups;
         // استخراج الأنواع الفريدة فقط
         distinctTypes = allLookups.Select(x => x.ValueType).Distinct().ToList();
+        selectedType = distinctTypes[0];
+        var changeEventArgs = new ChangeEventArgs();
+        changeEventArgs.Value = selectedType;
+        OnTypeFilterChanged(changeEventArgs);
     }
 
     private void OnTypeFilterChanged(ChangeEventArgs e)
     {
-        selectedType = e.Value?.ToString() ?? "";
+         selectedType = e?.Value?.ToString() ?? "";
         if (string.IsNullOrEmpty(selectedType))
         {
             filteredLookups = allLookups;

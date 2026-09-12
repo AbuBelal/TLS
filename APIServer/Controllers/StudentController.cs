@@ -21,14 +21,17 @@ namespace APIServer.Controllers
         private readonly IStudentRepository _studentRepository;
         private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IAppSettingsRepository _appSettingsRepository;
         private readonly AuditLogService _auditLogService;
 
-        public StudentController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService)
+
+        public StudentController(IStudentRepository studentRepository, IUserRepository UserRepository, IEmployeeRepository EmployeeRepository, AuditLogService auditLogService, IAppSettingsRepository SettingsRepository)
         {
             _studentRepository = studentRepository;
             _userRepository = UserRepository;
             _employeeRepository = EmployeeRepository;
             _auditLogService = auditLogService;
+            _appSettingsRepository = SettingsRepository;
         }
         #region CurUser CurEmp Details
         private async Task<ApplicationUser> CurrentUser ()
@@ -196,11 +199,11 @@ namespace APIServer.Controllers
 
             // جلب الطلاب بنفس فلاتر الصفحة لكن بدون pagination
             var students = await _studentRepository.GetFilteredForExportAsync(request, centerId);
-
+            var AppSettings = await _appSettingsRepository.GetAllAsync();
             // توصيف عنوان الورقة حسب الفلاتر المطبقة
             var sheetTitle = BuildSheetTitle(request);
 
-            var bytes = StudentExportService.GenerateExcelForAdmin(students, sheetTitle, centerName);
+            var bytes = StudentExportService.GenerateExcelForAdmin(students, sheetTitle, centerName,AppSettings.ToList());
             var fileName = $"طلاب_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
             await _auditLogService.LogAsync("Read", "Student", "", $"تصدير الطلاب حسب التصفية: {fileName}");
             return File(bytes,

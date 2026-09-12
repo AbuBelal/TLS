@@ -129,6 +129,10 @@
                             <label class="form-check-label" for="special">ذوي احتياجات خاصة؟</label>
                             <InputCheckbox @bind-Value="student.IsSpecialNeeds" class="form-check-input" id="special" />
                         </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="RecBag">هل استلم حقيبة مدرسية🎒؟</label>
+                            <InputCheckbox @bind-Value="student.IsReceviedBag" class="form-check-input" id="RecBag" />
+                        </div>
                     </div>
 
                     @* حقل مشروط للاحتياجات الخاصة *@
@@ -287,6 +291,7 @@ else if (StdEmisInfo is not null && StdEmisInfo.IdentityNo.Length > 0)
         // جلب البيانات للمنسدلات من الـ API
         genders = await LookupValueApi.GetByValueType(LookupTypes.Gender) ?? new();
         levels = await LookupValueApi.GetByValueType(LookupTypes.Level) ?? new();
+        levels = levels.Where(x => x.IsActive).ToList();
         centers = await CenterApi.GetAll();          // ← جديد
         selectedCenterId = student.StdCenters?.FirstOrDefault(x => x.IsActive)?.CenterId;
         isLoading = false;

@@ -6,6 +6,7 @@
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using SharedLib.Entities;
+using SharedLib.Fixed;
 using SharedLib.Helpers;
 
 namespace APIServerLib.Services;
@@ -200,8 +201,18 @@ public static class StudentExportService
         wb.SaveAs(ms);
         return ms.ToArray();
     }
-    public static byte[] GenerateExcelForAdmin(List<Student> students, string sheetTitle, string centerName)
+    public static byte[] GenerateExcelForAdmin(List<Student> students, string sheetTitle, string centerName ,List<AppSetting> appSettings=null)
     {
+        string AreaName = appSettings.FirstOrDefault(x => x.SettingKey == RequiredAppSettings.AreaNameAr)?.SettingValueStr;
+
+        //get year begin from app settings
+        var YearBeginStr = appSettings.FirstOrDefault(x => x.SettingKey == RequiredAppSettings.YearBegin)?.SettingValueStr;
+        DateOnly YearBegin;
+        if (string.IsNullOrEmpty(YearBeginStr))
+            YearBegin = new DateOnly(2026, 09, 19);
+        else
+            YearBegin = DateOnly.FromDateTime(DateTime.ParseExact(YearBeginStr ?? "19-09-2026", "dd-MM-yyyy", null));
+
         //students = students.OrderBy(x => x.StdCenters.FirstOrDefault(x => x.IsActive).Center.SortOrder).ToList();
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("الطلاب");
@@ -226,9 +237,9 @@ public static class StudentExportService
             ("الشعبة", 5),
             ("رقم الجوال",   13),
             ("هل ذوي اح تياجات خاصة؟", 8),
-            ("نوع الاحتياج",       20),
+            ("تاريخ الإلتحاق", 15),
+            ("هل استلم حقيبة مدرسية ؟", 8),
             ("ملاحظات", 25),
-            ("تاريخ الإضافة", 15)
         };
 
         for (int c = 0; c < headers.Length; c++)
@@ -269,8 +280,8 @@ public static class StudentExportService
             // قيم الخلايا
             int c = 1;
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            ws.Cell(row, c++).Value = "";
-            
+            ws.Cell(row, c++).Value = AreaName;
+
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = center?.CenterCode ?? "";
 
@@ -313,16 +324,23 @@ public static class StudentExportService
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = student.IsSpecialNeeds ? "Yes" : "No";
 
+            //ws.Cell(row, c++).Style.NumberFormat.Format = "dd-MM-yyyy";
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            ws.Cell(row, c++).Value = student.SpecialNeeds??"";
+            //ws.Cell(row, c++).Value = student.StdCenters.FirstOrDefault(x => x.IsActive)?.FromDate.ToString("dd-MM-yyyy");//student.StdCenters.FirstOrDefault(x => x.IsActive)?.FromDate.ToDateTime(TimeOnly.MinValue);//?.ToString("dd-MM-yyyy");
+            var fromDate = student.StdCenters.Min(x => x.FromDate);
+            if(fromDate < YearBegin)
+            {
+                fromDate = YearBegin;
+            }
+            ws.Cell(row, c++).Value = fromDate.ToString("dd-MM-yyyy");
+
+
+            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            ws.Cell(row, c++).Value =student.IsReceviedBag ? "Yes" : "No";
 
             ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             ws.Cell(row, c++).Value = student.Comments ?? "";
 
-
-            //ws.Cell(row, c++).Style.NumberFormat.Format = "dd-MM-yyyy";
-            ws.Cell(row, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-            ws.Cell(row, c++).Value = student.StdCenters.FirstOrDefault(x => x.IsActive)?.FromDate.ToString("dd-MM-yyyy");//student.StdCenters.FirstOrDefault(x => x.IsActive)?.FromDate.ToDateTime(TimeOnly.MinValue);//?.ToString("dd-MM-yyyy");
 
             // تنسيق الصف كاملاً
             var rowRange = ws.Range(row, 1, row, totalCols);

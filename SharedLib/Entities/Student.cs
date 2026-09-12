@@ -16,6 +16,7 @@ namespace SharedLib.Entities
         public short? SectionNo { get; set; } = 1;
         public bool IsUnrwa { get; set; }=false;
         public bool IsSpecialNeeds { get; set; }=false;
+        public bool IsReceviedBag { get; set; }=false;
         public string? SpecialNeeds { get; set; }
 
         //gender

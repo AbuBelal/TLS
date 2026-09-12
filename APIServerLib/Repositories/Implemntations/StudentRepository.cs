@@ -180,6 +180,7 @@ namespace APIServerLib.Repositories.Implemntations
                         oldStd.IsUnrwa = student.IsUnrwa;
                         oldStd.IsSpecialNeeds = student.IsSpecialNeeds;
                         oldStd.SpecialNeeds = student.SpecialNeeds;
+                        oldStd.IsReceviedBag = student.IsReceviedBag;
                         oldStd.Comments = student.Comments;
                     }
 
