@@ -202,6 +202,7 @@ namespace APIServerLib.Repositories.Implemntations
                 .Where(x => CenterId == 0 ? true : x.StdCenters.FirstOrDefault(z => z.IsActive).CenterId == CenterId)
                 .Include(s => s.Gender)
                 .Include(s => s.Level)
+                .OrderByDescending(s=>s.StdCenters.FirstOrDefault(x=>x.IsActive).FromDate)
                 //.Include(x => x.StdCenters).ThenInclude(x => x.Center)
                 .AsQueryable();
 
@@ -267,11 +268,14 @@ namespace APIServerLib.Repositories.Implemntations
             if (request.FromDate.HasValue)
             {
                 query = query.Where(s =>
-                    s.StdCenters.Any(sc => sc.FromDate >= request.FromDate.Value));
+                    s.StdCenters.Any(sc => sc.IsActive && sc.FromDate >= request.FromDate.Value));
             }
 
             // 3. حساب العدد الإجمالي (بعد الفلترة)
             var totalCount = await query.CountAsync();
+            var Male = await query.CountAsync(x=>x.GenderId==1);
+            var Female = await query.CountAsync(x=>x.GenderId==2);
+            var IsUnrwa = await query.CountAsync(x=>x.IsUnrwa);
 
             // 4. تطبيق الترتيب والتقسيم
             var pageSize = Math.Clamp(request.PageSize, 1, 100);
@@ -299,14 +303,25 @@ namespace APIServerLib.Repositories.Implemntations
                 AddedDate = s.StdCenters.FirstOrDefault(x => x.IsActive)?.FromDate,
             }).OrderByDescending(s => s.AddedDate).ToList();
 
+
+            // فلتر تاريخ الإضافة
+            //if (request.FromDate.HasValue)
+            //{
+            //    studentDtos = studentDtos.Where(x => x.AddedDate >= request.FromDate).OrderBy(x => x.AddedDate).ToList();
+            //}
+
             // 5. بناء الاستجابة
             var response = new PaginatedResponse<StudentDto>
             {
                 Items = studentDtos,
                 TotalCount = totalCount,
+                MaleCount = Male,
+                FemaleCount= Female,
+                IsUnrwa=IsUnrwa,
                 CurrentPage = currentPage,
                 PageSize = pageSize
             };
+
 
             return response;
         }

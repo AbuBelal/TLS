@@ -31,4 +31,7 @@ public class PaginatedResponse<T>
 
     /// <summary>هل يوجد صفحة تالية؟</summary>
     public bool HasNext => CurrentPage < TotalPages;
+    public long MaleCount { get; set; } = 0;
+    public long FemaleCount { get; set; } = 0;
+    public long IsUnrwa { get; set; } = 0;
 }

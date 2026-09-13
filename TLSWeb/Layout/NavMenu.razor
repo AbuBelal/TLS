@@ -106,7 +106,7 @@
                         <span>عرض جميع الطلاب</span>
                     </a>
 
-                    @if (appSetting?.FirstOrDefault(x => x.SettingKey == SharedLib.Fixed.RequiredAppSettings.CanAddStudents)?.SettingValueBool == true)
+                  @if (appSetting?.FirstOrDefault(x => x.SettingKey == SharedLib.Fixed.RequiredAppSettings.CanAddStudents)?.SettingValueBool == true)
                     {
                         <a href="@PagesUris.StudentsPages.Add" class="@SubLinkClass" @onclick="CloseSidebar">
                             <span class="w-1.5 h-1.5 rounded-full bg-white/35 flex-shrink-0"></span>

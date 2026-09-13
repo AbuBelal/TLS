@@ -23,6 +23,12 @@ public partial class NewStudentsReport : ComponentBase
     private int pageSize = 25;
     private int totalCount;
     private int totalPages;
+    /// <summary>
+    private long Male = 0;
+    private long Female = 0;
+    private long IsUnrwa = 0;
+
+    /// </summary>
 
     // ====== التصدير ======
     private bool isExporting;
@@ -59,6 +65,9 @@ public partial class NewStudentsReport : ComponentBase
             totalCount = response.TotalCount;
             totalPages = response.TotalPages;
             currentPage = response.CurrentPage;
+            Male = response.MaleCount;
+            Female = response.FemaleCount;
+            IsUnrwa = response.IsUnrwa;
         }
         catch (Exception ex)
         {
