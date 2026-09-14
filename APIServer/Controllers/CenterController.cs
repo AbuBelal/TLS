@@ -2,6 +2,7 @@ using APIServerLib.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedLib.DTOs;
+using SharedLib.DTOs.Centers;
 using SharedLib.Entities;
 using SharedLib.Fixed;
 using SharedLib.Responses;
@@ -106,6 +107,13 @@ namespace APIServer.Controllers
         {
             var days = await _centerRepository.GetDaysofWorksAsync();
             return Ok(days);
+        }
+
+        [HttpGet("GetCentersWithLevelsAndSectionsAsync")]
+        public async Task<ActionResult<List<CentersInfo>>> GetCentersWithLevelsAndSectionsAsync()
+        {
+            var centersInfo = await _centerRepository.GetCentersWithLevelsAndSectionsAsync();
+            return Ok(centersInfo);
         }
     }
 }

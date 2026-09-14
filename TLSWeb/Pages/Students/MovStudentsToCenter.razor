@@ -1,0 +1,316 @@
+﻿@using SharedLib.DTOs.Centers
+@using SharedLib.DTOs.Students
+@using TLSWeb.Components
+@attribute [Route(PagesUris.StudentsPages.MovTdsToCenter)]
+
+<div class="container-fluid py-4" dir="rtl">
+
+    <div class="mb-4">
+        <h3 class="fw-bold text-primary mb-1">
+            <i class="bi bi-arrow-left-right me-2"></i>
+            نقل شعبة أو جزء من شعبة إلى مركز آخر
+        </h3>
+        <p class="text-muted mb-0">حدد بيانات النقل من المركز المصدر إلى المركز الهدف</p>
+    </div>
+    @if (!AllCenterInfo.Any())
+    {
+        <LoadingComponent></LoadingComponent>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-box-arrow-up-left me-2 text-danger"></i>من مركز (المصدر)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label fw-semibold">المركز</label>
+                        <select class="form-select" @bind="SelectedCenterIdFrom" @bind:after="OnCenterChanged">
+                            <option value="">اختر المركز</option>
+                            @foreach (var center in AllCenterInfo)
+                            {
+                                <option value="@center.CenterId">@center.CenterArName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label fw-semibold">الصف</label>
+                        <select class="form-select" @bind="SelectedLevelId" @bind:after="OnLevelChanged" disabled="@(SelectedCenterIdFrom <= 0)">
+                            <option value="">اختر الصف</option>
+                            @foreach (var level in FromCenterLevels)
+                            {
+                                <option value="@level.LevelId">@level.LevelName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label fw-semibold">الشعبة</label>
+                        <select class="form-select" @bind="SelectedSectionId" disabled="@(SelectedLevelId <= 0)">
+                            <option value="">اختر الشعبة</option>
+                            @foreach (var section in FromCenterSections)
+                            {
+                                <option value="@section">@section</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <label class="form-label fw-semibold">الجنس</label>
+                        <select class="form-select" @bind="SelectedGenderId">
+                            <option value="">اختر الجنس</option>
+                            @foreach (var gender in FromCenterGenders)
+                            {
+                                <option value="@gender.Id">@gender.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+   
+        <div class="text-center mb-4">
+            <i class="bi bi-arrow-down-circle-fill fs-2 text-primary"></i>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-box-arrow-in-down-right me-2 text-success"></i>إلى مركز (الهدف)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-4">
+                        <label class="form-label fw-semibold">المركز</label>
+                        <select class="form-select" @bind="SelectedCenterIdTo">
+                            <option value="">اختر المركز</option>
+                            @foreach (var center in AllCenterInfo.Where(c => c.CenterId != SelectedCenterIdFrom))
+                            {
+                                <option value="@center.CenterId">@center.CenterArName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger py-2"><i class="bi bi-exclamation-triangle me-2"></i>@ErrorMessage</div>
+        }
+
+        <div class="d-flex justify-content-start gap-2">
+            <button class="btn btn-primary px-4" @onclick="TransferAsync" disabled="@(!CanTransfer || isLoading)">
+                @if (isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    <span>جاري الحفظ...</span>
+                }
+                else
+                {
+                    <i class="bi bi bi-floppy me-1"></i>
+                    <span>تنفيذ النقل </span>
+                }
+            </button>
+            <button class="btn btn-outline-secondary px-4" @onclick="ResetForm">
+                <i class="bi bi-x-circle me-1"></i> إلغاء
+            </button>
+        </div>
+    }
+</div>
+
+    
+
+@code {
+    private List<CentersInfo> AllCenterInfo = new();
+    private List<CenterLevels> FromCenterLevels = new();
+    private List<short?> FromCenterSections = new();
+    private List<LookupValue> FromCenterGenders = new();
+
+    private long SelectedCenterIdFrom { get; set; }
+    private long SelectedCenterIdTo { get; set; }
+    private long SelectedLevelId { get; set; }
+    private short SelectedSectionId { get; set; }
+    private long SelectedGenderId { get; set; }
+    private bool isLoading = false;
+    private string? ErrorMessage { get; set; }
+
+    private bool CanTransfer =>
+        SelectedCenterIdFrom > 0 &&
+        SelectedCenterIdTo > 0 &&
+        SelectedCenterIdFrom != SelectedCenterIdTo &&
+        SelectedLevelId > 0 &&
+        SelectedSectionId > 0 &&
+        SelectedGenderId > 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllCenterInfo = await CenterApi.GetCentersWithLevelsAndSections();
+        FromCenterGenders = await LookupValueApi.GetByValueType(SharedLib.Fixed.LookupTypes.Gender);
+    }
+
+    private void OnCenterChanged()
+    {
+        FromCenterLevels = SelectedCenterIdFrom > 0
+            ? AllCenterInfo.FirstOrDefault(c => c.CenterId == SelectedCenterIdFrom)?.Levels ?? new List<CenterLevels>()
+            : new List<CenterLevels>();
+
+        // إعادة تعيين القيم التابعة
+        SelectedLevelId = 0;
+        FromCenterSections = new List<short?>();
+        SelectedSectionId = 0;
+    }
+
+    private void OnLevelChanged()
+    {
+        FromCenterSections = SelectedLevelId > 0
+            ? FromCenterLevels.FirstOrDefault(l => l.LevelId == SelectedLevelId)?.Sections ?? new List<short?>()
+            : new List<short?>();
+
+        SelectedSectionId = 0;
+    }
+
+    private async Task TransferAsync()
+    {
+        isLoading = true;
+        ErrorMessage = null;
+
+        if (!CanTransfer)
+        {
+            ErrorMessage = "يرجى تعبئة جميع الحقول والتأكد أن المركز الهدف مختلف عن المركز المصدر.";
+            return;
+        }
+
+        // TODO: استدعاء الـ API الخاص بتنفيذ عملية النقل هنا
+        MovStdToCenter request=new ();
+        request.FromCenterId = SelectedCenterIdFrom;
+        request.ToCenterId = SelectedCenterIdTo;
+        request.GenderId = SelectedGenderId;
+        request.LevelId = SelectedLevelId;
+        request.Section = SelectedSectionId;
+
+        var res =await StudentApi.MoveToCenter(request);
+        if(res.Success)
+        {
+            MudSnackbar.Add(res.Message , Severity.Success);
+        }
+        isLoading = false;
+    }
+
+    private void ResetForm()
+    {
+        SelectedCenterIdFrom = 0;
+        SelectedCenterIdTo = 0;
+        SelectedLevelId = 0;
+        SelectedSectionId = 0;
+        SelectedGenderId = 0;
+        FromCenterLevels = new();
+        FromCenterSections = new();
+        ErrorMessage = null;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @using SharedLib.DTOs.Centers
+@attribute [Route(PagesUris.StudentsPages.MovTdsToCenter)]
+
+<h3>نقل شعبة أو جزء من شعبة إلى مركز آخر</h3>
+من مركز
+<select @bind:after="SelectedCenterIdFrom" @onchange="OnCenterChanged">
+    <option value="">اختر المركز</option>
+    @foreach (var center in AllCenterInfo)
+    {
+        <option value="@center.CenterId">@center.CenterArName</option>
+    }   
+</select>
+
+الصف
+<select @bind="SelectedLevelId">
+    <option value="">اختر الصف</option>
+    @foreach (var level in FromCenterLevels)
+    {
+        <option value="@level.LevelId">@level.LevelName</option>
+    }
+</select>
+
+الشعبة
+<select @bind="SelectedSectionId">
+    <option value="">اختر الشعبة</option>
+    @foreach (var section in FromCenterSections)
+    {
+        <option value="@section">@section</option>
+    }
+    </select>
+
+الجنس
+<select @bind="SelectedGenderId">
+    <option value="">اختر الجنس</option>
+    @foreach (var gender in FromCenterGenders)
+    {
+        <option value="@gender.Id">@gender.Name</option>
+    }
+    </select>
+
+
+إلى مركز
+<select @bind="SelectedCenterIdTo">
+    <option value="">اختر المركز</option>
+    @foreach (var center in AllCenterInfo)
+    {
+        <option value="@center.CenterId">@center.CenterArName</option>
+    }
+</select>
+
+@code {
+    private List<CentersInfo> AllCenterInfo = new List<CentersInfo>();
+    private List<CenterLevels> FromCenterLevels = new List<CenterLevels>();
+    private List<int> FromCenterSections = new List<int>();
+    private List<LookupValue> FromCenterGenders = new List<LookupValue>();
+    /// selected
+    private long SelectedCenterIdFrom { get; set; }
+    private long SelectedCenterIdTo { get; set; }
+    private long SelectedLevelId { get; set; }
+    private int SelectedSectionId { get; set; }
+    private long SelectedGenderId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllCenterInfo = await CenterApi.GetCentersWithLevelsAndSections();
+        FromCenterGenders = await LookupValueApi.GetByValueType(SharedLib.Fixed.LookupTypes.Gender);
+    }
+
+    private async Task OnCenterChanged()
+    {
+        if(SelectedCenterIdFrom>0)
+            FromCenterLevels =  AllCenterInfo.FirstOrDefault(c => c.CenterId == SelectedCenterIdFrom)?.Levels ?? new List<CenterLevels>();
+    }
+    private async Task OnLevelChanged()
+    {
+        if (SelectedLevelId > 0)
+            FromCenterSections = FromCenterLevels.FirstOrDefault(l => l.LevelId == SelectedLevelId)?.Sections;
+    }
+}
+ *@

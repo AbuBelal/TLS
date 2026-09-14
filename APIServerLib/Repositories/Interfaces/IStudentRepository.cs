@@ -1,5 +1,6 @@
 // APIServerLib\Repositories\Interfaces\IStudentRepository.cs
 using SharedLib.DTOs;
+using SharedLib.DTOs.Students;
 using SharedLib.Entities;
 using SharedLib.Responses;
 
@@ -27,6 +28,6 @@ namespace APIServerLib.Repositories.Interfaces
         Task<List<StudentsCountsDto>> GetTotalStudentsCountAsync(StudentsCountsRequestDto request);
         Task<GeneralResponse> PromotionStudentsAsync(long FromLevelId, long ToLevelId);
 
-
+        Task<GeneralResponse> MovStdToCenter(MovStdToCenter request);
     }
 }

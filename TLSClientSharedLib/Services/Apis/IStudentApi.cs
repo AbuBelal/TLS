@@ -57,5 +57,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Get(ApiUrls.Student.Promotion)]
         Task<GeneralResponse> Promote(StudentPromotionRequest request);
+
+        [Post(ApiUrls.Student.MoveToCenter)]
+        Task<GeneralResponse> MoveToCenter(MovStdToCenter request);
     }
 }

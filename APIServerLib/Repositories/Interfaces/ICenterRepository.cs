@@ -1,4 +1,5 @@
 using SharedLib.DTOs;
+using SharedLib.DTOs.Centers;
 using SharedLib.Entities;
 using SharedLib.Responses;
 
@@ -18,5 +19,6 @@ namespace APIServerLib.Repositories.Interfaces
         Task<GeneralResponse> UpdateByUserAsync(CenterUpsertDto dto, string userId);
         Task<GeneralResponse> Update(CenterUpsertDto dto);
         Task<List<string?>> GetDaysofWorksAsync();
+        Task<List<CentersInfo>> GetCentersWithLevelsAndSectionsAsync();
     }
 }

@@ -33,7 +33,8 @@
             public const string Add = PriorUrl + "/Add";
             public const string Edit = PriorUrl + "/Edit";
             public const string NewStudentsReport = PriorUrl + "/NewStudentsReport";  // ← جديد
-            public const string StudentsCounts = PriorUrl + "/StudentsCounts";  // ← جديد
+            public const string StudentsCounts = PriorUrl + "/StudentsCounts";  
+            public const string MovTdsToCenter = PriorUrl + "/MovTdsToCenter";
         }
         public static class LookupsValuePages
         {

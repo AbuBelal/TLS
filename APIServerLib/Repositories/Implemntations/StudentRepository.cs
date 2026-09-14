@@ -6,6 +6,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
+using SharedLib.DTOs.Students;
 using SharedLib.Entities;
 using SharedLib.Responses;
 using System.Security.Claims;
@@ -411,9 +412,9 @@ namespace APIServerLib.Repositories.Implemntations
             {
                 return await _context.Students
                      .AsNoTracking()
-                    .Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
-                     .Include(s => s.Gender)
-                     .Include(s => s.Level)
+                     //.Include(s => s.StdCenters).ThenInclude(sc => sc.Center)
+                     //.Include(s => s.Gender)
+                     //.Include(s => s.Level)
                      .OrderBy(s => s.StdCenters
                      .FirstOrDefault(z => z.IsActive)!.CenterId)
                      .ThenBy(s => s.Level.SortOrder)
@@ -557,5 +558,37 @@ namespace APIServerLib.Repositories.Implemntations
             return new GeneralResponse(true, $"تم ترقية {students.Count} الطلاب من المستوى {Levels.FirstOrDefault(l=>l.Id==FromLevelId)?.Name} إلى المستوى {Levels.FirstOrDefault(l => l.Id == ToLevelId)?.Name}.", students.Count);
         }
 
+        public async Task<GeneralResponse> MovStdToCenter(MovStdToCenter request)
+        {
+           var stds=_context.Students
+                .Include(s => s.StdCenters)
+                .Where(s => s.StdCenters.Any(x=>x.IsActive) && s.StdCenters.FirstOrDefault(sc => sc.IsActive).CenterId == request.FromCenterId &&
+                s.LevelId == request.LevelId && (request.GenderId.HasValue ? s.GenderId == request.GenderId : true) &&
+              (request.Section.HasValue ? s.SectionNo == request.Section : true)).ToList();
+
+            foreach (var std in stds)
+            {
+                var activeStdCenter = std.StdCenters.FirstOrDefault(sc => sc.IsActive);
+                if (activeStdCenter != null)
+                {
+                    activeStdCenter.IsActive = false;
+                    activeStdCenter.ToDate = DateOnly.FromDateTime(DateTime.Now);
+                }
+                var newStdCenter = new StdCenter
+                {
+                    StudentId = std.Id,
+                    CenterId = request.ToCenterId,
+                    IsActive = true,
+                    FromDate = DateOnly.FromDateTime(DateTime.Now)
+                };
+                _context.StdCenters.Add(newStdCenter);
+            }
+            _context.SaveChanges();
+            string fromCenterName = _context.Centers.FirstOrDefault(c => c.Id == request.FromCenterId)?.Name ?? "المركز السابق";
+            string toCenterName = _context.Centers.FirstOrDefault(c => c.Id == request.ToCenterId)?.Name ?? "المركز الجديد";
+            string levelName = _context.LookupValues.FirstOrDefault(l => l.Id == request.LevelId)?.Name ?? "الصف ";
+            string message = $"تم نقل {stds.Count} الطلاب من {fromCenterName} إلى {toCenterName} في الصف {levelName}.";
+            return new GeneralResponse(true, message, stds.Count);
+        }
     }
  }

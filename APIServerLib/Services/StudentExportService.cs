@@ -203,10 +203,13 @@ public static class StudentExportService
     }
     public static byte[] GenerateExcelForAdmin(List<Student> students, string sheetTitle, string centerName ,List<AppSetting> appSettings=null)
     {
-        string AreaName = appSettings.FirstOrDefault(x => x.SettingKey == RequiredAppSettings.AreaNameAr)?.SettingValueStr;
-
-        //get year begin from app settings
-        var YearBeginStr = appSettings.FirstOrDefault(x => x.SettingKey == RequiredAppSettings.YearBegin)?.SettingValueStr;
+        string AreaName = "";
+        string YearBeginStr = "19-09-2026";
+        if (appSettings is not null)
+        {
+            AreaName = appSettings.FirstOrDefault(x => x.SettingKey == RequiredAppSettings.AreaNameAr)?.SettingValueStr ?? "";
+             YearBeginStr = appSettings.FirstOrDefault(x => x.SettingKey == RequiredAppSettings.YearBegin)?.SettingValueStr;
+        }
         DateOnly YearBegin;
         if (string.IsNullOrEmpty(YearBeginStr))
             YearBegin = new DateOnly(2026, 09, 19);

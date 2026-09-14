@@ -2,6 +2,7 @@
 using APIServerLib.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOs;
+using SharedLib.DTOs.Centers;
 using SharedLib.Entities;
 using SharedLib.Responses;
 
@@ -142,6 +143,36 @@ namespace APIServerLib.Repositories.Implemntations
         {
             var DaysOfWorks = await _context.Centers.Select(c => c.DaysOfWeek).Distinct().ToListAsync();
             return DaysOfWorks;
+        }
+
+        public Task<List<CentersInfo>> GetCentersWithLevelsAndSectionsAsync()
+        {
+           List<CentersInfo> centersInfoList = new List<CentersInfo>();
+            var centers = _context.Centers.AsNoTracking().ToList();
+            foreach (var center in centers)
+            {
+                var centerInfo = new CentersInfo
+                {
+                    CenterId = center.Id,
+                    CenterArName = center.Name,
+                };
+
+                List<CenterLevels> CenLev = _context.Students.Where(s => s.StdCenters.FirstOrDefault(x => x.IsActive == true).CenterId == center.Id)?
+                    .Select(s =>new CenterLevels { LevelId= s.LevelId,LevelName=s.Level.Name })
+                    .Distinct()
+                    .ToList();
+                foreach(var level in CenLev)
+                {
+                    level.Sections = _context.Students.Where(s => s.LevelId == level.LevelId && s.StdCenters.FirstOrDefault(x => x.IsActive == true).CenterId == center.Id)
+                        .Select(s => s.SectionNo)
+                        .Distinct()
+                        .ToList();
+                }
+                centerInfo.Levels = CenLev;
+                centersInfoList.Add(centerInfo);
+            }
+
+            return Task.FromResult(centersInfoList);
         }
     }
 }

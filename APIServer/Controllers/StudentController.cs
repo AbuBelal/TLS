@@ -223,9 +223,9 @@ namespace APIServer.Controllers
 
             var centerName = await GetCenterNameAsync(centerId);
             var students = await _studentRepository.GetAllByCenterAsync(centerId);
-
+            var AppSettings = await _appSettingsRepository.GetAllAsync();
             var bytes = StudentExportService.GenerateExcelForAdmin(
-                students, "جميع الطلاب", centerName);
+                students, "جميع الطلاب", centerName, AppSettings.ToList());
 
             var fileName = $"جميع_طلاب_{centerName}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
             await _auditLogService.LogAsync("Read", "Student", "", $"تصدير جميع الطلاب: {fileName}");
@@ -273,6 +273,14 @@ namespace APIServer.Controllers
         {
             var response = await _studentRepository.PromotionStudentsAsync(request.FromLevelId , request.ToLevelId);
             await _auditLogService.LogAsync("Update", "Student", "", $"ترقية الطلاب من المستوى {request.FromLevelId} إلى {request.ToLevelId}");
+            return Ok(response);
+        }
+
+        [HttpPost("MoveToCenter")]
+        public async Task<ActionResult<GeneralResponse>> MoveStudentsToCenter(MovStdToCenter request)
+        {
+            var response = await _studentRepository.MovStdToCenter(request);
+            await _auditLogService.LogAsync("Update", "Student", "", $"نقل الطلاب إلى المركز {request.ToCenterId}");
             return Ok(response);
         }
 

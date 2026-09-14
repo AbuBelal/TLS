@@ -91,6 +91,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetStdInfoFromEmis = "/api/Emis/fetch-Std-Info";
             public const string GetStdCounts = PriorUrl + "/StdCounts";
             public const string Promotion = PriorUrl + "/Promote";
+            public const string MoveToCenter = PriorUrl + "/MoveToCenter";
 
         }
         public static class Center
@@ -103,6 +104,7 @@ namespace TLSClientSharedLib.Helpers
             public const string DeleteById = PriorUrl + "/{id}";
             public const string MyCenter = PriorUrl + "/my-center";
            public  const string GetDaysOfWorks = PriorUrl + "/Get-Days-of-Works";
+            public const string GetCentersWithLevelsAndSections = PriorUrl + "/GetCentersWithLevelsAndSectionsAsync";
 
         }
         public static class Reports

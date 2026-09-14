@@ -1,6 +1,7 @@
 // TLSClientSharedLib\Services\Apis\ICenterApi.cs
 using Refit;
 using SharedLib.DTOs;
+using SharedLib.DTOs.Centers;
 using SharedLib.Entities;
 using SharedLib.Responses;
 using System.Collections.Generic;
@@ -34,5 +35,8 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Get(ApiUrls.Center.GetDaysOfWorks)]
         Task<List<string?>> GetDaysOfWorks();
+
+        [Get(ApiUrls.Center.GetCentersWithLevelsAndSections)]
+        Task<List<CentersInfo>> GetCentersWithLevelsAndSections();
     }
 }
