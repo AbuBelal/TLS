@@ -92,6 +92,7 @@ namespace TLSClientSharedLib.Helpers
             public const string GetStdCounts = PriorUrl + "/StdCounts";
             public const string Promotion = PriorUrl + "/Promote";
             public const string MoveToCenter = PriorUrl + "/MoveToCenter";
+            public const string StdCountByCenterLevelSecGender = PriorUrl + "/StdCountByCenterLevelSecGender";
 
         }
         public static class Center

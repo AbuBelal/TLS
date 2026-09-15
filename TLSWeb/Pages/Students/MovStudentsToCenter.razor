@@ -104,11 +104,11 @@
         }
 
         <div class="d-flex justify-content-start gap-2">
-            <button class="btn btn-primary px-4" @onclick="TransferAsync" disabled="@(!CanTransfer || isLoading)">
+            <button class="btn btn-primary px-4" @onclick="ShowConfirmationDialog" disabled="@(!CanTransfer || isLoading)">
                 @if (isLoading)
                 {
                     <span class="spinner-border spinner-border-sm me-1"></span>
-                    <span>جاري الحفظ...</span>
+                    <span>جاري النقل...</span>
                 }
                 else
                 {
@@ -123,7 +123,9 @@
     }
 </div>
 
-    
+<DialogMsg IsOpen="@isDialogOpen" Title="تأكيد النقل" Message="@dialogMessage"
+           OnConfirmed="ConfirmDialog" OnCancel="CancelDialog" DialogType="warning"
+           Icon="bi-exclamation-triangle" />
 
 @code {
     private List<CentersInfo> AllCenterInfo = new();
@@ -137,15 +139,17 @@
     private short SelectedSectionId { get; set; }
     private long SelectedGenderId { get; set; }
     private bool isLoading = false;
+    private bool isDialogOpen = false;
     private string? ErrorMessage { get; set; }
+    private string? dialogMessage { get; set; }
 
     private bool CanTransfer =>
         SelectedCenterIdFrom > 0 &&
         SelectedCenterIdTo > 0 &&
         SelectedCenterIdFrom != SelectedCenterIdTo &&
         SelectedLevelId > 0 &&
-        SelectedSectionId > 0 &&
-        SelectedGenderId > 0;
+        SelectedSectionId > 0;
+    // && SelectedGenderId > 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -189,9 +193,9 @@
         MovStdToCenter request=new ();
         request.FromCenterId = SelectedCenterIdFrom;
         request.ToCenterId = SelectedCenterIdTo;
-        request.GenderId = SelectedGenderId;
         request.LevelId = SelectedLevelId;
         request.Section = SelectedSectionId;
+        request.GenderId = SelectedGenderId;
 
         var res =await StudentApi.MoveToCenter(request);
         if(res.Success)
@@ -199,6 +203,38 @@
             MudSnackbar.Add(res.Message , Severity.Success);
         }
         isLoading = false;
+    }
+    private async Task ShowConfirmationDialog()
+    {
+        MovStdToCenter request = new();
+        request.FromCenterId = SelectedCenterIdFrom;
+        request.ToCenterId = SelectedCenterIdTo;
+        request.LevelId = SelectedLevelId;
+        request.Section = SelectedSectionId;
+        request.GenderId = SelectedGenderId;
+
+        var StdCount = await StudentApi.StdCountByCenterLevelSecGender(request);
+
+        string fromCenterName = AllCenterInfo.FirstOrDefault(c => c.CenterId == SelectedCenterIdFrom)?.CenterArName ?? "المركز المصدر";
+        string toCenterName = AllCenterInfo.FirstOrDefault(c => c.CenterId == SelectedCenterIdTo)?.CenterArName ?? "المركز الهدف";
+        string levelName = FromCenterLevels.FirstOrDefault(l => l.LevelId == SelectedLevelId)?.LevelName ?? "الصف";
+        string sectionName = SelectedSectionId > 0 ? SelectedSectionId.ToString() : "الشعبة";
+        string genderName = FromCenterGenders.FirstOrDefault(g => g.Id == SelectedGenderId)?.Name ?? "جميع الطلاب";
+        dialogMessage = $"هل أنت متأكد من نقل الطلاب وعددهم ({StdCount}) من {fromCenterName}، الصف / {levelName}، الشعبة  / {sectionName}، الجنس / {genderName} ، إلى / {toCenterName}؟";
+        // dialogMessage = $"هل أنت متأكد من نقل الطلاب من المركز {AllCenterInfo.FirstOrDefault(c => c.CenterId == SelectedCenterIdFrom)?.CenterArName} إلى المركز {AllCenterInfo.FirstOrDefault(c => c.CenterId == SelectedCenterIdTo)?.CenterArName}؟";
+        
+        isDialogOpen = true;
+    }
+
+    private void CancelDialog()
+    {
+        isDialogOpen = false;
+        StateHasChanged();
+    }
+    private async void ConfirmDialog()
+    {
+        await TransferAsync();
+        isDialogOpen = false;
     }
 
     private void ResetForm()

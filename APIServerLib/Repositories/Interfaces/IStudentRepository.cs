@@ -29,5 +29,6 @@ namespace APIServerLib.Repositories.Interfaces
         Task<GeneralResponse> PromotionStudentsAsync(long FromLevelId, long ToLevelId);
 
         Task<GeneralResponse> MovStdToCenter(MovStdToCenter request);
+        Task<long> StdCountByCenterLevelSecGender(MovStdToCenter request);
     }
 }

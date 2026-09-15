@@ -283,6 +283,13 @@ namespace APIServer.Controllers
             await _auditLogService.LogAsync("Update", "Student", "", $"نقل الطلاب إلى المركز {request.ToCenterId}");
             return Ok(response);
         }
+        [HttpGet("StdCountByCenterLevelSecGender")]
+        public async Task<ActionResult<long>> GetStdCountByCenterLevelSecGender([FromQuery] MovStdToCenter request)
+        {
+            var result = await _studentRepository.StdCountByCenterLevelSecGender(request);
+            await _auditLogService.LogAsync("Read", "Student", "", $"قراءة عدد الطلاب حسب المركز والمستوى والقسم والجنس");
+            return Ok(result);
+        }
 
         #region std counts
         [HttpPost("StdCounts")]

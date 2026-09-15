@@ -563,7 +563,7 @@ namespace APIServerLib.Repositories.Implemntations
            var stds=_context.Students
                 .Include(s => s.StdCenters)
                 .Where(s => s.StdCenters.Any(x=>x.IsActive) && s.StdCenters.FirstOrDefault(sc => sc.IsActive).CenterId == request.FromCenterId &&
-                s.LevelId == request.LevelId && (request.GenderId.HasValue ? s.GenderId == request.GenderId : true) &&
+                s.LevelId == request.LevelId && (request.GenderId>0 ? s.GenderId == request.GenderId : true) &&
               (request.Section.HasValue ? s.SectionNo == request.Section : true)).ToList();
 
             foreach (var std in stds)
@@ -589,6 +589,17 @@ namespace APIServerLib.Repositories.Implemntations
             string levelName = _context.LookupValues.FirstOrDefault(l => l.Id == request.LevelId)?.Name ?? "الصف ";
             string message = $"تم نقل {stds.Count} الطلاب من {fromCenterName} إلى {toCenterName} في الصف {levelName}.";
             return new GeneralResponse(true, message, stds.Count);
+        }
+
+        public async Task<long> StdCountByCenterLevelSecGender(MovStdToCenter request)
+        {
+            var stdsCount = 
+                await _context.Students
+                 .CountAsync(s => s.StdCenters.Any(x => x.IsActive) && s.StdCenters.FirstOrDefault(sc => sc.IsActive).CenterId == request.FromCenterId &&
+                 s.LevelId == request.LevelId && (request.GenderId > 0 ? s.GenderId == request.GenderId : true) &&
+               (request.Section.HasValue ? s.SectionNo == request.Section : true));
+
+            return  stdsCount;
         }
     }
  }

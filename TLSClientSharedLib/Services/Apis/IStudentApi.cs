@@ -60,5 +60,7 @@ namespace TLSClientSharedLib.Services.Apis
 
         [Post(ApiUrls.Student.MoveToCenter)]
         Task<GeneralResponse> MoveToCenter(MovStdToCenter request);
+        [Get(ApiUrls.Student.StdCountByCenterLevelSecGender)]
+        Task<long> StdCountByCenterLevelSecGender(MovStdToCenter request);
     }
 }
